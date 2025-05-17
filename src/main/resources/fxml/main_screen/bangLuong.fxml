@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import java.net.URL?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.BangLuongUI">
+   <children>
+   <!--phan dau-->
+      <AnchorPane layoutY="25.0" prefHeight="150.0" prefWidth="1300.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Text layoutX="14.0" layoutY="57.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Bảng lương">
+               <font>
+                  <Font name="Open Sans Semibold" size="40.0" />
+               </font>
+            </Text>
+
+            <!--nut tao bang luong-->
+            <Button fx:id="btnTaoBangLuong" layoutX="14.0" layoutY="91.0" mnemonicParsing="false" onAction="#taoBangLuong" prefHeight="45.0" prefWidth="197.0" styleClass="btn" text="Tạo bảng lương" textFill="WHITE" AnchorPane.leftAnchor="14.0">
+               <font>
+                  <Font name="Open Sans Semibold" size="20.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+
+            <!--nut loc thoi gian-->
+            <HBox alignment="CENTER_LEFT" layoutX="867.0" layoutY="93.0" prefHeight="43.0" prefWidth="419.0" spacing="10.0">
+               <children>
+                  <Label prefHeight="48.0" prefWidth="95.0" text="Thời gian:">
+                     <font>
+                        <Font name="Open Sans Semibold" size="20.0" />
+                     </font>
+                  </Label>
+
+                  <ComboBox fx:id="thangCombobox" prefHeight="41.0" prefWidth="120.0" promptText="Tháng">
+                     <styleClass>
+                        <String fx:value="font-size-18" />
+                        <String fx:value="font-family" />
+                        <String fx:value="combobox" />
+                     </styleClass>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ComboBox>
+
+                  <ComboBox fx:id="namCombobox" prefHeight="41.0" prefWidth="113.0" promptText="Năm">
+                     <styleClass>
+                        <String fx:value="font-size-18" />
+                        <String fx:value="font-family" />
+                        <String fx:value="combobox" />
+                     </styleClass>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ComboBox>
+
+                  <Button fx:id="btnLoc" mnemonicParsing="false" onAction="#loc" prefHeight="43.0" prefWidth="61.0" styleClass="btn" text="Lọc" textFill="WHITE">
+                     <font>
+                        <Font name="Open Sans Semibold" size="20.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+         <styleClass>
+            <String fx:value="radius" />
+            <String fx:value="white-bg" />
+            <String fx:value="shadow" />
+         </styleClass>
+      </AnchorPane>
+      <Separator layoutX="3.0" layoutY="162.0" prefHeight="15.0" prefWidth="1290.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="7.0" />
+      <AnchorPane layoutY="185.0" prefHeight="715.0" prefWidth="1300.0">
+         <children>
+            <VBox prefHeight="715.0" prefWidth="1300.0" spacing="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+               <children>
+      
+               <!--bang du lieu-->
+                  <TableView fx:id="tableViewBangLuong" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="635.0" prefWidth="1300.0">
+                    <columns>
+                      <TableColumn fx:id="colMaBangLuong" editable="false" prefWidth="106.0" reorderable="false" resizable="false" sortable="false" text="Mã bảng lương" />
+                        <TableColumn fx:id="colHoTen" editable="false" prefWidth="164.0" reorderable="false" resizable="false" sortable="false" text="Họ tên" />
+                        <TableColumn fx:id="colThang" editable="false" prefWidth="76.0" reorderable="false" resizable="false" sortable="false" text="Tháng" />
+                        <TableColumn fx:id="colNgayCong" editable="false" prefWidth="74.0" reorderable="false" resizable="false" sortable="false" text="Ngày công" />
+                        <TableColumn fx:id="colNghiCoCong" editable="false" prefWidth="92.0" reorderable="false" resizable="false" sortable="false" text="Nghỉ có công" />
+                        <TableColumn fx:id="colNghiKhongCong" editable="false" prefWidth="113.0" reorderable="false" resizable="false" sortable="false" text="Nghỉ không công" />
+                        <TableColumn fx:id="colThuongDoanhThu" editable="false" prefWidth="129.0" reorderable="false" resizable="false" sortable="false" text="Thưởng doanh thu" />
+                        <TableColumn fx:id="colLuongThucNhan" editable="false" prefWidth="132.0" reorderable="false" resizable="false" sortable="false" text="Lương thực nhận" />
+                        <TableColumn fx:id="colGhiChu" prefWidth="334.0" reorderable="false" resizable="false" text="Ghi chú" />
+                        <TableColumn fx:id="colHanhDong" editable="false" prefWidth="78.0" reorderable="false" resizable="false" sortable="false" />
+                    </columns>
+                  </TableView>
+      
+                  <Pagination fx:id="phanTrang" maxPageIndicatorCount="5" pageCount="30" prefHeight="64.0" prefWidth="1300.0">
+                     <styleClass>
+                        <String fx:value="font-family" />
+                        <String fx:value="font-size-20" />
+                     </styleClass>
+                  </Pagination>
+               </children>
+            </VBox>
+         </children>
+      </AnchorPane>
+   </children>
+   <stylesheets>
+      <URL value="@../css/bangLuongCSS.css" />
+      <URL value="@../css/buttons.css" />
+   </stylesheets>
+</AnchorPane>

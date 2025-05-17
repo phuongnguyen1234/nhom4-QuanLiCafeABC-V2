@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.DangNhapUI">
+   <children>
+      <AnchorPane prefHeight="600.0" prefWidth="400.0" styleClass="gradient" stylesheets="@dangNhapCSS.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         
+         <!--phan ben trai-->
+         <children>
+            <ImageView fitHeight="220.0" fitWidth="218.0" layoutX="91.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../icons/coffee-cup.png" />
+               </image>
+            </ImageView>
+            <Text fill="WHITE" layoutX="86.0" layoutY="371.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Quản lí cà phê ABC">
+               <font>
+                  <Font name="Open Sans Semibold" size="25.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+
+      <!--phan ben phai-->
+      <AnchorPane layoutX="400.0" prefHeight="600.0" prefWidth="400.0" style="-fx-background-color: #FFFFFF;" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Text fill="#286155" layoutX="127.0" layoutY="220.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Đăng nhập">
+               <font>
+                  <Font name="Open Sans Semibold" size="28.0" />
+               </font>
+            </Text>
+
+            <!--text field email-->
+            <TextField fx:id="emailTextField" layoutX="25.0" layoutY="243.0" prefHeight="40.0" prefWidth="350.0" promptText="Email đăng nhập" styleClass="textfield" stylesheets="@dangNhapCSS.css">
+               <font>
+                  <Font name="Open Sans" size="14.0" />
+               </font>
+            </TextField>
+
+            <!--password field-->
+            <PasswordField fx:id="matKhauTextField" layoutX="25.0" layoutY="294.0" prefHeight="40.0" prefWidth="350.0" promptText="Mật khẩu" styleClass="textfield" stylesheets="@dangNhapCSS.css">
+               <font>
+                  <Font name="Open Sans" size="14.0" />
+               </font>
+            </PasswordField>
+
+            <!--nut dang nhap-->
+            <Button fx:id="btnDangNhap" layoutX="25.0" layoutY="346.0" mnemonicParsing="false" onAction="#kichNutDangNhap" prefHeight="40.0" prefWidth="350.0" styleClass="login-btn" stylesheets="@dangNhapCSS.css" text="Đăng nhập" textFill="WHITE">
+               <font>
+                  <Font name="Open Sans Semibold" size="18.0" />
+               </font>
+            </Button>  
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

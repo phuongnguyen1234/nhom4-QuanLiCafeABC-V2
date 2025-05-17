@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import java.net.URL?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="900.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.QuanLiThucDonUI">
+   <children>
+      <TableView fx:id="tableViewMon" layoutX="14.0" layoutY="183.0" prefHeight="635.0" prefWidth="1280.0" AnchorPane.bottomAnchor="82.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="183.0">
+         <columns>
+            <TableColumn fx:id="colSTT" editable="false" prefWidth="49.0" resizable="false" sortable="false" text="STT" />
+            <TableColumn fx:id="colMaMon" prefWidth="174.0" resizable="false" text="Mã món" />
+            <TableColumn fx:id="colTenMon" prefWidth="448.0" resizable="false" text="Tên món" />
+            <TableColumn fx:id="colTrangThai" prefWidth="130.0" resizable="false" text="Trạng thái" />
+            <TableColumn fx:id="colDonGia" prefWidth="134.0" resizable="false" text="Đơn giá" />
+            <TableColumn fx:id="colDanhMuc" prefWidth="165.0" resizable="false" text="Danh mục" />
+            <TableColumn fx:id="colHanhDong" maxWidth="1.7976931348623157E308" prefWidth="178.0" resizable="false" />
+         </columns>
+      </TableView>
+      <AnchorPane prefHeight="150.0" prefWidth="1300.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <Text layoutX="14.0" layoutY="57.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Quản lí thực đơn">
+               <font>
+                  <Font name="Open Sans Semibold" size="40.0" />
+               </font>
+            </Text>
+            <HBox alignment="CENTER" layoutX="810.0" layoutY="93.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">
+               <children>
+                  <Label text="Tìm theo tên:  ">
+                     <font>
+                        <Font name="Open Sans Semibold" size="20.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="timMonTheoTenTextField" prefHeight="45.0" prefWidth="278.0" promptText="Espresso">
+                     <font>
+                        <Font name="Open Sans" size="18.0" />
+                     </font>
+                  </TextField>
+                  <Button fx:id="btnTimKiem" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#timKiem" prefHeight="45.0" prefWidth="45.0" styleClass="btn">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <graphic>
+                        <ImageView fitHeight="29.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../icons/magnifying-glass.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+               </children>
+            </HBox>
+            <HBox layoutX="14.0" layoutY="93.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0">
+               <children>
+                  <Button fx:id="btnDanhMuc" mnemonicParsing="false" onAction="#danhMuc" prefHeight="45.0" prefWidth="150.0" styleClass="btn" text="Danh mục" textFill="WHITE">
+                     <font>
+                        <Font name="Open Sans Semibold" size="18.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnThemMon" mnemonicParsing="false" onAction="#themMon" prefHeight="45.0" prefWidth="150.0" styleClass="btn" text="Thêm món" textFill="WHITE">
+                     <font>
+                        <Font name="Open Sans Semibold" size="18.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+         <styleClass>
+            <String fx:value="radius" />
+            <String fx:value="white-bg" />
+            <String fx:value="shadow" />
+         </styleClass>
+      </AnchorPane>
+      <Separator layoutX="9.0" layoutY="161.0" prefHeight="15.0" prefWidth="1290.0" />
+      <Pagination fx:id="phanTrang" layoutX="515.0" layoutY="830.0" maxPageIndicatorCount="5" pageCount="30" prefHeight="60.0" prefWidth="271.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="515.0" AnchorPane.rightAnchor="514.0">
+         <styleClass>
+            <String fx:value="font-size-20" />
+            <String fx:value="font-family" />
+         </styleClass>
+      </Pagination>
+      <Button fx:id="btnQuayLai" layoutX="1140.0" layoutY="837.0" mnemonicParsing="false" onAction="#quayLai" prefHeight="45.0" prefWidth="150.0" styleClass="btn" text="Quay lại" textFill="WHITE" AnchorPane.bottomAnchor="18.0" AnchorPane.rightAnchor="10.0">
+         <font>
+            <Font name="Open Sans Semibold" size="18.0" />
+         </font>
+      </Button>
+   </children>
+   <stylesheets>
+      <URL value="@../css/thucDonCSS.css" />
+      <URL value="@../css/buttons.css" />
+   </stylesheets>
+</AnchorPane>
