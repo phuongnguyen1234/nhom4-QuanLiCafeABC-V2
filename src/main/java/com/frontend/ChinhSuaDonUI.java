@@ -1,14 +1,12 @@
 package com.frontend;
 
-import java.io.ByteArrayInputStream;
-
 import com.backend.dto.MonTrongDonDTO;
+import com.backend.utils.ImageUtils;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 
@@ -53,7 +51,7 @@ public class ChinhSuaDonUI {
     private void loadChinhSuaDonData() {
         if (mon != null) {
             tenMonText.setText("Tên: " + mon.getTenMon());
-            anhMinhHoaImageView.setImage(new Image(new ByteArrayInputStream(mon.getAnhMinhHoa())));
+            anhMinhHoaImageView.setImage(ImageUtils.getMonImage(mon.getMaMon()));
             donGiaText.setText("Đơn giá: " + mon.getDonGia());
             soLuongSpinner.getValueFactory().setValue(mon.getSoLuong());
             yeuCauKhacTextArea.setText(mon.getYeuCauKhac());

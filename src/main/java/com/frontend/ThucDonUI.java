@@ -1,8 +1,6 @@
 package com.frontend;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -107,7 +105,7 @@ public class ThucDonUI {
 
     List<DanhMucMonKhongAnhDTO> danhMucList = new ArrayList<>();
 
-    private final DanhMucMonKhongAnhDTO danhMucTatCa = new DanhMucMonKhongAnhDTO(0, "Tất cả", "", new ArrayList<>());
+    private final DanhMucMonKhongAnhDTO danhMucTatCa = new DanhMucMonKhongAnhDTO(0, "Tất cả", "", "", new ArrayList<>());
 
     private TrangChuUI trangChuUI;
 
@@ -331,7 +329,6 @@ danhMucCombobox.setOnAction(event -> {
         vBoxThucDon.getChildren().clear();
         scrollPaneThucDon.setFitToHeight(false);
 
-        HttpClient httpClient = HttpClient.newBuilder().build();
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         for (DanhMucMonKhongAnhDTO danhMuc : danhMucList) {
@@ -370,8 +367,7 @@ danhMucCombobox.setOnAction(event -> {
 
                 // Tải ảnh bất đồng bộ
                 executor.submit(() -> {
-                    InputStream inputStream = new ByteArrayInputStream(ImageUtils.getMonImageByID(mon.getMaMon()));
-                    Image image = new Image(inputStream);
+                    Image image = ImageUtils.getMonImage(mon.getMaMon());
                     Platform.runLater(() -> imageView.setImage(image));
                 });
 

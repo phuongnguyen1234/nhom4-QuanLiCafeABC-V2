@@ -15,9 +15,10 @@
          <columns>
             <TableColumn fx:id="colSTT" editable="false" prefWidth="49.0" resizable="false" sortable="false" text="STT" />
             <TableColumn fx:id="colMaDanhMuc" prefWidth="124.0" resizable="false" text="Mã danh mục" />
-            <TableColumn fx:id="colTenDanhMuc" prefWidth="247.0" resizable="false" text="Tên danh mục" />
+            <TableColumn fx:id="colTenDanhMuc" prefWidth="201.0" resizable="false" text="Tên danh mục" />
+            <TableColumn fx:id="colLoai" prefWidth="121.0" text="Loại" />
             <TableColumn fx:id="colTrangThai" prefWidth="140.0" resizable="false" text="Trạng thái" />
-            <TableColumn fx:id="colHanhDong" prefWidth="218.0" resizable="false" />
+            <TableColumn fx:id="colHanhDong" prefWidth="143.0" resizable="false" />
          </columns>
       </TableView>
       <HBox layoutX="275.0" layoutY="541.0" spacing="10.0">

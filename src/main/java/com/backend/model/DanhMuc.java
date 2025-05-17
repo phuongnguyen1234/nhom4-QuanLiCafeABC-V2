@@ -22,6 +22,9 @@ public class DanhMuc {
     @Column(name = "TenDanhMuc")
     private String tenDanhMuc;
 
+    @Column(name = "Loai")
+    private String loai;
+
     @Column(name = "TrangThai")
     private String trangThai;
 
@@ -31,9 +34,10 @@ public class DanhMuc {
 
     public DanhMuc(){}
 
-    public DanhMuc(int maDanhMuc, String tenDanhMuc, String trangThai, List<Mon> list) {
+    public DanhMuc(int maDanhMuc, String tenDanhMuc, String loai, String trangThai, List<Mon> list) {
         this.maDanhMuc = maDanhMuc;
         this.tenDanhMuc = tenDanhMuc;
+        this.loai = loai;
         this.trangThai = trangThai;
         this.monList = list;
         for (Mon mon : list) {
@@ -55,6 +59,14 @@ public class DanhMuc {
 
     public void setTenDanhMuc(String tenDanhMuc) {
         this.tenDanhMuc = tenDanhMuc;
+    }
+
+    public String getLoai() {
+        return loai;
+    }
+
+    public void setLoai(String loai) {
+        this.loai = loai;
     }
 
     public String getTrangThai() {

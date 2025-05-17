@@ -18,7 +18,7 @@
       <VBox layoutX="84.0" layoutY="99.0" prefHeight="340.0" prefWidth="500.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
 
-            <Text fx:id="tenCaPheText" strokeType="OUTSIDE" strokeWidth="0.0" text="Tên:" wrappingWidth="287.03515625">
+            <Text fx:id="tenMonText" strokeType="OUTSIDE" strokeWidth="0.0" text="Tên:" wrappingWidth="287.03515625">
                <font>
                   <Font name="Open Sans Semibold" size="20.0" />
                </font>

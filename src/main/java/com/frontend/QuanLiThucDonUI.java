@@ -7,8 +7,6 @@ import com.backend.dto.DanhMucKhongMonDTO;
 import com.backend.dto.DanhMucMonKhongAnhDTO;
 import com.backend.dto.MonKhongAnhDTO;
 import com.backend.dto.MonQLy;
-import com.backend.model.DanhMuc;
-import com.backend.model.Mon;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -170,6 +168,7 @@ public class QuanLiThucDonUI {
                 DanhMucKhongMonDTO dto = new DanhMucKhongMonDTO();
                 dto.setMaDanhMuc(danhMuc.getMaDanhMuc());
                 dto.setTenDanhMuc(danhMuc.getTenDanhMuc());
+                dto.setLoai(danhMuc.getLoai());
                 dto.setTrangThai(danhMuc.getTrangThai());
                 list.add(dto);
             }
@@ -202,6 +201,7 @@ public class QuanLiThucDonUI {
                 DanhMucKhongMonDTO dto = new DanhMucKhongMonDTO();
                 dto.setMaDanhMuc(danhMuc.getMaDanhMuc());
                 dto.setTenDanhMuc(danhMuc.getTenDanhMuc());
+                dto.setLoai(danhMuc.getLoai());
                 dto.setTrangThai(danhMuc.getTrangThai());
                 list.add(dto);
             }

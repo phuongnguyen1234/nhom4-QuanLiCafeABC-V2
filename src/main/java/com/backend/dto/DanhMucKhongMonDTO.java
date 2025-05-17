@@ -3,13 +3,15 @@ package com.backend.dto;
 public class DanhMucKhongMonDTO {
     private int maDanhMuc;
     private String tenDanhMuc;
+    private String loai;
     private String trangThai;
 
     public DanhMucKhongMonDTO(){}
 
-    public DanhMucKhongMonDTO(int maDanhMuc, String tenDanhMuc, String trangThai) {
+    public DanhMucKhongMonDTO(int maDanhMuc, String tenDanhMuc, String loai, String trangThai) {
         this.maDanhMuc = maDanhMuc;
         this.tenDanhMuc = tenDanhMuc;
+        this.loai = loai;
         this.trangThai = trangThai;
     }
 
@@ -27,6 +29,14 @@ public class DanhMucKhongMonDTO {
 
     public void setTenDanhMuc(String tenDanhMuc) {
         this.tenDanhMuc = tenDanhMuc;
+    }
+
+    public String getLoai() {
+        return loai;
+    }
+
+    public void setLoai(String loai) {
+        this.loai = loai;
     }
 
     public String getTrangThai() {

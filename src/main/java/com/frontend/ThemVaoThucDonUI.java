@@ -12,10 +12,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import com.backend.dto.DanhMucKhongMonDTO;
-import com.backend.dto.MonTrongDonDTO;
 import com.backend.dto.MonQLy;
-import com.backend.model.DanhMuc;
-import com.backend.model.Mon;
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,7 +21,6 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
@@ -48,6 +44,9 @@ public class ThemVaoThucDonUI {
 
     public void setDanhMucList(List<DanhMucKhongMonDTO> danhMucList) {
         this.danhMucList = danhMucList;
+
+        //lay cac danh muc co trang thai la Khong hoat dong
+        danhMucList.removeIf(danhMuc -> danhMuc.getTrangThai().equals("Không hoạt động"));
         ObservableList<DanhMucKhongMonDTO> observableDanhMucList = FXCollections.observableArrayList(danhMucList);
         danhMucCombobox.setItems(observableDanhMucList);
     }
@@ -142,14 +141,7 @@ public class ThemVaoThucDonUI {
 
         createRequest(mon);
 
-
-        // Thông báo thành công
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Thành công");
-        alert.setHeaderText(null);
-        alert.setContentText("Thêm cà phê vào thực đơn thành công!");
-        alert.showAndWait();
-
+        MessageUtils.showInfoMessage("Thêm món vào thực đơn thành công!");
         // Ẩn cửa sổ sau khi cập nhật
         tenMonTextField.getScene().getWindow().hide();
     }

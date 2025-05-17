@@ -5,15 +5,17 @@ import java.util.List;
 public class DanhMucMonKhongAnhDTO {
     private int maDanhMuc;
     private String tenDanhMuc;
+    private String loai;
     private String trangThai;
     private List<MonKhongAnhDTO> monList;
 
     public DanhMucMonKhongAnhDTO() {
     }
 
-    public DanhMucMonKhongAnhDTO(int maDanhMuc, String tenDanhMuc, String trangThai, List<MonKhongAnhDTO> monList) {
+    public DanhMucMonKhongAnhDTO(int maDanhMuc, String tenDanhMuc, String loai, String trangThai, List<MonKhongAnhDTO> monList) {
         this.maDanhMuc = maDanhMuc;
         this.tenDanhMuc = tenDanhMuc;
+        this.loai = loai;
         this.trangThai = trangThai;
         this.monList = monList;
     }
@@ -32,6 +34,14 @@ public class DanhMucMonKhongAnhDTO {
 
     public void setTenDanhMuc(String tenDanhMuc) {
         this.tenDanhMuc = tenDanhMuc;
+    }
+
+    public String getLoai() {
+        return loai;
+    }
+
+    public void setLoai(String loai) {
+        this.loai = loai;
     }
 
     public String getTrangThai() {

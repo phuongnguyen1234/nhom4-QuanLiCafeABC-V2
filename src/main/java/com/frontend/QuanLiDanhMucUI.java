@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.backend.dto.DanhMucKhongMonDTO;
-import com.backend.model.DanhMuc;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TableCell;
@@ -16,6 +18,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class QuanLiDanhMucUI {
     @FXML
@@ -25,7 +29,7 @@ public class QuanLiDanhMucUI {
     private TableColumn<DanhMucKhongMonDTO, Integer> colSTT;
 
     @FXML
-    private TableColumn<DanhMucKhongMonDTO, String> colMaDanhMuc, colTenDanhMuc, colTrangThai;
+    private TableColumn<DanhMucKhongMonDTO, String> colMaDanhMuc, colTenDanhMuc, colLoai, colTrangThai;
 
     @FXML
     private TableColumn<DanhMucKhongMonDTO, Void> colHanhDong;
@@ -42,11 +46,16 @@ public class QuanLiDanhMucUI {
         list.addAll(listDanhMuc);
     }
 
+    public List<DanhMucKhongMonDTO> getListDanhMuc() {
+        return listDanhMuc;
+    }
+
     @FXML
     public void initialize(){
         // Liên kết các cột với thuộc tính của DanhMuc
         colMaDanhMuc.setCellValueFactory(new PropertyValueFactory<>("maDanhMuc"));
         colTenDanhMuc.setCellValueFactory(new PropertyValueFactory<>("tenDanhMuc"));
+        colLoai.setCellValueFactory(new PropertyValueFactory<>("loai"));
         colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
 
         tableViewDanhMuc.setItems(list);
@@ -88,10 +97,47 @@ public class QuanLiDanhMucUI {
     }
 
     @FXML
-    public void them(){}
+    public void them(){
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/themDanhMuc.fxml"));
+            Parent node = loader.load();
+
+            ThemDanhMucUI controller = loader.getController();
+            controller.setQuanLiDanhMucUI(this);
+
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL); // Chặn tương tác ngoài
+            dialogStage.setTitle("Thêm danh mục");
+            dialogStage.setScene(new Scene(node));
+            dialogStage.setResizable(false);
+
+            // Hiển thị và chờ người dùng đóng dialog
+            dialogStage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private void sua(DanhMucKhongMonDTO danhMucDTO) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/chinhSuaDanhMuc.fxml"));
+            Parent node = loader.load();
 
+            ChinhSuaDanhMucUI controller = loader.getController();
+            controller.setDanhMuc(danhMucDTO);
+            controller.setQuanLiDanhMucUI(this);
+
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL); // Chặn tương tác ngoài
+            dialogStage.setTitle("Sửa danh mục");
+            dialogStage.setScene(new Scene(node));
+            dialogStage.setResizable(false);
+
+            // Hiển thị và chờ người dùng đóng dialog
+            dialogStage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

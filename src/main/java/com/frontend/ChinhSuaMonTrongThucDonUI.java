@@ -54,6 +54,8 @@ public class ChinhSuaMonTrongThucDonUI {
 
     public void setDanhMucList(List<DanhMucMonKhongAnhDTO> danhMucList) {
         this.danhMucList = danhMucList;
+        // Lọc danh mục có trạng thái là "Không hoạt động"
+        danhMucList.removeIf(danhMuc -> danhMuc.getTrangThai().equals("Không hoạt động"));
         ObservableList<DanhMucMonKhongAnhDTO> observableDanhMucList = FXCollections.observableArrayList(danhMucList);
         danhMucCombobox.setItems(observableDanhMucList);
     }
@@ -111,7 +113,7 @@ public class ChinhSuaMonTrongThucDonUI {
             }            
     
             // Cập nhật ảnh minh họa
-            anhMinhHoaImageView.setImage(new Image(new ByteArrayInputStream(ImageUtils.getMonImageByID(mon.getMaMon()))));
+            anhMinhHoaImageView.setImage(ImageUtils.getMonImage(mon.getMaMon()));
             if (mon.getTrangThai().equals("Bán"))
                 trangThaiCheckBox.setSelected(true);
             else
@@ -180,12 +182,7 @@ public class ChinhSuaMonTrongThucDonUI {
         monUpdate.setAnhMinhHoa(mon.getAnhMinhHoa());
         updateRequest(monUpdate);
 
-        // Thông báo thành công
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Thành công");
-        alert.setHeaderText(null);
-        alert.setContentText("Cập nhật món thành công!");
-        alert.showAndWait();
+        MessageUtils.showInfoMessage("Cập nhật thành công!");
 
         // Ẩn cửa sổ sau khi cập nhật
         tenMonTextField.getScene().getWindow().hide();
