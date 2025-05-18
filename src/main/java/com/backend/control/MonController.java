@@ -48,9 +48,9 @@ public class MonController {
 
 
     @PatchMapping("/{maMon}")
-    public ResponseEntity<Mon> updateMon(@PathVariable String maMon, @RequestBody Mon mon) {
+    public ResponseEntity<Mon> updateMon(@RequestBody MonQLy mon) {
         try {
-            Mon updated = monService.partialUpdate(maMon, mon);
+            Mon updated = monService.updateMon(mon);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

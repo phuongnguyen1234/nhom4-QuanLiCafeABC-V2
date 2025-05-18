@@ -3,7 +3,6 @@ package com.frontend;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.backend.dto.DanhMucKhongMonDTO;
 import com.backend.dto.DanhMucMonKhongAnhDTO;
 import com.backend.dto.MonKhongAnhDTO;
 import com.backend.dto.MonQLy;
@@ -50,6 +49,8 @@ public class QuanLiThucDonUI {
 
     private TrangChuUI trangChuUI;
 
+    private QuanLiDanhMucUI quanLiDanhMucUI;
+
     public void setTrangChuUI(TrangChuUI trangChuUI) {
         this.trangChuUI = trangChuUI;
     }
@@ -58,8 +59,8 @@ public class QuanLiThucDonUI {
         return listDanhMuc;
     }
 
-    public QuanLiThucDonUI getQuanLiThucDonUI() {
-        return this;
+    public QuanLiDanhMucUI getQuanLiDanhMucUI() {
+        return this.quanLiDanhMucUI;
     }
 
     @FXML
@@ -138,7 +139,6 @@ public class QuanLiThucDonUI {
             Parent node = loader.load();
 
             ChinhSuaMonTrongThucDonUI controller = loader.getController();
-            controller.setDanhMucList(listDanhMuc);
             controller.setMon(mon);
             // Tạo Stage dialog
             Stage dialogStage = new Stage();
@@ -161,18 +161,6 @@ public class QuanLiThucDonUI {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_screen/quanLiDanhMuc.fxml"));
             Parent node = loader.load();
 
-            QuanLiDanhMucUI controller = loader.getController();
-
-            List<DanhMucKhongMonDTO> list = new ArrayList<>();
-            for (DanhMucMonKhongAnhDTO danhMuc : listDanhMuc) {
-                DanhMucKhongMonDTO dto = new DanhMucKhongMonDTO();
-                dto.setMaDanhMuc(danhMuc.getMaDanhMuc());
-                dto.setTenDanhMuc(danhMuc.getTenDanhMuc());
-                dto.setLoai(danhMuc.getLoai());
-                dto.setTrangThai(danhMuc.getTrangThai());
-                list.add(dto);
-            }
-            controller.setListDanhMuc(list);
             // Tạo Stage dialog
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL); // Chặn tương tác ngoài
@@ -195,17 +183,6 @@ public class QuanLiThucDonUI {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/themVaoThucDon.fxml"));
             Parent node = loader.load();
 
-            ThemVaoThucDonUI controller = loader.getController();
-            List<DanhMucKhongMonDTO> list = new ArrayList<>();
-            for (DanhMucMonKhongAnhDTO danhMuc : listDanhMuc) {
-                DanhMucKhongMonDTO dto = new DanhMucKhongMonDTO();
-                dto.setMaDanhMuc(danhMuc.getMaDanhMuc());
-                dto.setTenDanhMuc(danhMuc.getTenDanhMuc());
-                dto.setLoai(danhMuc.getLoai());
-                dto.setTrangThai(danhMuc.getTrangThai());
-                list.add(dto);
-            }
-            controller.setDanhMucList(list);
             // Tạo Stage dialog
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL); // Chặn tương tác ngoài
@@ -229,4 +206,7 @@ public class QuanLiThucDonUI {
 
     @FXML
     public void timKiem(){}
+
+    
 }
+

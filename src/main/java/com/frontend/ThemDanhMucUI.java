@@ -11,8 +11,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 public class ThemDanhMucUI {
     @FXML
@@ -20,7 +23,13 @@ public class ThemDanhMucUI {
 
     @FXML
     private ComboBox<String> loaiComboBox;
-    
+
+    @FXML
+    private Button btnThem, btnQuayLai;
+
+    @FXML
+    private AnchorPane mainAnchorPane;
+
     private QuanLiDanhMucUI quanLiDanhMucUI;
 
     public void setQuanLiDanhMucUI(QuanLiDanhMucUI quanLiDanhMucUI) {
@@ -28,15 +37,14 @@ public class ThemDanhMucUI {
     }
 
     @FXML
-    public void initialize(){
+    public void initialize() {
         loaiComboBox.getItems().addAll("Đồ uống", "Đồ ăn", "Khác");
     }
 
     @FXML
-    public void them(){
+    public void them() {
         DanhMucKhongMonDTO danhMuc = new DanhMucKhongMonDTO();
 
-        // Kiểm tra các trường nhập liệu
         if (tenDanhMucTextField.getText().isEmpty()) {
             MessageUtils.showErrorMessage("Tên danh mục không được để trống");
             return;
@@ -46,61 +54,71 @@ public class ThemDanhMucUI {
             MessageUtils.showErrorMessage("Vui lòng chọn loại danh mục");
             return;
         }
-        
+
         danhMuc.setTenDanhMuc(tenDanhMucTextField.getText());
         danhMuc.setTrangThai("Hoạt động");
         danhMuc.setLoai(loaiComboBox.getValue());
 
-        createRequest(danhMuc);
-        quanLiDanhMucUI.getListDanhMuc().add(danhMuc);
-        MessageUtils.showInfoMessage("Thêm danh mục thành công");
-        tenDanhMucTextField.getScene().getWindow().hide();
+        // Đánh dấu đang xử lý
+        mainAnchorPane.setDisable(true);
+        btnThem.setDisable(true);
+        btnQuayLai.setDisable(true);
+
+        Task<Void> task = createRequest(danhMuc);
+
+        task.setOnSucceeded(e -> {
+            quanLiDanhMucUI.loadDanhSachDanhMuc();
+            MessageUtils.showInfoMessage("Thêm danh mục thành công");
+            btnThem.setDisable(false);
+            btnQuayLai.setDisable(false);
+            mainAnchorPane.setDisable(false);
+            tenDanhMucTextField.getScene().getWindow().hide();
+        });
+
+        task.setOnFailed(e -> {
+            Throwable ex = task.getException();
+            ex.printStackTrace();
+            MessageUtils.showErrorMessage("Lỗi khi thêm: " + ex.getMessage());
+            btnThem.setDisable(false);
+            btnQuayLai.setDisable(false);
+            mainAnchorPane.setDisable(false);
+        });
+
+        task.setOnCancelled(e -> {
+            btnThem.setDisable(false);
+            btnQuayLai.setDisable(false);
+        });
+
+        new Thread(task).start();
     }
 
     @FXML
-    public void quayLai(){
+    public void quayLai() {
         tenDanhMucTextField.getScene().getWindow().hide();
     }
 
-    private void createRequest(DanhMucKhongMonDTO danhMuc) {
-        Task<Void> task = new Task<Void>() {
+    private Task<Void> createRequest(DanhMucKhongMonDTO danhMuc) {
+        return new Task<>() {
             @Override
             protected Void call() throws Exception {
-            try {
-                // Tạo ObjectMapper để chuyển đối tượng Mon thành JSON
                 ObjectMapper mapper = new ObjectMapper();
                 String json = mapper.writeValueAsString(danhMuc);
-                System.out.println("JSON gửi đi: " + json);
-                // Tạo HttpClient
-                HttpClient client = HttpClient.newHttpClient();
 
-                // Tạo request POST
+                HttpClient client = HttpClient.newHttpClient();
                 HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:8080/danh-muc/create")) // endpoint tạo mới
-                        .POST(HttpRequest.BodyPublishers.ofString(json)) // dùng POST thay vì PATCH
+                        .uri(URI.create("http://localhost:8080/danh-muc/create"))
+                        .POST(HttpRequest.BodyPublishers.ofString(json))
                         .header("Content-Type", "application/json")
                         .build();
 
-                // Gửi request
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-                // Xử lý phản hồi
-                if (response.statusCode() == 201 || response.statusCode() == 200) {
-                    System.out.println("Tạo danh mục thành công!");
-                    System.out.println("Phản hồi: " + response.body());
-                } else {
-                    System.err.println("Lỗi khi tạo danh mục. Mã trạng thái: " + response.statusCode());
-                    System.err.println("Thông điệp: " + response.body());
+                if (response.statusCode() != 201 && response.statusCode() != 200) {
+                    throw new RuntimeException("Tạo thất bại: " + response.body());
                 }
 
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("Lỗi khi gửi POST request: " + e.getMessage());
+                return null;
             }
-
-            return null;
-        }
         };
-        new Thread(task).start();
     }
 }

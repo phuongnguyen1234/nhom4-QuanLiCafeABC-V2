@@ -58,26 +58,17 @@ public class MonServiceImpl implements MonService {
     }
 
     @Override
-    public Mon partialUpdate(String maMon, Mon monUpdate) {
-        Optional<Mon> optionalMon = monRepository.findById(maMon);
-        if (!optionalMon.isPresent()) {
-            throw new RuntimeException("Không tìm thấy món với mã: " + maMon);
-        }
-
-        Mon mon = optionalMon.get();
-
-        // Cập nhật các trường không null / hợp lệ
-        if (monUpdate.getTenMon() != null) mon.setTenMon(monUpdate.getTenMon());
-        if (monUpdate.getDonGia() != -1) mon.setDonGia(monUpdate.getDonGia());
-        if (monUpdate.getTrangThai() != null) mon.setTrangThai(monUpdate.getTrangThai());
-        if (monUpdate.getAnhMinhHoa() != null) mon.setAnhMinhHoa(monUpdate.getAnhMinhHoa());
-
-        if (monUpdate.getDanhMuc() != null && monUpdate.getDanhMuc().getMaDanhMuc() != 0) {
-            int maDanhMuc = monUpdate.getDanhMuc().getMaDanhMuc();
-            DanhMuc danhMuc = danhMucRepository.findById(maDanhMuc)
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục có mã: " + maDanhMuc));
-            mon.setDanhMuc(danhMuc);
-        }
+    public Mon updateMon(MonQLy monUpdate) {
+        Mon mon = new Mon();
+        mon.setMaMon(monUpdate.getMaMon());
+        mon.setTenMon(monUpdate.getTenMon());
+        mon.setDonGia(monUpdate.getDonGia());
+        mon.setTrangThai(monUpdate.getTrangThai());
+        mon.setAnhMinhHoa(monUpdate.getAnhMinhHoa());
+        // Tìm đối tượng danh mục từ mã danh mục
+        DanhMuc danhMuc = danhMucRepository.findById(monUpdate.getMaDanhMuc())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục với mã: " + monUpdate.getMaDanhMuc()));
+        mon.setDanhMuc(danhMuc);
 
         return monRepository.save(mon);
     }

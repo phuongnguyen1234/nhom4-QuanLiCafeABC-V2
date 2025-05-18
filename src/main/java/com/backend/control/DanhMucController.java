@@ -42,4 +42,10 @@ public class DanhMucController {
         DanhMuc updatedDanhMuc = danhMucService.partialUpdate(maDanhMuc, danhMuc);
         return ResponseEntity.ok(updatedDanhMuc);
     }
+
+    @GetMapping("/all/no-dish")
+    public ResponseEntity<List<DanhMucKhongMonDTO>> getAllDanhMucKhongMon() {
+        List<DanhMucKhongMonDTO> danhMucList = danhMucService.getAllDanhMucKhongMon();
+        return ResponseEntity.ok(danhMucList);
+    }
 }

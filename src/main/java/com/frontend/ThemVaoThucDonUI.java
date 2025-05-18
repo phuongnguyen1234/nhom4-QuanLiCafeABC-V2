@@ -13,20 +13,22 @@ import javax.imageio.ImageIO;
 
 import com.backend.dto.DanhMucKhongMonDTO;
 import com.backend.dto.MonQLy;
+import com.backend.utils.HttpUtils;
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 public class ThemVaoThucDonUI {
     @FXML
@@ -38,18 +40,15 @@ public class ThemVaoThucDonUI {
     @FXML
     private ComboBox<DanhMucKhongMonDTO> danhMucCombobox;
 
+    @FXML
+    private Button btnThemVaoThucDon, btnQuayLai;
+
     private MonQLy mon;
 
     private List<DanhMucKhongMonDTO> danhMucList;
 
-    public void setDanhMucList(List<DanhMucKhongMonDTO> danhMucList) {
-        this.danhMucList = danhMucList;
-
-        //lay cac danh muc co trang thai la Khong hoat dong
-        danhMucList.removeIf(danhMuc -> danhMuc.getTrangThai().equals("Không hoạt động"));
-        ObservableList<DanhMucKhongMonDTO> observableDanhMucList = FXCollections.observableArrayList(danhMucList);
-        danhMucCombobox.setItems(observableDanhMucList);
-    }
+    @FXML
+    private AnchorPane mainAnchorPane;
 
     @FXML
     public void initialize() {
@@ -70,12 +69,6 @@ public class ThemVaoThucDonUI {
                     setText(empty ? "" : item.getTenDanhMuc());  // Cập nhật khi hiển thị trên button
                 }
             });
-            
-
-            // Chọn mặc định nếu cần (tùy chọn)
-            //if (!danhMucList.isEmpty()) {
-                //danhMucCombobox.getSelectionModel().selectFirst(); // Chọn mục đầu tiên nếu danh sách không rỗng
-            //}
 
             // Khi người dùng chọn danh mục, bạn có thể lấy mã danh mục
             danhMucCombobox.setOnAction(event -> {
@@ -84,67 +77,122 @@ public class ThemVaoThucDonUI {
                     int maDanhMuc = selectedDanhMuc.getMaDanhMuc();
                 }
             });
+
+            Task<List<DanhMucKhongMonDTO>> loadDanhMucTask = new Task<>() {
+                @Override
+                protected List<DanhMucKhongMonDTO> call() throws Exception {
+                    danhMucList = HttpUtils.getListDanhMucKhongMon();
+                    return danhMucList;
+                }
+            };
+
+            // Disable toàn bộ dialog trong khi loading
+            mainAnchorPane.setDisable(true);
+
+            // Khi load thành công:
+            loadDanhMucTask.setOnSucceeded(event -> {
+                List<DanhMucKhongMonDTO> list = loadDanhMucTask.getValue();
+                // loai bo cac danh muc co trang thai "Ngừng hoạt động"
+                list.removeIf(danhMuc -> danhMuc.getTrangThai().equals("Ngừng hoạt động"));
+                danhMucCombobox.getItems().setAll(list);
+                mainAnchorPane.setDisable(false); // enable lại
+            });
+
+            // Nếu có lỗi:
+            loadDanhMucTask.setOnFailed(event -> {
+                Throwable ex = loadDanhMucTask.getException();
+                ex.printStackTrace(); // hoặc hiện alert
+                mainAnchorPane.setDisable(false); // vẫn enable lại để không bị kẹt
+            });
+
+            // Chạy task:
+            new Thread(loadDanhMucTask).start();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @FXML
-    public void themVaoThucDon() {
-        if (mon == null) {
-            mon = new MonQLy();
-        }
-
-        int donGia = 0;
-
-        // Kiểm tra và gán giá trị từ giao diện
-        if (tenMonTextField.getText().isEmpty()) {
-            MessageUtils.showErrorMessage("Tên cà phê không được để trống!");
-            return;
-        }
-
-        try {
-            donGia = Integer.parseInt(donGiaTextField.getText());
-            if (donGia <= 0) {
-                MessageUtils.showErrorMessage("Đơn giá phải lớn hơn 0!");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            MessageUtils.showErrorMessage("Đơn giá phải là một số nguyên hợp lệ!");
-            return;
-        }
-
-        if (danhMucCombobox.getValue() == null) {
-            MessageUtils.showErrorMessage("Vui lòng chọn danh mục!");
-            return;
-        }
-
-            // Xử lý ảnh
-        if (anhMinhHoaImageView.getImage() != null) {  
-            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-                ImageIO.write(SwingFXUtils.fromFXImage(anhMinhHoaImageView.getImage(), null), "jpg", byteArrayOutputStream);
-                mon.setAnhMinhHoa(byteArrayOutputStream.toByteArray());
-            } catch (IOException e) {
-                MessageUtils.showErrorMessage("Lỗi khi xử lý ảnh minh họa!");
-                return;
-            }
-        } else {
-            MessageUtils.showErrorMessage("Vui lòng chọn ảnh minh họa!");
-            return;
-        }
-
-        mon.setMaMon(null); // Đặt mã món là null để server tự sinh mã mới
-        mon.setTenMon(tenMonTextField.getText());
-        mon.setDonGia(donGia);
-        mon.setTrangThai("Bán");
-        mon.setMaDanhMuc(danhMucCombobox.getValue().getMaDanhMuc());
-
-        createRequest(mon);
-
-        MessageUtils.showInfoMessage("Thêm món vào thực đơn thành công!");
-        // Ẩn cửa sổ sau khi cập nhật
-        tenMonTextField.getScene().getWindow().hide();
+public void themVaoThucDon() {
+    if (mon == null) {
+        mon = new MonQLy();
     }
+
+    int donGia = 0;
+
+    // Kiểm tra đầu vào
+    if (tenMonTextField.getText().isEmpty()) {
+        MessageUtils.showErrorMessage("Tên cà phê không được để trống!");
+        return;
+    }
+
+    try {
+        donGia = Integer.parseInt(donGiaTextField.getText());
+        if (donGia <= 0) {
+            MessageUtils.showErrorMessage("Đơn giá phải lớn hơn 0!");
+            return;
+        }
+    } catch (NumberFormatException e) {
+        MessageUtils.showErrorMessage("Đơn giá phải là số hợp lệ!");
+        return;
+    }
+
+    if (danhMucCombobox.getValue() == null) {
+        MessageUtils.showErrorMessage("Vui lòng chọn danh mục!");
+        return;
+    }
+
+    if (anhMinhHoaImageView.getImage() != null) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            ImageIO.write(SwingFXUtils.fromFXImage(anhMinhHoaImageView.getImage(), null), "jpg", byteArrayOutputStream);
+            mon.setAnhMinhHoa(byteArrayOutputStream.toByteArray());
+        } catch (IOException e) {
+            MessageUtils.showErrorMessage("Lỗi ảnh minh họa!");
+            return;
+        }
+    } else {
+        MessageUtils.showErrorMessage("Vui lòng chọn ảnh minh họa!");
+        return;
+    }
+
+    mon.setMaMon(null);
+    mon.setTenMon(tenMonTextField.getText());
+    mon.setDonGia(donGia);
+    mon.setTrangThai("Bán");
+    mon.setMaDanhMuc(danhMucCombobox.getValue().getMaDanhMuc());
+
+    // Disable form khi bắt đầu xử lý
+    mainAnchorPane.setDisable(true);
+    btnThemVaoThucDon.setDisable(true);
+    btnQuayLai.setDisable(true);
+
+    Task<Void> requestTask = createRequest(mon);
+
+    requestTask.setOnSucceeded(event -> {
+        MessageUtils.showInfoMessage("Thêm món thành công!");
+        btnThemVaoThucDon.setDisable(false);
+        btnQuayLai.setDisable(false);
+        tenMonTextField.getScene().getWindow().hide();
+    });
+
+    requestTask.setOnFailed(event -> {
+        Throwable ex = requestTask.getException();
+        ex.printStackTrace();
+        MessageUtils.showErrorMessage("Lỗi khi thêm món: " + ex.getMessage());
+        mainAnchorPane.setDisable(false); // Enable lại nếu lỗi
+        btnThemVaoThucDon.setDisable(false);
+        btnQuayLai.setDisable(false);
+    });
+
+    requestTask.setOnCancelled(e -> {
+            btnThemVaoThucDon.setDisable(false);
+            btnQuayLai.setDisable(false);
+        });
+
+    new Thread(requestTask).start();
+}
+
 
 
     @FXML
@@ -181,48 +229,31 @@ public class ThemVaoThucDonUI {
         }
     }
 
-    private void createRequest(MonQLy mon) {
-    Task<Void> task = new Task<>() {
+    private Task<Void> createRequest(MonQLy mon) {
+    return new Task<>() {
         @Override
         protected Void call() throws Exception {
-            try {
-                // Tạo ObjectMapper để chuyển đối tượng Mon thành JSON
-                ObjectMapper mapper = new ObjectMapper();
-                String json = mapper.writeValueAsString(mon);
-                System.out.println("JSON gửi đi: " + json);
-                // Tạo HttpClient
-                HttpClient client = HttpClient.newHttpClient();
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(mon);
+            System.out.println("JSON: " + json);
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("http://localhost:8080/mon"))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .header("Content-Type", "application/json")
+                    .build();
 
-                // Tạo request POST
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:8080/mon")) // endpoint tạo mới
-                        .POST(HttpRequest.BodyPublishers.ofString(json)) // dùng POST thay vì PATCH
-                        .header("Content-Type", "application/json")
-                        .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-                // Gửi request
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-                // Xử lý phản hồi
-                if (response.statusCode() == 201 || response.statusCode() == 200) {
-                    System.out.println("Tạo món thành công!");
-                    System.out.println("Phản hồi: " + response.body());
-                } else {
-                    System.err.println("Lỗi khi tạo món. Mã trạng thái: " + response.statusCode());
-                    System.err.println("Thông điệp: " + response.body());
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("Lỗi khi gửi POST request: " + e.getMessage());
+            if (response.statusCode() != 201 && response.statusCode() != 200) {
+                throw new RuntimeException("Lỗi khi tạo món. Mã trạng thái: " + response.statusCode());
             }
 
             return null;
         }
     };
-
-    new Thread(task).start();
 }
+
 
 
 }

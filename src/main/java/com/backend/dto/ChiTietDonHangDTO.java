@@ -1,30 +1,30 @@
 package com.backend.dto;
 
 public class ChiTietDonHangDTO {
-    private String maCaPhe;
+    private String maMon;
     private String maDonHang;
-    private String  tenCaPhe;
+    private String  tenMon;
     private int donGia ;
     private int soLuong;
-    private String yeuCauDacBiet;
+    private String yeuCauKhac;
     private int tamTinh;
 
-    public ChiTietDonHangDTO(String maCaPhe, String yeuCauDacBiet, int soLuong, int donGia, String maDonHang, String tenCaPhe, int tamTinh) {
-        this.maCaPhe = maCaPhe;
-        this.yeuCauDacBiet = yeuCauDacBiet;
+    public ChiTietDonHangDTO(String maDonHang, String tenMon, String maMon, String yeuCauKhac, int soLuong, int donGia, int tamTinh) {
+        this.maMon = maMon;
+        this.yeuCauKhac = yeuCauKhac;
         this.soLuong = soLuong;
         this.donGia = donGia;
         this.maDonHang = maDonHang;
-        this.tenCaPhe = tenCaPhe;
+        this.tenMon = tenMon;
         this.tamTinh = tamTinh;
     }
 
-    public String getMaCaPhe() {
-        return maCaPhe;
+    public String getMaMon() {
+        return maMon;
     }
 
-    public void setMaCaPhe(String maCaPhe) {
-        this.maCaPhe = maCaPhe;
+    public void setMaMon(String maMon) {
+        this.maMon = maMon;
     }
 
     public String getMaDonHang() {
@@ -35,12 +35,12 @@ public class ChiTietDonHangDTO {
         this.maDonHang = maDonHang;
     }
 
-    public String getTenCaPhe() {
-        return tenCaPhe;
+    public String getTenMon() {
+        return tenMon;
     }
 
-    public void setTenCaPhe(String tenCaPhe) {
-        this.tenCaPhe = tenCaPhe;
+    public void setTenMon(String tenMon) {
+        this.tenMon = tenMon;
     }
 
     public int getDonGia() {
@@ -59,12 +59,12 @@ public class ChiTietDonHangDTO {
         this.soLuong = soLuong;
     }
 
-    public String getYeuCauDacBiet() {
-        return yeuCauDacBiet;
+    public String getYeuCauKhac() {
+        return yeuCauKhac;
     }
 
-    public void setYeuCauDacBiet(String yeuCauDacBiet) {
-        this.yeuCauDacBiet = yeuCauDacBiet;
+    public void setYeuCauKhac(String yeuCauKhac) {
+        this.yeuCauKhac = yeuCauKhac;
     }
 
     public int getTamTinh() {

@@ -17,8 +17,8 @@ public class NhanVien {
     @Column(name = "MaNhanVien")
     private String maNhanVien;
 
-    @Column(name = "TenNhanVien")
-    private String tenNhanVien;
+    @Column(name = "HoTen")
+    private String hoTen;
 
     @Column(name = "AnhChanDung")
     private byte[] anhChanDung;
@@ -70,11 +70,11 @@ public class NhanVien {
 
     public NhanVien(){}
 
-    public NhanVien(String maNhanVien, String tenNhanVien, byte[] anhChanDung, String gioiTinh, 
+    public NhanVien(String maNhanVien, String hoTen, byte[] anhChanDung, String gioiTinh, 
     LocalDate ngaySinh, String queQuan, String diaChi, String soDienThoai, String loaiNhanVien, String viTri,
     LocalDate thoiGianVaoLam, int mucLuong, String trangThai, String email, String matKhau, String trangThaiHoatDong) {
         this.maNhanVien = maNhanVien;
-        this.tenNhanVien = tenNhanVien;
+        this.hoTen = hoTen;
         this.anhChanDung = anhChanDung;
         this.gioiTinh = gioiTinh;
         this.ngaySinh = ngaySinh;
@@ -100,12 +100,12 @@ public class NhanVien {
         this.maNhanVien = maNhanVien;
     }
 
-    public String getTenNhanVien() {
-        return tenNhanVien;
+    public String getHoTen() {
+        return hoTen;
     }
 
-    public void setTenNhanVien(String tenNhanVien) {
-        this.tenNhanVien = tenNhanVien;
+    public void setHoTen(String hoTen) {
+        this.hoTen = hoTen;
     }
 
     public byte[] getAnhChanDung() {

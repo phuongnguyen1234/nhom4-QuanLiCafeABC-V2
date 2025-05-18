@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.backend.dto.DanhMucKhongMonDTO;
+import com.backend.utils.HttpUtils;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -37,17 +39,39 @@ public class QuanLiDanhMucUI {
     @FXML
     private TableView<DanhMucKhongMonDTO> tableViewDanhMuc;
 
-    private List<DanhMucKhongMonDTO> listDanhMuc = new ArrayList<>();
+    private final List<DanhMucKhongMonDTO> listDanhMuc = new ArrayList<>();
 
-    private ObservableList<DanhMucKhongMonDTO> list = FXCollections.observableArrayList();
-
-    public void setListDanhMuc(List<DanhMucKhongMonDTO> listDanhMuc) {
-        list.clear();
-        list.addAll(listDanhMuc);
-    }
+    private final ObservableList<DanhMucKhongMonDTO> list = FXCollections.observableArrayList();
 
     public List<DanhMucKhongMonDTO> getListDanhMuc() {
         return listDanhMuc;
+    }
+
+    public void loadDanhSachDanhMuc() {
+        // Tạo một Task để thực hiện việc tải danh sách danh mục
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                // Gọi phương thức tải danh sách danh mục từ HttpUtils
+                listDanhMuc.clear();
+                listDanhMuc.addAll(HttpUtils.getListDanhMucKhongMon());
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                super.succeeded();
+                // Cập nhật danh sách vào TableView
+                list.setAll(listDanhMuc);
+            }
+
+            @Override
+            protected void failed() {
+                super.failed();
+                // Xử lý lỗi nếu cần thiết
+            }
+        };
+        new Thread(task).start();
     }
 
     @FXML
@@ -94,6 +118,9 @@ public class QuanLiDanhMucUI {
         tableViewDanhMuc.getColumns().forEach(column -> {
             column.setReorderable(false);
         });
+
+        loadDanhSachDanhMuc();
+
     }
 
     @FXML
@@ -116,7 +143,7 @@ public class QuanLiDanhMucUI {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    } 
 
     private void sua(DanhMucKhongMonDTO danhMucDTO) {
         try {

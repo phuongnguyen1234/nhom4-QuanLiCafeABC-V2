@@ -12,4 +12,6 @@ public interface DanhMucService {
     DanhMuc createDanhMuc(DanhMucKhongMonDTO danhMuc);
 
     DanhMuc partialUpdate(int maDanhMuc, DanhMucKhongMonDTO danhMucUpdate);
+
+    List<DanhMucKhongMonDTO> getAllDanhMucKhongMon();
 }

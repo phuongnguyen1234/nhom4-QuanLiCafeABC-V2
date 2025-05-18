@@ -1,6 +1,5 @@
 package com.frontend;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -8,34 +7,35 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.backend.dto.DanhMucMonKhongAnhDTO;
+import com.backend.dto.DanhMucKhongMonDTO;
 import com.backend.dto.MonQLy;
 import com.backend.model.DanhMuc;
 import com.backend.model.Mon;
+import com.backend.utils.HttpUtils;
 import com.backend.utils.ImageUtils;
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 public class ChinhSuaMonTrongThucDonUI {
+
     @FXML
     private TextField tenMonTextField, donGiaTextField;
 
@@ -43,229 +43,253 @@ public class ChinhSuaMonTrongThucDonUI {
     private ImageView anhMinhHoaImageView;
 
     @FXML
-    private ComboBox<DanhMucMonKhongAnhDTO> danhMucCombobox;
+    private ComboBox<DanhMucKhongMonDTO> danhMucCombobox;
 
     @FXML
     private CheckBox trangThaiCheckBox;
 
-    private List<DanhMucMonKhongAnhDTO> danhMucList = new ArrayList<>();
+    @FXML
+    private AnchorPane mainAnchorPane;
+
+    @FXML
+    private Button btnCapNhat, btnQuayLai;
 
     private MonQLy mon;
 
-    public void setDanhMucList(List<DanhMucMonKhongAnhDTO> danhMucList) {
-        this.danhMucList = danhMucList;
-        // Lọc danh mục có trạng thái là "Không hoạt động"
-        danhMucList.removeIf(danhMuc -> danhMuc.getTrangThai().equals("Không hoạt động"));
-        ObservableList<DanhMucMonKhongAnhDTO> observableDanhMucList = FXCollections.observableArrayList(danhMucList);
-        danhMucCombobox.setItems(observableDanhMucList);
-    }
-    
+    private List<DanhMucKhongMonDTO> danhMucList;
+
     @FXML
     public void initialize() {
-        try {
-            danhMucCombobox.setButtonCell(new ListCell<DanhMucMonKhongAnhDTO>() {
+        // Set cách hiển thị của ComboBox
+        danhMucCombobox.setButtonCell(new ListCell<>() {
             @Override
-            protected void updateItem(DanhMucMonKhongAnhDTO item, boolean empty) {
+            protected void updateItem(DanhMucKhongMonDTO item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty ? "" : item.getTenDanhMuc());  // Cập nhật khi hiển thị trên button
+                setText(empty || item == null ? "" : item.getTenDanhMuc());
             }
         });
-            // Cập nhật cách hiển thị tên danh mục trong ComboBox
-            danhMucCombobox.setCellFactory(param -> new ListCell<DanhMucMonKhongAnhDTO>() {
-                @Override
-                protected void updateItem(DanhMucMonKhongAnhDTO item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(empty ? "" : item.getTenDanhMuc());  // Hiển thị TenDanhMuc thay vì đối tượng
-                }
-            });
-            
-            // Chọn mặc định nếu cần (tùy chọn)
-            if (!danhMucList.isEmpty()) {
-                danhMucCombobox.getSelectionModel().selectFirst(); // Chọn mục đầu tiên nếu danh sách không rỗng
-            }
 
-            // Khi người dùng chọn danh mục, bạn có thể lấy mã danh mục
-            danhMucCombobox.setOnAction(event -> {
-                DanhMucMonKhongAnhDTO selectedDanhMuc = danhMucCombobox.getSelectionModel().getSelectedItem();
-                if (selectedDanhMuc != null) {
-                    int maDanhMuc = selectedDanhMuc.getMaDanhMuc();
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        danhMucCombobox.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(DanhMucKhongMonDTO item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.getTenDanhMuc());
+            }
+        });
+
+        // Load danh mục từ backend
+        Task<List<DanhMucKhongMonDTO>> loadTask = new Task<>() {
+            @Override
+            protected List<DanhMucKhongMonDTO> call() throws Exception {
+                danhMucList = HttpUtils.getListDanhMucKhongMon();
+                return danhMucList;
+            }
+        };
+
+        mainAnchorPane.setDisable(true);
+
+        loadTask.setOnSucceeded(event -> {
+            List<DanhMucKhongMonDTO> list = loadTask.getValue();
+            list.removeIf(danhMuc -> danhMuc.getTrangThai().equals("Ngừng hoạt động"));
+            danhMucCombobox.getItems().setAll(list);
+            if (!danhMucCombobox.getItems().isEmpty()) {
+                danhMucCombobox.getSelectionModel().selectFirst();
+            }
+            mainAnchorPane.setDisable(false);
+
+        });
+
+        loadTask.setOnFailed(event -> {
+            event.getSource().getException().printStackTrace();
+            MessageUtils.showErrorMessage("Lỗi load danh muc: " + loadTask.getException().getMessage());
+            mainAnchorPane.setDisable(false);
+        });
+
+        new Thread(loadTask).start();
     }
 
-    public void setMon(MonQLy mon){
+    public void setMon(MonQLy mon) {
         this.mon = mon;
-        
-        if (mon != null) {
-            // Cập nhật tên cà phê và đơn giá
-            tenMonTextField.setText(mon.getTenMon());
-            donGiaTextField.setText(String.valueOf(mon.getDonGia()));
-    
-            // Tìm kiếm và chọn danh mục tương ứng trong ComboBox
-            for (DanhMucMonKhongAnhDTO item : danhMucCombobox.getItems()) {
+
+        if (mon == null) return;
+
+        tenMonTextField.setText(mon.getTenMon());
+        donGiaTextField.setText(String.valueOf(mon.getDonGia()));
+        trangThaiCheckBox.setSelected("Bán".equals(mon.getTrangThai()));
+        anhMinhHoaImageView.setImage(ImageUtils.getMonImage(mon.getMaMon()));
+
+        // Delay chọn danh mục nếu danh sách chưa load
+        Task<Void> waitForComboBoxLoad = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                while (danhMucCombobox.getItems().isEmpty()) {
+                    Thread.sleep(50);
+                }
+                return null;
+            }
+        };
+
+        waitForComboBoxLoad.setOnSucceeded(e -> {
+            for (DanhMucKhongMonDTO item : danhMucCombobox.getItems()) {
                 if (item.getMaDanhMuc() == mon.getMaDanhMuc()) {
-                    danhMucCombobox.setValue(item); // Chọn mục danh mục trong ComboBox
+                    danhMucCombobox.setValue(item);
                     break;
                 }
-            }            
-    
-            // Cập nhật ảnh minh họa
-            anhMinhHoaImageView.setImage(ImageUtils.getMonImage(mon.getMaMon()));
-            if (mon.getTrangThai().equals("Bán"))
-                trangThaiCheckBox.setSelected(true);
-            else
-                trangThaiCheckBox.setSelected(false);
-        }
-        
+            }
+        });
+
+        new Thread(waitForComboBoxLoad).start();
     }
 
     @FXML
     public void capNhat() {
         if (mon == null) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Lỗi");
-            alert.setHeaderText("Không có dữ liệu để cập nhật");
-            alert.setContentText("Vui lòng chọn một món để cập nhật!");
-            alert.showAndWait();
+            MessageUtils.showErrorMessage("Không có món nào để cập nhật!");
             return;
         }
 
-        int donGia = 0;
-
-        // Kiểm tra và gán giá trị từ giao diện
-        if (tenMonTextField.getText().isEmpty()) {
+        String tenMon = tenMonTextField.getText().trim();
+        if (tenMon.isEmpty()) {
             MessageUtils.showErrorMessage("Tên món không được để trống!");
             return;
         }
 
+        int donGia;
         try {
             donGia = Integer.parseInt(donGiaTextField.getText());
-            if (donGia <= 0){
+            if (donGia <= 0) {
                 MessageUtils.showErrorMessage("Đơn giá phải lớn hơn 0!");
                 return;
-            } 
+            }
         } catch (NumberFormatException e) {
-            MessageUtils.showErrorMessage("Đơn giá phải là một số nguyên hợp lệ!");
+            MessageUtils.showErrorMessage("Đơn giá phải là số nguyên hợp lệ!");
             return;
         }
 
-        if (danhMucCombobox.getValue() == null) {
+        DanhMucKhongMonDTO selectedDanhMuc = danhMucCombobox.getValue();
+        if (selectedDanhMuc == null) {
             MessageUtils.showErrorMessage("Vui lòng chọn danh mục!");
             return;
-        } 
+        }
 
-        // Xử lý ảnh
-        if (anhMinhHoaImageView.getImage() != null) {
-            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-                ImageIO.write(SwingFXUtils.fromFXImage(anhMinhHoaImageView.getImage(), null), "jpg", byteArrayOutputStream);
-                mon.setAnhMinhHoa(byteArrayOutputStream.toByteArray());
+        // Chuẩn bị ảnh mới nếu có
+        Image image = anhMinhHoaImageView.getImage();
+        byte[] anhBytes = null;
+        if (image != null) {
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "jpg", baos);
+                mon.setAnhMinhHoa(baos.toByteArray());
+                anhBytes = baos.toByteArray();
             } catch (IOException e) {
                 MessageUtils.showErrorMessage("Lỗi khi xử lý ảnh minh họa!");
                 return;
+            } catch (IllegalArgumentException e) {
+                MessageUtils.showErrorMessage("Ảnh chưa được load!");
+                return;
             }
         }
 
-        Mon monUpdate = new Mon();
+        MonQLy monUpdate = new MonQLy();
         monUpdate.setMaMon(mon.getMaMon());
-        monUpdate.setTenMon(tenMonTextField.getText());
+        monUpdate.setTenMon(tenMon);
         monUpdate.setDonGia(donGia);
         monUpdate.setTrangThai(trangThaiCheckBox.isSelected() ? "Bán" : "Không bán");
+        monUpdate.setMaDanhMuc(selectedDanhMuc.getMaDanhMuc());
 
-        DanhMuc dm = new DanhMuc();
-        dm.setMaDanhMuc(danhMucCombobox.getValue().getMaDanhMuc());
-        dm.setTenDanhMuc(danhMucCombobox.getValue().getTenDanhMuc());
+        monUpdate.setAnhMinhHoa(anhBytes != null ? anhBytes : mon.getAnhMinhHoa());
 
-        monUpdate.setDanhMuc(dm);
-        monUpdate.setAnhMinhHoa(mon.getAnhMinhHoa());
-        updateRequest(monUpdate);
+        //debug
+        System.out.println("Cập nhật món: " + monUpdate.getTenMon());
+        System.out.println("Đơn giá: " + monUpdate.getDonGia());
+        System.out.println("Mã danh mục: " + monUpdate.getMaDanhMuc());
+        System.out.println("Trạng thái: " + monUpdate.getTrangThai());
+        
+        // Disable form khi bắt đầu xử lý
+        mainAnchorPane.setDisable(true);
+        btnCapNhat.setDisable(true);
+        btnQuayLai.setDisable(true);
 
-        MessageUtils.showInfoMessage("Cập nhật thành công!");
+        Task<Void> requestTask = updateRequest(monUpdate);
 
-        // Ẩn cửa sổ sau khi cập nhật
-        tenMonTextField.getScene().getWindow().hide();
+        requestTask.setOnSucceeded(event -> {
+            MessageUtils.showInfoMessage("Cập nhật thành công!");
+            btnCapNhat.setDisable(false);
+            btnQuayLai.setDisable(false);
+            mainAnchorPane.setDisable(false);
+            tenMonTextField.getScene().getWindow().hide();
+        });
+
+        requestTask.setOnFailed(event -> {
+            Throwable ex = requestTask.getException();
+            ex.printStackTrace();
+            MessageUtils.showErrorMessage("Lỗi khi cập nhật: " + ex.getMessage());
+            btnCapNhat.setDisable(false);
+            btnQuayLai.setDisable(false);
+            mainAnchorPane.setDisable(false); // Enable lại nếu lỗi
+        });
+
+        requestTask.setOnCancelled(event -> {
+            btnCapNhat.setDisable(false);
+            btnQuayLai.setDisable(false);
+        });
+
+        new Thread(requestTask).start();
     }
-
 
     @FXML
-    public void quayLai(){
+    public void quayLai() {
         tenMonTextField.getScene().getWindow().hide();
     }
-
-
 
     @FXML
     private void chonHinhAnh() {
-        // Tạo đối tượng FileChooser
         FileChooser fileChooser = new FileChooser();
-
-        // Cấu hình bộ lọc chỉ cho phép chọn các file ảnh
-        fileChooser.getExtensionFilters().addAll(
+        fileChooser.getExtensionFilters().add(
             new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif")
         );
 
-        // Hiển thị hộp thoại chọn file
-        File selectedFile = fileChooser.showOpenDialog(tenMonTextField.getScene().getWindow());
+        File file = fileChooser.showOpenDialog(tenMonTextField.getScene().getWindow());
 
-        if (selectedFile != null) {
+        if (file != null) {
             try {
-                // Đọc file ảnh đã chọn và chuyển thành đối tượng Image
-                Image selectedImage = new Image(selectedFile.toURI().toString());
-
-                // Hiển thị ảnh trong ImageView
-                anhMinhHoaImageView.setImage(selectedImage);
+                Image img = new Image(file.toURI().toString());
+                anhMinhHoaImageView.setImage(img);
             } catch (Exception e) {
                 e.printStackTrace();
-                // Thông báo lỗi nếu không thể tải ảnh
-                System.err.println("Không thể tải ảnh: " + e.getMessage());
+                MessageUtils.showErrorMessage("Không thể tải ảnh: " + e.getMessage());
             }
         }
     }
 
-    private void updateRequest(Mon mon) {
-        Task<Void> task = new Task<>() {
+    private Task<Void> updateRequest(MonQLy mon) {
+        return new Task<>() {
             @Override
             protected Void call() throws Exception {
                 try {
-                    // Tạo ObjectMapper để chuyển đổi đối tượng Mon thành JSON
                     ObjectMapper mapper = new ObjectMapper();
                     String json = mapper.writeValueAsString(mon);
 
-                    // Tạo HttpClient
                     HttpClient client = HttpClient.newHttpClient();
-
-                // Tạo request PATCH
-                HttpRequest request = HttpRequest.newBuilder()
+                    HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:8080/mon/" + mon.getMaMon()))
                         .method("PATCH", HttpRequest.BodyPublishers.ofString(json))
                         .header("Content-Type", "application/json")
                         .build();
 
-                // Gửi request
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                    //lay string JSON gui di
+                    System.out.println("JSON gửi đi: " + json);
+                    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-                // Xử lý phản hồi
-                if (response.statusCode() == 200) {
-                    System.out.println("Cập nhật thành công!");
-                    System.out.println("Phản hồi: " + response.body());
-                } else {
-                    System.err.println("Lỗi khi cập nhật. Mã trạng thái: " + response.statusCode());
-                    System.err.println("Thông điệp: " + response.body());
+                    if (response.statusCode() != 200) {
+                        System.err.println("Lỗi cập nhật: " + response.statusCode());
+                        System.err.println("Phản hồi: " + response.body());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("Lỗi khi gửi PATCH request: " + e.getMessage());
                 }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("Lỗi khi gửi PATCH request: " + e.getMessage());
+                return null;
             }
-
-            return null;
-        }
-    };
-
-    new Thread(task).start();
+        };
     }
-
-    
 }

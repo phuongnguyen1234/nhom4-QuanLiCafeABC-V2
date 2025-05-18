@@ -69,4 +69,17 @@ public class DanhMucServiceImpl implements DanhMucService {
 
         return danhMucRepository.save(danhMuc);
     }
+
+    @Override
+    public List<DanhMucKhongMonDTO> getAllDanhMucKhongMon() {
+        List<DanhMuc> danhMucs = danhMucRepository.findAll();
+        return danhMucs.stream().map(d -> {
+            DanhMucKhongMonDTO dto = new DanhMucKhongMonDTO();
+            dto.setMaDanhMuc(d.getMaDanhMuc());
+            dto.setTenDanhMuc(d.getTenDanhMuc());
+            dto.setTrangThai(d.getTrangThai());
+            dto.setLoai(d.getLoai());
+            return dto;
+        }).collect(Collectors.toList());
+    }
 }

@@ -13,7 +13,7 @@ public interface MonService {
 
     Mon createMon(MonQLy mon);
 
-    Mon partialUpdate(String maMon, Mon mon);
+    Mon updateMon(MonQLy mon);
 
     byte[] getImage(String maMon) throws Exception;
 }
