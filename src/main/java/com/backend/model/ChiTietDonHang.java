@@ -1,5 +1,7 @@
 package com.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -17,12 +19,20 @@ public class ChiTietDonHang {
     @ManyToOne
     @MapsId("maDonHang")
     @JoinColumn(name = "MaDonHang")
+    @JsonIgnore
     private DonHang donHang;
 
     @ManyToOne
     @MapsId("maMon")
     @JoinColumn(name = "MaMon")
+    @JsonIgnore
     private Mon mon;
+
+    @Column(name = "TenMon")
+    private String tenMon;
+
+    @Column(name = "DonGia")
+    private int donGia;
 
     @Column(name = "SoLuong")
     private int soLuong;
@@ -35,9 +45,11 @@ public class ChiTietDonHang {
 
     public ChiTietDonHang(){}
 
-    public ChiTietDonHang(DonHang donHang, Mon mon, int soLuong, String yeuCauKhac, int tamTinh) {
+    public ChiTietDonHang(DonHang donHang, Mon mon, String tenMon, int donGia, int soLuong, String yeuCauKhac, int tamTinh) {
         this.donHang = donHang;
         this.mon = mon;
+        this.tenMon = tenMon;
+        this.donGia = donGia;
         this.soLuong = soLuong;
         this.yeuCauKhac = yeuCauKhac;
         this.tamTinh = tamTinh;
@@ -66,6 +78,22 @@ public class ChiTietDonHang {
 
     public void setMon(Mon mon) {
         this.mon = mon;
+    }
+
+    public String getTenMon() {
+        return tenMon;
+    }
+
+    public void setTenMon(String tenMon) {
+        this.tenMon = tenMon;
+    }
+
+    public int getDonGia() {
+        return donGia;
+    }
+
+    public void setDonGia(int donGia) {
+        this.donGia = donGia;
     }
 
     public int getSoLuong() {

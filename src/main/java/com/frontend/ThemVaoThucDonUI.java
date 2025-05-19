@@ -188,6 +188,7 @@ public void themVaoThucDon() {
     requestTask.setOnCancelled(e -> {
             btnThemVaoThucDon.setDisable(false);
             btnQuayLai.setDisable(false);
+            mainAnchorPane.setDisable(false); // Enable lại nếu bị hủy
         });
 
     new Thread(requestTask).start();

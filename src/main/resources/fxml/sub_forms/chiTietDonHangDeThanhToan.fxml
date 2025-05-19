@@ -10,9 +10,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="600.0" styleClass="white-bg" stylesheets="@../css/thucDonCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ChiTietDonHangDeThanhToanUI">
+<AnchorPane fx:id="mainAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="600.0" styleClass="white-bg" stylesheets="@../css/thucDonCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ChiTietDonHangDeThanhToanUI">
    <children>
-      <Text layoutX="238.0" layoutY="46.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Đơn hàng">
+      <Text layoutX="230.0" layoutY="46.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Đơn hàng">
          <font>
             <Font name="Open Sans Semibold" size="30.0" />
          </font>
@@ -32,7 +32,7 @@
             <TableView fx:id="tableViewDonHang" prefHeight="118.0" prefWidth="570.0" VBox.vgrow="ALWAYS">
               <columns>
                 <TableColumn fx:id="colSTT" prefWidth="34.0" text="STT" />
-                <TableColumn fx:id="colTenCaPhe" prefWidth="147.0" text="Tên" />
+                <TableColumn fx:id="colTenMon" prefWidth="147.0" text="Tên " />
                   <TableColumn fx:id="colYeuCauKhac" prefWidth="121.0" text="Yêu cầu khác" />
                   <TableColumn fx:id="colSoLuong" prefWidth="68.0" text="Số lượng" />
                   <TableColumn fx:id="colDonGia" prefWidth="101.0" text="Đơn giá" />
@@ -51,7 +51,7 @@
                <children>
 
                <!--nút thanh toán thành công-->
-                  <Button fx:id="btnXacNhanThanhToan" mnemonicParsing="false" onAction="#xacNhanThanhToan" styleClass="btn" text="Thanh toán thành công" textFill="WHITE">
+                  <Button fx:id="btnXacNhanThanhToan" mnemonicParsing="false" onAction="#xacNhanThanhToan" styleClass="btn" text="Xác nhận thanh toán" textFill="WHITE">
                      <font>
                         <Font name="Open Sans Semibold" size="20.0" />
                      </font>

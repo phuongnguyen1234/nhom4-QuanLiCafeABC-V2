@@ -43,6 +43,7 @@ public class Mon {
         joinColumns = @JoinColumn(name = "MaMon"),
         inverseJoinColumns = @JoinColumn(name = "MaDonHang")
     )
+    @JsonIgnore
     private List<DonHang> donHangList;
 
     public Mon(){}

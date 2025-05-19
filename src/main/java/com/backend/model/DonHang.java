@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -21,7 +23,11 @@ public class DonHang {
 
     @ManyToOne
     @JoinColumn(name = "MaNhanVien")
+    @JsonIgnore
     private NhanVien nhanVien;
+
+    @Column(name = "HoTen")
+    private String hoTen;
 
     @Column(name = "ThoiGianDatHang")
     private LocalDateTime thoiGianDatHang;
@@ -34,9 +40,10 @@ public class DonHang {
 
     public DonHang(){}
 
-    public DonHang(String maDonHang, NhanVien nhanVien, LocalDateTime thoiGianDatHang, int tongTien){
+    public DonHang(String maDonHang, NhanVien nhanVien, String hoTen, LocalDateTime thoiGianDatHang, int tongTien){
         this.maDonHang = maDonHang;
         this.nhanVien = nhanVien;
+        this.hoTen = hoTen;
         this.thoiGianDatHang = thoiGianDatHang;
         this.tongTien = tongTien;
         this.chiTietDonHangs = new ArrayList<>();
@@ -56,6 +63,14 @@ public class DonHang {
 
     public void setNhanVien(NhanVien nhanVien) {
         this.nhanVien = nhanVien;
+    }
+
+    public String getHoTen() {
+        return hoTen;
+    }
+
+    public void setHoTen(String hoTen) {
+        this.hoTen = hoTen;
     }
 
     public LocalDateTime getThoiGianDatHang() {

@@ -3,6 +3,8 @@ package com.backend.model;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -19,6 +21,7 @@ public class BangLuong {
 
     @ManyToOne
     @JoinColumn(name = "MaNhanVien", referencedColumnName = "MaNhanVien")
+    @JsonIgnore
     private NhanVien nhanVien;
 
     @Column(name = "Thang")

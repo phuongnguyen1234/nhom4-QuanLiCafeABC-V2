@@ -5,13 +5,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.service.ChiTietHoaDonService;
+import com.backend.service.DoanhThuService;
 
 @RestController
-@RequestMapping("/api/cthd")
+@RequestMapping("/doanh-thu")
 @CrossOrigin(origins = "*")
-public class ChiTietHoaDonController {
+public class DoanhThuController {
     @Autowired
-    private ChiTietHoaDonService chiTietHoaDonService;
-
+    private DoanhThuService doanhThuService;
 }

@@ -6,18 +6,18 @@ import java.util.List;
 public class DonHangDTO {
     private String maDonHang;
     private String maNhanVien;
-    private String tenNhanVien;
-    private List<MonTrongDonDTO> danhSachCaPheTrongDon;
+    private String hoTen;
+    private List<MonTrongDonDTO> danhSachMonTrongDon;
     private LocalDateTime thoiGianDatHang;
     private int tongTien;
 
     public DonHangDTO(){}
 
-    public DonHangDTO(String maDonHang, String maNhanVien, String tenNhanVien, List<MonTrongDonDTO> danhSachCaPheTrongDon, LocalDateTime thoiGianDatHang, int tongTien){
+    public DonHangDTO(String maDonHang, String hoTen, String tenNhanVien, List<MonTrongDonDTO> danhSachMonTrongDon, LocalDateTime thoiGianDatHang, int tongTien){
         this.maDonHang = maDonHang;
         this.maNhanVien = maNhanVien;
-        this.tenNhanVien = tenNhanVien;
-        this.danhSachCaPheTrongDon = danhSachCaPheTrongDon;
+        this.hoTen = hoTen;
+        this.danhSachMonTrongDon = danhSachMonTrongDon;
         this.thoiGianDatHang = thoiGianDatHang;
         this.tongTien = tongTien;
     }
@@ -38,20 +38,20 @@ public class DonHangDTO {
         this.maNhanVien = maNhanVien;
     }
 
-    public String getTenNhanVien() {
-        return tenNhanVien;
+    public String getHoTen() {
+        return hoTen;
     }
 
-    public void setTenNhanVien(String tenNhanVien) {
-        this.tenNhanVien = tenNhanVien;
+    public void setHoTen(String hoTen) {
+        this.hoTen = hoTen;
     }
 
-    public List<MonTrongDonDTO> getDanhSachCaPheTrongDon() {
-        return danhSachCaPheTrongDon;
+    public List<MonTrongDonDTO> getDanhSachMonTrongDon() {
+        return danhSachMonTrongDon;
     }
 
-    public void setDanhSachCaPheTrongDon(List<MonTrongDonDTO> danhSachCaPheTrongDon) {
-        this.danhSachCaPheTrongDon = danhSachCaPheTrongDon;
+    public void setDanhSachMonTrongDon(List<MonTrongDonDTO> danhSachMonTrongDon) {
+        this.danhSachMonTrongDon = danhSachMonTrongDon;
     }
 
     public LocalDateTime getThoiGianDatHang() {

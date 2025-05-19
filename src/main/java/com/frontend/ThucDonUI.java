@@ -21,10 +21,9 @@ import com.backend.dto.MonKhongAnhDTO;
 import com.backend.dto.MonTrongDonDTO;
 import com.backend.model.NhanVien;
 import com.backend.utils.ImageUtils;
+import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.frontend.control.CapNhatThucDonController;
-import com.frontend.control.TaoDonGoiDoMoiController;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -95,7 +94,7 @@ public class ThucDonUI {
 
     private final ObservableList<MonTrongDonDTO> danhSachMonTrongDon = FXCollections.observableArrayList();
 
-    private NhanVien nhanVien;
+    private NhanVien nhanVien = new NhanVien();
 
     private final HttpClient client = HttpClient.newHttpClient();
 
@@ -277,7 +276,6 @@ public class ThucDonUI {
         }
     }
     
-
     private void xoa(MonTrongDonDTO mon) {
         if (mon == null) {
             return;
@@ -324,7 +322,6 @@ public class ThucDonUI {
         else btnThanhToan.setDisable(false);
     }
     
-
     public void hienThiThucDon(List<DanhMucMonKhongAnhDTO> danhMucList) {
         vBoxThucDon.setMaxHeight(Region.USE_COMPUTED_SIZE);
         vBoxThucDon.getChildren().clear();
@@ -404,43 +401,43 @@ public class ThucDonUI {
 
     @FXML
     private void thanhToan() {
-        /*try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/chiTietDonHangDeThanhToan.fxml"));
+        //test
+        nhanVien.setMaNhanVien("NV000");
+        nhanVien.setHoTen("Admin");
+        
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/chiTietDonHangDeThanhToan.fxml"));
             Parent root = loader.load();
 
             // Tải controller của form hóa đơn
-            XacNhanDonHangScreen controller = loader.getController();
+            ChiTietDonHangDeThanhToanUI controller = loader.getController();
 
             //set thong tin don hang
             donHang = new DonHangDTO();
             donHang.setMaNhanVien(nhanVien.getMaNhanVien());
-            donHang.setTenNhanVien(nhanVien.getTenNhanVien());
-            donHang.setdanhSachMonTrongDon(taoDonController.laydanhSachMonTrongDon());
+            donHang.setHoTen(nhanVien.getHoTen());
+            donHang.setDanhSachMonTrongDon(danhSachMonTrongDon);
             int tongTien = 0;
-            for (MonDTO monDTO : taoDonController.laydanhSachMonTrongDon()) {
+            for (MonTrongDonDTO monDTO : danhSachMonTrongDon) {
                 tongTien += monDTO.getTamTinh(); // Cộng giá trị tamTinh của từng món
             }
             donHang.setTongTien(tongTien);
 
             controller.setDonHang(donHang);
-            controller.setThucDonUI(taoDonController);
-            controller.setThucDonScreen(this);
+            controller.setThucDonUI(this);
 
             // Hiển thị dialog
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Hóa Đơn");
+            stage.setTitle("Hóa đơn");
             stage.setScene(new Scene(root));
             stage.setResizable(false);
             stage.showAndWait();
 
         } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Lỗi");
-            alert.setHeaderText("Không thể mở form hóa đơn.");
-            alert.setContentText("Vui lòng kiểm tra lại file FXML.");
-            alert.showAndWait();
-        } */
+            MessageUtils.showErrorMessage("Không thể mở hóa đơn.");
+            e.printStackTrace();
+        } 
     }
 
     public void hienThiFormThemMon(MonKhongAnhDTO mon) {
@@ -487,7 +484,6 @@ public class ThucDonUI {
             e.printStackTrace();
         }
     }
-
 
 
     public void capNhatTongTien(List<MonTrongDonDTO> danhSachMonTrongDon) {

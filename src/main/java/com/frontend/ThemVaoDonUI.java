@@ -42,17 +42,12 @@ public class ThemVaoDonUI {
 
     public void setMon(MonTrongDonDTO mon){
         this.mon = mon;
-        loadThemVaoDonData();
-    }
 
-    private void loadThemVaoDonData() {
-        if (mon != null) {
-            tenMonText.setText("Tên: " + mon.getTenMon());
-            anhMinhHoaImageView.setImage(ImageUtils.getMonImage(mon.getMaMon()));
-            donGiaText.setText("Đơn giá: " + mon.getDonGia());
-            soLuongSpinner.getValueFactory().setValue(1);
-            yeuCauKhacTextArea.setText(mon.getYeuCauKhac());
-        }
+        tenMonText.setText("Tên: " + mon.getTenMon());
+        anhMinhHoaImageView.setImage(ImageUtils.getMonImage(mon.getMaMon()));
+        donGiaText.setText("Đơn giá: " + mon.getDonGia());
+        soLuongSpinner.getValueFactory().setValue(1);
+        yeuCauKhacTextArea.setText(mon.getYeuCauKhac());
     }
 
     @FXML
