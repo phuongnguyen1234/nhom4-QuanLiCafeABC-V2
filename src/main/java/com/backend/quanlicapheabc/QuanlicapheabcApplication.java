@@ -11,6 +11,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 @SpringBootApplication
@@ -37,6 +38,9 @@ public class QuanlicapheabcApplication extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_screen/trangChu.fxml"));
         primaryStage.setScene(new Scene(loader.load()));
         primaryStage.setTitle("Quản lý Cà phê ABC");
+        primaryStage.setResizable(false);
+        // Đặt icon cho cửa sổ
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/coffee-cup.png")));
         primaryStage.show();
     }
 

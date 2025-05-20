@@ -11,7 +11,7 @@
 
 <AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.QuanLiDanhMucUI">
    <children>
-      <TableView fx:id="tableViewDanhMuc" layoutX="10.0" layoutY="60.0" prefHeight="465.0" prefWidth="780.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
+      <TableView fx:id="tableViewDanhMuc" layoutX="10.0" layoutY="60.0" prefHeight="465.0" prefWidth="780.0" styleClass="table-view-quan-li" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
          <columns>
             <TableColumn fx:id="colSTT" editable="false" prefWidth="49.0" resizable="false" sortable="false" text="STT" />
             <TableColumn fx:id="colMaDanhMuc" prefWidth="124.0" resizable="false" text="Mã danh mục" />

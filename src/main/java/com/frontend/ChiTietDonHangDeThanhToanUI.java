@@ -106,7 +106,7 @@ public class ChiTietDonHangDeThanhToanUI {
                 btnQuayLai.setDisable(false);
                 MessageUtils.showInfoMessage("Tạo đơn thành công");
                 ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
-                thucDonUI.datLai();
+                thucDonUI.resetDonHang();
             });
 
             task.setOnFailed(e -> {

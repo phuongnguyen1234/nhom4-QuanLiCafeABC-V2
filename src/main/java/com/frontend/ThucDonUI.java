@@ -10,7 +10,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -38,7 +37,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -264,12 +262,13 @@ public class ThucDonUI {
             controller.setMon(mon);
             controller.setMonIndex(danhSachMonTrongDon.indexOf(mon));
             controller.setThucDonUI(this);
-            //controller.setController(taoDonController);
     
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Chỉnh sửa " + mon.getTenMon() + " trong đơn hàng");
             stage.setScene(new Scene(root));
+            stage.setResizable(false);
+            stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/edit-text.png")));
             stage.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();
@@ -281,17 +280,8 @@ public class ThucDonUI {
             return;
         }
     
-        // Tạo Alert kiểu CONFIRMATION
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Xác nhận xóa");
-        alert.setHeaderText("Bạn có chắc chắn muốn xóa " + mon.getTenMon() + " ra khỏi đơn?");
-        alert.setContentText("Hành động này không thể hoàn tác.");
-    
-        // Hiển thị và chờ người dùng phản hồi
-        Optional<ButtonType> result = alert.showAndWait();
-    
         // Xử lý phản hồi của người dùng
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        if (MessageUtils.showConfirmationDialog("Xác nhận xóa", "Bạn có chắc chắn muốn xóa " + mon.getTenMon() + " ra khỏi đơn?", "Hành động này không thể hoàn tác.", "/icons/bin.png", this.getClass())) {
             try {
                 // Gọi hàm xóa trong TaoDonGoiDoMoiController
                 danhSachMonTrongDon.remove(mon);
@@ -432,6 +422,7 @@ public class ThucDonUI {
             stage.setTitle("Hóa đơn");
             stage.setScene(new Scene(root));
             stage.setResizable(false);
+            stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/invoice.png")));
             stage.showAndWait();
 
         } catch (IOException e) {
@@ -460,6 +451,7 @@ public class ThucDonUI {
             stage.setTitle("Thêm " + mon.getTenMon() + " vào đơn");
             stage.setScene(new Scene(root));
             stage.setResizable(false);
+            stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/add.png")));
             stage.showAndWait();
 
         } catch (IOException e) {
@@ -499,6 +491,15 @@ public class ThucDonUI {
 
     @FXML
     public void datLai() {
+        if (MessageUtils.showConfirmationDialog("Xác nhận đặt lại", "Bạn có chắc chắn muốn đặt lại đơn hàng?", "Hành động này sẽ xóa tất cả món trong đơn hàng hiện tại.", "/icons/bin.png", this.getClass())) {
+            resetDonHang();
+            System.out.println("Đơn hàng đã được đặt lại.");
+        } else {
+            System.out.println("Người dùng đã hủy.");
+        }
+    } 
+
+    public void resetDonHang() {
         // Xóa tất cả các món trong đơn
         danhSachMonTrongDon.clear();
             
@@ -509,7 +510,7 @@ public class ThucDonUI {
     
         // Cập nhật lại tổng tiền
         capNhatTongTien(danhSachMonTrongDon);
-    } 
+    }
 
     public List<MonTrongDonDTO> layDanhSachMonTrongDon() {
         return danhSachMonTrongDon;

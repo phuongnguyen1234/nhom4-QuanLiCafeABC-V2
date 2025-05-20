@@ -19,6 +19,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -137,6 +138,7 @@ public class QuanLiDanhMucUI {
             dialogStage.setTitle("Thêm danh mục");
             dialogStage.setScene(new Scene(node));
             dialogStage.setResizable(false);
+            dialogStage.getIcons().add(new Image(getClass().getResource("/icons/add.png").toExternalForm()));
 
             // Hiển thị và chờ người dùng đóng dialog
             dialogStage.showAndWait();
@@ -159,6 +161,7 @@ public class QuanLiDanhMucUI {
             dialogStage.setTitle("Sửa danh mục");
             dialogStage.setScene(new Scene(node));
             dialogStage.setResizable(false);
+            dialogStage.getIcons().add(new Image(getClass().getResource("/icons/edit-text.png").toExternalForm()));
 
             // Hiển thị và chờ người dùng đóng dialog
             dialogStage.showAndWait();
@@ -168,5 +171,7 @@ public class QuanLiDanhMucUI {
     }
 
     @FXML
-    public void quayLai(){}
+    public void quayLai(){
+        btnQuayLai.getScene().getWindow().hide();
+    }
 }
