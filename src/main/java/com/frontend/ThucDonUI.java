@@ -104,6 +104,8 @@ public class ThucDonUI {
 
     private TrangChuUI trangChuUI;
 
+    private final ExecutorService imageLoaderExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
     public void setTrangChuUI(TrangChuUI trangChuUI) {
         this.trangChuUI = trangChuUI;
     }
@@ -178,15 +180,12 @@ public class ThucDonUI {
                 .sorted(Comparator.comparing(dm -> loaiUuTien.getOrDefault(dm.getLoai(), Integer.MAX_VALUE)))
                 .collect(Collectors.toList());
 
-            // Thêm "Tất cả" vào đầu danh sách hiển thị
-            List<DanhMucMonKhongAnhDTO> hienThiTrenCombobox = new ArrayList<>();
-            hienThiTrenCombobox.add(danhMucTatCa);
-            hienThiTrenCombobox.addAll(danhMucHoatDongList);
+            List<DanhMucMonKhongAnhDTO> danhMucHienThi = new ArrayList<>();
+            danhMucHienThi.add(danhMucTatCa);
+            danhMucHienThi.addAll(danhMucHoatDongList);
 
-            // Gán danh sách vào ComboBox
-            danhMucCombobox.setItems(FXCollections.observableArrayList(hienThiTrenCombobox));
-            danhMucCombobox.setValue(danhMucTatCa); // Chọn mặc định
-
+            danhMucCombobox.setItems(FXCollections.observableArrayList(danhMucHienThi));
+            danhMucCombobox.setValue(danhMucTatCa);
             // Ẩn label loading
             loadingLabel.setVisible(false);
 
@@ -207,15 +206,6 @@ public class ThucDonUI {
             protected void updateItem(DanhMucMonKhongAnhDTO item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? "" : item.getTenDanhMuc());
-            }
-        });
-
-        danhMucCombobox.setOnAction(event -> {
-            DanhMucMonKhongAnhDTO selected = danhMucCombobox.getValue();
-            if (selected == null || selected.getMaDanhMuc() == -1) {
-                hienThiThucDon(tatCaDanhMucList);
-            } else {
-                hienThiThucDon(List.of(selected));
             }
         });
 
@@ -317,8 +307,6 @@ public class ThucDonUI {
         vBoxThucDon.getChildren().clear();
         scrollPaneThucDon.setFitToHeight(false);
 
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
         for (DanhMucMonKhongAnhDTO danhMuc : danhMucList) {
             List<MonKhongAnhDTO> danhSachMonBan = danhMuc.getMonList().stream()
                     .filter(mon -> "Bán".equalsIgnoreCase(mon.getTrangThai()))
@@ -341,42 +329,7 @@ public class ThucDonUI {
 
             for (int i = 0; i < danhSachMonBan.size(); i++) {
                 MonKhongAnhDTO mon = danhSachMonBan.get(i);
-
-                VBox monBox = new VBox(6);
-                monBox.setAlignment(Pos.TOP_CENTER);
-                monBox.setPrefSize(160, 200);
-                monBox.getStyleClass().addAll("white-bg", "shadow", "radius");
-
-                ImageView imageView = new ImageView();
-                imageView.setFitHeight(120);
-                imageView.setFitWidth(120);
-                imageView.setPreserveRatio(false);
-                imageView.setImage(new Image(getClass().getResource("/icons/loading.png").toExternalForm()));
-
-                // Tải ảnh bất đồng bộ
-                executor.submit(() -> {
-                    Image image = ImageUtils.getMonImage(mon.getMaMon());
-                    Platform.runLater(() -> imageView.setImage(image));
-                });
-
-                imageView.setCursor(Cursor.HAND);
-                imageView.setOnMouseClicked(event -> hienThiFormThemMon(mon));
-
-                Text tenMonText = new Text(mon.getTenMon());
-                tenMonText.setWrappingWidth(156);
-                tenMonText.setTextAlignment(TextAlignment.CENTER);
-                tenMonText.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-font-family: Open Sans;");
-
-                VBox vBoxText = new VBox(tenMonText);
-                vBoxText.setPrefHeight(45);
-                vBoxText.setAlignment(Pos.TOP_CENTER);
-
-                Text donGiaText = new Text(String.format("%d VND", mon.getDonGia()));
-                donGiaText.setTextAlignment(TextAlignment.CENTER);
-                donGiaText.setStyle("-fx-font-size: 16px; -fx-font-family: Open Sans;");
-
-                monBox.getChildren().addAll(imageView, vBoxText, donGiaText);
-
+                VBox monBox = taoMonBox(mon);
                 int row = i / columns;
                 int col = i % columns;
                 gridPane.add(monBox, col, row);
@@ -385,8 +338,6 @@ public class ThucDonUI {
             danhMucBox.getChildren().addAll(lblDanhMuc, gridPane);
             vBoxThucDon.getChildren().add(danhMucBox);
         }
-
-        executor.shutdown();
     }
 
     @FXML
@@ -528,6 +479,42 @@ public class ThucDonUI {
         } else {
             throw new IOException("HTTP Error: " + response.statusCode());
         }
+    }
+
+    private VBox taoMonBox(MonKhongAnhDTO mon) {
+        VBox monBox = new VBox(6);
+        monBox.setAlignment(Pos.TOP_CENTER);
+        monBox.setPrefSize(160, 200);
+        monBox.getStyleClass().addAll("white-bg", "shadow", "radius");
+
+        ImageView imageView = new ImageView(new Image(getClass().getResource("/icons/loading.png").toExternalForm()));
+        imageView.setFitHeight(120);
+        imageView.setFitWidth(120);
+        imageView.setPreserveRatio(false);
+
+        imageLoaderExecutor.submit(() -> {
+            Image image = ImageUtils.getMonImage(mon.getMaMon());
+            Platform.runLater(() -> imageView.setImage(image));
+        });
+
+        imageView.setCursor(Cursor.HAND);
+        imageView.setOnMouseClicked(event -> hienThiFormThemMon(mon));
+
+        Text tenMonText = new Text(mon.getTenMon());
+        tenMonText.setWrappingWidth(156);
+        tenMonText.setTextAlignment(TextAlignment.CENTER);
+        tenMonText.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-font-family: Open Sans;");
+
+        Text donGiaText = new Text(String.format("%d VND", mon.getDonGia()));
+        donGiaText.setTextAlignment(TextAlignment.CENTER);
+        donGiaText.setStyle("-fx-font-size: 16px; -fx-font-family: Open Sans;");
+
+        VBox vBoxText = new VBox(tenMonText);
+        vBoxText.setPrefHeight(45);
+        vBoxText.setAlignment(Pos.TOP_CENTER);
+
+        monBox.getChildren().addAll(imageView, vBoxText, donGiaText);
+        return monBox;
     }
 
 }

@@ -32,12 +32,12 @@
                   <!--table don hang-->
                   <TableView fx:id="tableViewDatHang" layoutX="6.0" layoutY="77.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="665.0" prefWidth="565.0" AnchorPane.bottomAnchor="143.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="6.0" AnchorPane.topAnchor="77.0">
                     <columns>
-                      <TableColumn fx:id="colTenMon" editable="false" prefWidth="117.0" resizable="false" sortable="false" text="Tên" />
-                        <TableColumn fx:id="colYeuCauKhac" editable="false" prefWidth="115.0" resizable="false" sortable="false" text="Yêu cầu khác" />
-                        <TableColumn fx:id="colSoLuong" editable="false" prefWidth="60.0" resizable="false" sortable="false" text="Số lượng" />
-                        <TableColumn fx:id="colDonGia" editable="false" prefWidth="70.0" resizable="false" sortable="false" text="Đơn giá" />
-                        <TableColumn fx:id="colTamTinh" editable="false" prefWidth="79.0" resizable="false" sortable="false" text="Tạm tính" />
-                        <TableColumn fx:id="colHanhDong" editable="false" prefWidth="122.0" resizable="false" sortable="false" />
+                        <TableColumn fx:id="colTenMon" editable="false" prefWidth="123.0" resizable="false" sortable="false" text="Tên món" />
+                        <TableColumn fx:id="colYeuCauKhac" editable="false" prefWidth="109.0" resizable="false" sortable="false" text="Yêu cầu khác" />
+                        <TableColumn fx:id="colDonGia" editable="false" prefWidth="71.0" resizable="false" sortable="false" text="Đơn giá" />
+                        <TableColumn fx:id="colSoLuong" editable="false" prefWidth="63.0" resizable="false" sortable="false" text="Số lượng" />
+                        <TableColumn fx:id="colTamTinh" editable="false" prefWidth="72.0" resizable="false" sortable="false" text="Tạm tính" />
+                        <TableColumn fx:id="colHanhDong" editable="false" prefWidth="121.0" resizable="false" sortable="false" />
                     </columns>
                   </TableView>
 

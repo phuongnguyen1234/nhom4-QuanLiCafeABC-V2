@@ -34,8 +34,8 @@
                 <TableColumn fx:id="colSTT" prefWidth="34.0" text="STT" />
                 <TableColumn fx:id="colTenMon" prefWidth="147.0" text="Tên " />
                   <TableColumn fx:id="colYeuCauKhac" prefWidth="121.0" text="Yêu cầu khác" />
-                  <TableColumn fx:id="colSoLuong" prefWidth="68.0" text="Số lượng" />
                   <TableColumn fx:id="colDonGia" prefWidth="101.0" text="Đơn giá" />
+                  <TableColumn fx:id="colSoLuong" prefWidth="68.0" text="Số lượng" />
                   <TableColumn fx:id="colTamTinh" prefWidth="99.0" text="Tạm tính" />
               </columns>
             </TableView>

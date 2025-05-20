@@ -52,7 +52,7 @@ public class ChinhSuaDonUI {
         if (mon != null) {
             tenMonText.setText("Tên: " + mon.getTenMon());
             anhMinhHoaImageView.setImage(ImageUtils.getMonImage(mon.getMaMon()));
-            donGiaText.setText("Đơn giá: " + mon.getDonGia());
+            donGiaText.setText("Đơn giá: " + mon.getDonGia() + " VND");
             soLuongSpinner.getValueFactory().setValue(mon.getSoLuong());
             yeuCauKhacTextArea.setText(mon.getYeuCauKhac());
         }

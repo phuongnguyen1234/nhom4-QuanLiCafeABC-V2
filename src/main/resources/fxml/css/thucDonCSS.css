@@ -50,11 +50,11 @@
     -fx-text-fill: #fff;
 }
 
-.table-view .table-cell{
+/*.table-view .table-cell{
     -fx-padding: 5px;
     -fx-font-family: "Open Sans";
     -fx-font-size: 13px;
-}
+} */
 
 .btn{
     -fx-background-color: linear-gradient(to bottom right, #098c53, #246861);
@@ -178,4 +178,9 @@
     -fx-font-family: "Open Sans";
     -fx-font-size: 18px;
     -fx-alignment: center;
+}
+
+#tableViewDatHang .table-cell, #tableViewDonHang .table-cell {
+    -fx-font-family: "Open Sans";
+    -fx-font-size: 14px;
 }

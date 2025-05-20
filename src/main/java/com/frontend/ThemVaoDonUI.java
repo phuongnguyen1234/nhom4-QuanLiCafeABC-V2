@@ -45,7 +45,7 @@ public class ThemVaoDonUI {
 
         tenMonText.setText("Tên: " + mon.getTenMon());
         anhMinhHoaImageView.setImage(ImageUtils.getMonImage(mon.getMaMon()));
-        donGiaText.setText("Đơn giá: " + mon.getDonGia());
+        donGiaText.setText("Đơn giá: " + mon.getDonGia() + " VND");
         soLuongSpinner.getValueFactory().setValue(1);
         yeuCauKhacTextArea.setText(mon.getYeuCauKhac());
     }
