@@ -123,7 +123,7 @@ public void themVaoThucDon() {
 
     // Kiểm tra đầu vào
     if (tenMonTextField.getText().isEmpty()) {
-        MessageUtils.showErrorMessage("Tên cà phê không được để trống!");
+        MessageUtils.showErrorMessage("Tên món không được để trống!");
         return;
     }
 

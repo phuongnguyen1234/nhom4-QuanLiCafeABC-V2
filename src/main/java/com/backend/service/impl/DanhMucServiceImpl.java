@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.backend.dto.DanhMucKhongMonDTO;
@@ -16,8 +15,11 @@ import com.backend.service.DanhMucService;
 
 @Service
 public class DanhMucServiceImpl implements DanhMucService {
-    @Autowired
-    private DanhMucRepository danhMucRepository;
+    private final DanhMucRepository danhMucRepository;
+
+    public DanhMucServiceImpl(DanhMucRepository danhMucRepository) {
+        this.danhMucRepository = danhMucRepository;
+    }
 
     @Override
     public List<DanhMucMonKhongAnhDTO> getAllDanhMucKhongAnh() {

@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.backend.dto.MonQLy;
@@ -18,11 +17,13 @@ import com.backend.service.MonService;
 
 @Service
 public class MonServiceImpl implements MonService {
-    @Autowired
-    private MonRepository monRepository;
+    private final MonRepository monRepository;
+    private final DanhMucRepository danhMucRepository;
 
-    @Autowired
-    private DanhMucRepository danhMucRepository;
+    public MonServiceImpl(MonRepository monRepository, DanhMucRepository danhMucRepository) {
+        this.monRepository = monRepository;
+        this.danhMucRepository = danhMucRepository;
+    }
 
     @Override
     public Map<Integer, List<Mon>> getAllMonGroupedByDanhMuc() {

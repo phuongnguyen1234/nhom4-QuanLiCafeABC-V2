@@ -2,7 +2,6 @@ package com.backend.control;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +21,11 @@ import com.backend.service.DanhMucService;
 @RequestMapping("/danh-muc")
 @CrossOrigin(origins = "*")
 public class DanhMucController {
-    @Autowired
-    private DanhMucService danhMucService;
+    private final DanhMucService danhMucService;
+
+    public DanhMucController(DanhMucService danhMucService) {
+        this.danhMucService = danhMucService;
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<DanhMucMonKhongAnhDTO>> getAllDanhMuc() {

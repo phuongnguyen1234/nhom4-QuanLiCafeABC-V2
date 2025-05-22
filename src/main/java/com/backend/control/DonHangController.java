@@ -1,6 +1,5 @@
 package com.backend.control;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,9 +15,12 @@ import com.backend.service.DonHangService;
 @RequestMapping("/don-hang")
 @CrossOrigin(origins = "*")
 public class DonHangController {
-    @Autowired
-    private DonHangService donHangService;
-    
+    private final DonHangService donHangService;
+
+    public DonHangController(DonHangService donHangService) {
+        this.donHangService = donHangService;
+    }
+
     @PostMapping("/create")
     public ResponseEntity<DonHang> createDonHang(@RequestBody DonHangDTO donHangDTO) {
         DonHang createdDonHang = donHangService.createDonHang(donHangDTO);

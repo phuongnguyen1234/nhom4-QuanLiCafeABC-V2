@@ -20,18 +20,19 @@ import com.backend.service.DonHangService;
 
 @Service
 public class DonHangServiceImpl implements DonHangService {
+    private final DonHangRepository donHangRepository;
+    private final NhanVienRepository nhanVienRepository;
+    private final MonRepository monRepository;
+    private final ChiTietDonHangRepository chiTietDonHangRepository;
 
-    @Autowired
-    private DonHangRepository donHangRepository;
-
-    @Autowired
-    private NhanVienRepository nhanVienRepository;
-
-    @Autowired
-    private MonRepository monRepository;
-
-    @Autowired
-    private ChiTietDonHangRepository chiTietDonHangRepository;
+    public DonHangServiceImpl(DonHangRepository donHangRepository,
+        NhanVienRepository nhanVienRepository, MonRepository monRepository,
+        ChiTietDonHangRepository chiTietDonHangRepository) {
+        this.donHangRepository = donHangRepository;
+        this.nhanVienRepository = nhanVienRepository;
+        this.monRepository = monRepository;
+        this.chiTietDonHangRepository = chiTietDonHangRepository;
+    }
 
     @Override
     public DonHang createDonHang(DonHangDTO donHangDTO) {

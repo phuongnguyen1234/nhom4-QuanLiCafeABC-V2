@@ -3,7 +3,6 @@ package com.backend.control;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,8 +24,11 @@ import com.backend.service.MonService;
 @RequestMapping("/mon")
 @CrossOrigin(origins = "*")
 public class MonController {
-    @Autowired
-    private MonService monService;
+    private final MonService monService;
+
+    public MonController(MonService monService) {
+        this.monService = monService;
+    }
 
     @GetMapping("/theo-danh-muc")
     public ResponseEntity<Map<Integer, List<Mon>>> getMonGroupedByDanhMuc() {

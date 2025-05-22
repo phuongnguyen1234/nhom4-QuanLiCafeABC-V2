@@ -8,6 +8,9 @@ import com.backend.service.ChiTietDonHangService;
 
 @Service
 public class ChiTietDonHangServiceImpl implements ChiTietDonHangService {
-    @Autowired
-    private ChiTietDonHangRepository chiTietDonHangRepository;
+    private final ChiTietDonHangRepository chiTietDonHangRepository;
+
+    public ChiTietDonHangServiceImpl(ChiTietDonHangRepository chiTietDonHangRepository) {
+        this.chiTietDonHangRepository = chiTietDonHangRepository;
+    }
 }

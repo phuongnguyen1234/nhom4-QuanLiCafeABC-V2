@@ -8,7 +8,10 @@ import com.backend.service.DoanhThuService;
 
 @Service
 public class DoanhThuServiceImpl implements DoanhThuService {
-    @Autowired
-    private DoanhThuRepository doanhThuRepository;
+    private final DoanhThuRepository doanhThuRepository;
+
+    public DoanhThuServiceImpl(DoanhThuRepository doanhThuRepository) {
+        this.doanhThuRepository = doanhThuRepository;
+    }
 
 }
