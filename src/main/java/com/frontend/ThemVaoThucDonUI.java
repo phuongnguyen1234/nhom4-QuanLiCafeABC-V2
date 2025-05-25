@@ -1,23 +1,23 @@
 package com.frontend;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
 import com.backend.dto.DanhMucKhongMonDTO;
-import com.backend.dto.MonQLy;
+import com.backend.dto.MonDTO;
 import com.backend.utils.HttpUtils;
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -29,6 +29,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.concurrent.Task;
+import java.util.UUID;
 
 public class ThemVaoThucDonUI {
     @FXML
@@ -43,9 +45,11 @@ public class ThemVaoThucDonUI {
     @FXML
     private Button btnThemVaoThucDon, btnQuayLai;
 
-    private MonQLy mon;
+    private MonDTO mon;
 
     private List<DanhMucKhongMonDTO> danhMucList;
+
+    private File selectedImageFile; // Lưu trữ file ảnh đã chọn
 
     @FXML
     private AnchorPane mainAnchorPane;
@@ -116,7 +120,7 @@ public class ThemVaoThucDonUI {
     @FXML
 public void themVaoThucDon() {
     if (mon == null) {
-        mon = new MonQLy();
+        mon = new MonDTO();
     }
 
     int donGia = 0;
@@ -143,17 +147,33 @@ public void themVaoThucDon() {
         return;
     }
 
-    if (anhMinhHoaImageView.getImage() != null) {
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            ImageIO.write(SwingFXUtils.fromFXImage(anhMinhHoaImageView.getImage(), null), "jpg", byteArrayOutputStream);
-            mon.setAnhMinhHoa(byteArrayOutputStream.toByteArray());
-        } catch (IOException e) {
-            MessageUtils.showErrorMessage("Lỗi ảnh minh họa!");
-            return;
-        }
-    } else {
+    // Xử lý ảnh minh họa: copy file và lưu đường dẫn
+    if (this.selectedImageFile == null) {
         MessageUtils.showErrorMessage("Vui lòng chọn ảnh minh họa!");
         return;
+    }
+
+    String originalFileName = selectedImageFile.getName();
+    String fileExtension = "";
+    int lastDotIndex = originalFileName.lastIndexOf('.');
+    if (lastDotIndex > 0 && lastDotIndex < originalFileName.length() - 1) {
+        fileExtension = originalFileName.substring(lastDotIndex); // e.g., .jpg, .png
+    }
+    // Tạo tên file duy nhất để tránh ghi đè
+    String newImageName = UUID.randomUUID().toString() + fileExtension;
+
+    Path targetDirectory = Paths.get("src/main/resources/images/mon");
+    try {
+        if (!Files.exists(targetDirectory)) {
+            Files.createDirectories(targetDirectory);
+        }
+        Path targetPath = targetDirectory.resolve(newImageName);
+        Files.copy(selectedImageFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+        mon.setAnhMinhHoa("/images/mon/" + newImageName); // Lưu đường dẫn tương đối cho resource loading
+        } catch (IOException e) {
+            e.printStackTrace();
+            MessageUtils.showErrorMessage("Lỗi khi lưu ảnh minh họa! " + e.getMessage());
+            return;
     }
 
     mon.setMaMon(null);
@@ -217,6 +237,7 @@ public void themVaoThucDon() {
 
         if (selectedFile != null) {
             try {
+                this.selectedImageFile = selectedFile; // Lưu file đã chọn
                 // Đọc file ảnh đã chọn và chuyển thành đối tượng Image
                 Image selectedImage = new Image(selectedFile.toURI().toString());
 
@@ -224,13 +245,14 @@ public void themVaoThucDon() {
                 anhMinhHoaImageView.setImage(selectedImage);
             } catch (Exception e) {
                 e.printStackTrace();
+                this.selectedImageFile = null; // Reset nếu có lỗi
                 // Thông báo lỗi nếu không thể tải ảnh
-                System.err.println("Không thể tải ảnh: " + e.getMessage());
+                MessageUtils.showErrorMessage("Không thể tải ảnh: " + e.getMessage());
             }
         }
     }
 
-    private Task<Void> createRequest(MonQLy mon) {
+    private Task<Void> createRequest(MonDTO mon) {
     return new Task<>() {
         @Override
         protected Void call() throws Exception {

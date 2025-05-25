@@ -1,5 +1,7 @@
 package com.backend.dto;
 
+import com.backend.model.DanhMuc;
+
 public class DanhMucKhongMonDTO {
     private int maDanhMuc;
     private String tenDanhMuc;
@@ -45,5 +47,14 @@ public class DanhMucKhongMonDTO {
 
     public void setTrangThai(String trangThai) {
         this.trangThai = trangThai;
+    }
+
+    public static DanhMucKhongMonDTO convertToDanhMucKhongMonDTO(DanhMuc danhMuc) {
+        return new DanhMucKhongMonDTO(
+            danhMuc.getMaDanhMuc(),
+            danhMuc.getTenDanhMuc(),
+            danhMuc.getLoai(),
+            danhMuc.getTrangThai()
+        );
     }
 }

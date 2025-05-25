@@ -2,6 +2,7 @@ package com.backend.model;
 
 import java.util.List;
 
+import com.backend.dto.MonDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -24,7 +25,7 @@ public class Mon {
     private String tenMon;
 
     @Column(name = "AnhMinhHoa")
-    private byte[] anhMinhHoa;
+    private String anhMinhHoa;
 
     @Column(name = "DonGia")
     private int donGia;
@@ -48,7 +49,7 @@ public class Mon {
 
     public Mon(){}
 
-    public Mon(String maMon, String tenMon, byte[] anhMinhHoa, int donGia, String trangThai, DanhMuc danhMuc){
+    public Mon(String maMon, String tenMon, String anhMinhHoa, int donGia, String trangThai, DanhMuc danhMuc){
         this.maMon = maMon;
         this.tenMon = tenMon;
         this.anhMinhHoa = anhMinhHoa;
@@ -73,11 +74,11 @@ public class Mon {
         this.tenMon = tenCaPhe;
     }
 
-    public byte[] getAnhMinhHoa() {
+    public String getAnhMinhHoa() {
         return anhMinhHoa;
     }
 
-    public void setAnhMinhHoa(byte[] anhMinhHoa) {
+    public void setAnhMinhHoa(String anhMinhHoa) {
         this.anhMinhHoa = anhMinhHoa;
     }
 
@@ -103,5 +104,17 @@ public class Mon {
 
     public void setDanhMuc(DanhMuc danhMuc) {
         this.danhMuc = danhMuc;
+    }
+
+    public static Mon convertToMon(MonDTO monDTO){
+        DanhMuc danhMuc = new DanhMuc(monDTO.getMaDanhMuc(), monDTO.getTenDanhMuc(), null, null, null);
+        return new Mon(
+            monDTO.getMaMon(),
+            monDTO.getTenMon(),
+            monDTO.getAnhMinhHoa(),
+            monDTO.getDonGia(),
+            monDTO.getTrangThai(),
+            danhMuc
+        );
     }
 }

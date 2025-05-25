@@ -3,11 +3,10 @@ package com.backend.service;
 import java.util.List;
 
 import com.backend.dto.DanhMucKhongMonDTO;
-import com.backend.dto.DanhMucMonKhongAnhDTO;
 import com.backend.model.DanhMuc;
 
 public interface DanhMucService {
-    List<DanhMucMonKhongAnhDTO> getAllDanhMucKhongAnh();
+    List<DanhMuc> getAllDanhMuc();
 
     DanhMuc createDanhMuc(DanhMucKhongMonDTO danhMuc);
 

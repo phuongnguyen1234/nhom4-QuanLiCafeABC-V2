@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.dto.DanhMucKhongMonDTO;
-import com.backend.dto.DanhMucMonKhongAnhDTO;
 import com.backend.model.DanhMuc;
 import com.backend.service.DanhMucService;
 
@@ -28,8 +27,8 @@ public class DanhMucController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<DanhMucMonKhongAnhDTO>> getAllDanhMuc() {
-        List<DanhMucMonKhongAnhDTO> danhMucList = danhMucService.getAllDanhMucKhongAnh();
+    public ResponseEntity<List<DanhMuc>> getAllDanhMuc() {
+        List<DanhMuc> danhMucList = danhMucService.getAllDanhMuc();
         return ResponseEntity.ok(danhMucList);
     }
 

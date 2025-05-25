@@ -14,10 +14,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import com.backend.dto.DanhMucMonKhongAnhDTO;
+import com.backend.dto.DanhMucKhongMonDTO;
 import com.backend.dto.DonHangDTO;
-import com.backend.dto.MonKhongAnhDTO;
 import com.backend.dto.MonTrongDonDTO;
+import com.backend.model.DanhMuc;
+import com.backend.model.Mon;
 import com.backend.model.NhanVien;
 import com.backend.utils.ImageUtils;
 import com.backend.utils.MessageUtils;
@@ -77,10 +78,10 @@ public class ThucDonUI {
     private Text tongTienText;
 
     @FXML
-    private ComboBox<DanhMucMonKhongAnhDTO> danhMucCombobox;
+    private ComboBox<DanhMucKhongMonDTO> danhMucCombobox;
 
     @FXML
-    private Button btnThanhToan;
+    private Button btnThanhToan, btnQuanLiThucDon;
 
     @FXML
     private Label loadingLabel;
@@ -98,11 +99,19 @@ public class ThucDonUI {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    List<DanhMucMonKhongAnhDTO> tatCaDanhMucList = new ArrayList<>();
+    List<DanhMucKhongMonDTO> tatCaDanhMucList = new ArrayList<>();
 
-    private final DanhMucMonKhongAnhDTO danhMucTatCa = new DanhMucMonKhongAnhDTO(0, "Tất cả", "", "", new ArrayList<>());
+    // Biến mới để lưu trữ tất cả DanhMuc với danh sách Món đầy đủ từ server
+    private final List<DanhMuc> allDanhMucWithItems = new ArrayList<>();
+
+    private final DanhMucKhongMonDTO danhMucTatCa = new DanhMucKhongMonDTO(0, "Tất cả", "", "");
 
     private TrangChuUI trangChuUI;
+    private final Map<String, Integer> loaiUuTienMap = new HashMap<>() {{
+        put("Đồ uống", 1);
+        put("Đồ ăn", 2);
+        put("Khác", 3);
+    }};
 
     private final ExecutorService imageLoaderExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -118,6 +127,8 @@ public class ThucDonUI {
     public void initialize() {
         //hien thi loading
         loadingLabel.setVisible(true);
+        btnQuanLiThucDon.setDisable(true);
+        danhMucCombobox.setDisable(true);
 
         // Cấu hình các cột trong TableView
         colTenMon.setCellValueFactory(new PropertyValueFactory<>("tenMon"));
@@ -157,45 +168,54 @@ public class ThucDonUI {
         });
 
         //khoi tao comboBox
-        Task<List<DanhMucMonKhongAnhDTO>> loadDanhMucTask = new Task<>() {
+        Task<List<DanhMuc>> loadDanhMucTask = new Task<>() {
             @Override
-            protected List<DanhMucMonKhongAnhDTO> call() throws Exception {
+            protected List<DanhMuc> call() throws Exception {
                 return layDanhSachDanhMuc();
             }
         };
     
         loadDanhMucTask.setOnSucceeded(e -> {
-            // Lưu lại tất cả danh mục (bao gồm cả ngừng hoạt động)
-            tatCaDanhMucList = loadDanhMucTask.getValue();
+            List<DanhMuc> fetchedDanhMucWithItems = loadDanhMucTask.getValue();
+            this.allDanhMucWithItems.clear();
+            this.allDanhMucWithItems.addAll(fetchedDanhMucWithItems);
 
-            // Bản đồ thứ tự ưu tiên cho từng loại
-            Map<String, Integer> loaiUuTien = new HashMap<>();
-            loaiUuTien.put("Đồ uống", 1);
-            loaiUuTien.put("Đồ ăn", 2);
-            loaiUuTien.put("Khác", 3);
+            // Populate tatCaDanhMucList (List<DanhMucKhongMonDTO>) for QuanLiThucDonUI and other potential uses
+            this.tatCaDanhMucList.clear();
+            for (DanhMuc dm : this.allDanhMucWithItems) {
+                this.tatCaDanhMucList.add(new DanhMucKhongMonDTO(dm.getMaDanhMuc(), dm.getTenDanhMuc(), dm.getLoai(), dm.getTrangThai()));
+            }
 
-            // Lọc và sắp xếp theo thứ tự định nghĩa
-            List<DanhMucMonKhongAnhDTO> danhMucHoatDongList = tatCaDanhMucList.stream()
+            // Prepare ComboBox items: active DanhMucKhongMonDTOs, sorted
+            List<DanhMucKhongMonDTO> danhMucKhongMonHoatDongList = this.allDanhMucWithItems.stream()
                 .filter(dm -> !"Ngừng hoạt động".equalsIgnoreCase(dm.getTrangThai()))
-                .sorted(Comparator.comparing(dm -> loaiUuTien.getOrDefault(dm.getLoai(), Integer.MAX_VALUE)))
+                .map(dm -> new DanhMucKhongMonDTO(dm.getMaDanhMuc(), dm.getTenDanhMuc(), dm.getLoai(), dm.getTrangThai()))
+                .sorted(Comparator.comparing(dto -> loaiUuTienMap.getOrDefault(dto.getLoai(), Integer.MAX_VALUE)))
                 .collect(Collectors.toList());
 
-            List<DanhMucMonKhongAnhDTO> danhMucHienThi = new ArrayList<>();
-            danhMucHienThi.add(danhMucTatCa);
-            danhMucHienThi.addAll(danhMucHoatDongList);
+            List<DanhMucKhongMonDTO> danhMucHienThiCombobox = new ArrayList<>();
+            danhMucHienThiCombobox.add(danhMucTatCa);
+            danhMucHienThiCombobox.addAll(danhMucKhongMonHoatDongList);
 
-            danhMucCombobox.setItems(FXCollections.observableArrayList(danhMucHienThi));
+            danhMucCombobox.setItems(FXCollections.observableArrayList(danhMucHienThiCombobox));
             danhMucCombobox.setValue(danhMucTatCa);
             // Ẩn label loading
             loadingLabel.setVisible(false);
 
-            // Hiển thị thực đơn cho các danh mục hoạt động
-            hienThiThucDon(danhMucHoatDongList);
+            // Initial menu display: active DanhMuc with items, sorted
+            List<DanhMuc> danhMucCoMonHoatDongList = this.allDanhMucWithItems.stream()
+                .filter(dm -> !"Ngừng hoạt động".equalsIgnoreCase(dm.getTrangThai()))
+                .sorted(Comparator.comparing(dm -> loaiUuTienMap.getOrDefault(dm.getLoai(), Integer.MAX_VALUE)))
+                .collect(Collectors.toList());
+            hienThiThucDon(danhMucCoMonHoatDongList);
+
+            btnQuanLiThucDon.setDisable(false);
+            danhMucCombobox.setDisable(false);
         });
 
         danhMucCombobox.setCellFactory(param -> new ListCell<>() {
             @Override
-            protected void updateItem(DanhMucMonKhongAnhDTO item, boolean empty) {
+            protected void updateItem(DanhMucKhongMonDTO item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? "" : item.getTenDanhMuc());
             }
@@ -203,7 +223,7 @@ public class ThucDonUI {
 
         danhMucCombobox.setButtonCell(new ListCell<>() {
             @Override
-            protected void updateItem(DanhMucMonKhongAnhDTO item, boolean empty) {
+            protected void updateItem(DanhMucKhongMonDTO item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? "" : item.getTenDanhMuc());
             }
@@ -218,27 +238,31 @@ public class ThucDonUI {
         thread.setDaemon(true);
         thread.start();
 
-        ObservableList<DanhMucMonKhongAnhDTO> observableDanhMucList = FXCollections.observableArrayList(tatCaDanhMucList);
-        danhMucCombobox.setItems(observableDanhMucList);
-         
         // Xử lý sự kiện khi chọn danh mục
         danhMucCombobox.setOnAction(event -> {
-            DanhMucMonKhongAnhDTO selectedDanhMuc = danhMucCombobox.getValue();
-            if (selectedDanhMuc == null || selectedDanhMuc == danhMucTatCa) {
-                // Chọn "Tất cả": hiển thị toàn bộ danh mục
-                hienThiThucDon(tatCaDanhMucList);
+            DanhMucKhongMonDTO selectedDanhMucDTO = danhMucCombobox.getValue();
+            if (selectedDanhMucDTO == null || selectedDanhMucDTO == danhMucTatCa) {
+                // "Tất cả": hiển thị thực đơn cho các danh mục hoạt động (List<DanhMuc>), sorted
+                List<DanhMuc> activeDanhMucToDisplay = this.allDanhMucWithItems.stream()
+                    .filter(dm -> !"Ngừng hoạt động".equalsIgnoreCase(dm.getTrangThai()))
+                    .sorted(Comparator.comparing(dm -> loaiUuTienMap.getOrDefault(dm.getLoai(), Integer.MAX_VALUE)))
+                    .collect(Collectors.toList());
+                hienThiThucDon(activeDanhMucToDisplay);
             } else {
-                // Chỉ hiển thị món trong danh mục được chọn
-                hienThiThucDon(List.of(selectedDanhMuc));
+                // Specific DanhMucKhongMonDTO selected
+                // Find the corresponding DanhMuc object (with items) from allDanhMucWithItems
+                this.allDanhMucWithItems.stream()
+                    .filter(dm -> dm.getMaDanhMuc() == selectedDanhMucDTO.getMaDanhMuc())
+                    .findFirst()
+                    .ifPresentOrElse(
+                        danhMucWithItems -> hienThiThucDon(List.of(danhMucWithItems)),
+                        () -> hienThiThucDon(new ArrayList<>()) // Fallback: display nothing if not found
+                    );
             }
         });
 
         // Gắn dữ liệu TableView với danh sách món trong đơn
         tableViewDatHang.setItems(danhSachMonTrongDon);
-        //nhanVien = session.getNhanVienByCurrentSession();
-        //btnThemVaoThucDon.setVisible(false);
-        //hien thi thuc don voi tat ca danh muc
-        hienThiThucDon(tatCaDanhMucList);
     }
 
     public void sua(MonTrongDonDTO mon) {
@@ -301,14 +325,14 @@ public class ThucDonUI {
         if(danhSachMonTrongDon.isEmpty()) btnThanhToan.setDisable(true);
         else btnThanhToan.setDisable(false);
     }
-    
-    public void hienThiThucDon(List<DanhMucMonKhongAnhDTO> danhMucList) {
+
+    public void hienThiThucDon(List<DanhMuc> danhMucList) {
         vBoxThucDon.setMaxHeight(Region.USE_COMPUTED_SIZE);
         vBoxThucDon.getChildren().clear();
         scrollPaneThucDon.setFitToHeight(false);
 
-        for (DanhMucMonKhongAnhDTO danhMuc : danhMucList) {
-            List<MonKhongAnhDTO> danhSachMonBan = danhMuc.getMonList().stream()
+        for (DanhMuc danhMuc : danhMucList) {
+            List<Mon> danhSachMonBan = danhMuc.getMonList().stream()
                     .filter(mon -> "Bán".equalsIgnoreCase(mon.getTrangThai()))
                     .collect(Collectors.toList());
 
@@ -328,7 +352,7 @@ public class ThucDonUI {
             int columns = 4;
 
             for (int i = 0; i < danhSachMonBan.size(); i++) {
-                MonKhongAnhDTO mon = danhSachMonBan.get(i);
+                Mon mon = danhSachMonBan.get(i);
                 VBox monBox = taoMonBox(mon);
                 int row = i / columns;
                 int col = i % columns;
@@ -382,7 +406,7 @@ public class ThucDonUI {
         } 
     }
 
-    public void hienThiFormThemMon(MonKhongAnhDTO mon) {
+    public void hienThiFormThemMon(Mon mon) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/themVaoDon.fxml"));
             Parent root = loader.load();
@@ -392,6 +416,7 @@ public class ThucDonUI {
             monTrongDon.setTenMon(mon.getTenMon());
             monTrongDon.setDonGia(mon.getDonGia());
             monTrongDon.setMaMon(mon.getMaMon());
+            monTrongDon.setAnhMinhHoa(mon.getAnhMinhHoa()); // Thêm dòng này để truyền đường dẫn ảnh
             monTrongDon.setYeuCauKhac("");
 
             controller.setMon(monTrongDon);
@@ -418,7 +443,7 @@ public class ThucDonUI {
 
             QuanLiThucDonUI controller = loader.getController();
             controller.setTrangChuUI(trangChuUI);
-            controller.setListMon(tatCaDanhMucList);
+            controller.setListMon(this.allDanhMucWithItems);
 
             // CHỈ cần gán vào center, KHÔNG cần mở Stage mới
             trangChuUI.getMainBorderPane().setCenter(root);
@@ -467,7 +492,7 @@ public class ThucDonUI {
         return danhSachMonTrongDon;
     }
 
-    private List<DanhMucMonKhongAnhDTO> layDanhSachDanhMuc() throws Exception {
+    private List<DanhMuc> layDanhSachDanhMuc() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI("http://localhost:8080/danh-muc/all"))
                 .GET()
@@ -481,7 +506,7 @@ public class ThucDonUI {
         }
     }
 
-    private VBox taoMonBox(MonKhongAnhDTO mon) {
+    private VBox taoMonBox(Mon mon) {
         VBox monBox = new VBox(6);
         monBox.setAlignment(Pos.TOP_CENTER);
         monBox.setPrefSize(160, 200);
@@ -492,9 +517,21 @@ public class ThucDonUI {
         imageView.setFitWidth(120);
         imageView.setPreserveRatio(false);
 
+        // Tải ảnh trong một thread riêng
         imageLoaderExecutor.submit(() -> {
-            Image image = ImageUtils.getMonImage(mon.getMaMon());
-            Platform.runLater(() -> imageView.setImage(image));
+            String imagePath = mon.getAnhMinhHoa();
+            String defaultImagePath = "/icons/loading.png"; // Đảm bảo bạn có file này trong resources/icons
+
+            // Sử dụng ImageUtils để tải ảnh từ resource, với fallback
+            Image imageToLoad = ImageUtils.loadFromResourcesOrDefault(imagePath, defaultImagePath);
+
+            // Cập nhật ImageView trên UI thread
+            Platform.runLater(() -> {
+                if (imageToLoad != null) { // Chỉ set ảnh nếu tải thành công (chính hoặc mặc định)
+                    imageView.setImage(imageToLoad);
+                }
+                // Nếu imageToLoad là null (cả ảnh chính và mặc định đều lỗi), ImageView sẽ giữ ảnh "loading.png"
+            });
         });
 
         imageView.setCursor(Cursor.HAND);
@@ -505,7 +542,7 @@ public class ThucDonUI {
         tenMonText.setTextAlignment(TextAlignment.CENTER);
         tenMonText.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-font-family: Open Sans;");
 
-        Text donGiaText = new Text(String.format("%d VND", mon.getDonGia()));
+        Text donGiaText = new Text(String.format("%,d VND", mon.getDonGia())); // Định dạng số tiền
         donGiaText.setTextAlignment(TextAlignment.CENTER);
         donGiaText.setStyle("-fx-font-size: 16px; -fx-font-family: Open Sans;");
 

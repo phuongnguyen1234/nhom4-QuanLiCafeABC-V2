@@ -51,7 +51,8 @@ public class ChinhSuaDonUI {
     private void loadChinhSuaDonData() {
         if (mon != null) {
             tenMonText.setText("Tên: " + mon.getTenMon());
-            anhMinhHoaImageView.setImage(ImageUtils.getMonImage(mon.getMaMon()));
+            // Sử dụng loadFromResourcesOrDefault với đường dẫn ảnh từ MonTrongDonDTO và một ảnh mặc định
+            anhMinhHoaImageView.setImage(ImageUtils.loadFromResourcesOrDefault(mon.getAnhMinhHoa(), "/icons/loading.png"));
             donGiaText.setText("Đơn giá: " + mon.getDonGia() + " VND");
             soLuongSpinner.getValueFactory().setValue(mon.getSoLuong());
             yeuCauKhacTextArea.setText(mon.getYeuCauKhac());
@@ -82,4 +83,3 @@ public class ChinhSuaDonUI {
         tenMonText.getScene().getWindow().hide();
     }
 } 
-

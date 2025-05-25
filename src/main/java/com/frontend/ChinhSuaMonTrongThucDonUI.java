@@ -1,27 +1,26 @@
 package com.frontend;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
-
-import javax.imageio.ImageIO;
+import java.util.UUID;
 
 import com.backend.dto.DanhMucKhongMonDTO;
-import com.backend.dto.MonQLy;
-import com.backend.model.DanhMuc;
-import com.backend.model.Mon;
+import com.backend.dto.MonDTO;
 import com.backend.utils.HttpUtils;
 import com.backend.utils.ImageUtils;
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javafx.concurrent.Task;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -32,7 +31,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 public class ChinhSuaMonTrongThucDonUI {
 
@@ -54,9 +52,11 @@ public class ChinhSuaMonTrongThucDonUI {
     @FXML
     private Button btnCapNhat, btnQuayLai;
 
-    private MonQLy mon;
+    private MonDTO mon;
 
     private List<DanhMucKhongMonDTO> danhMucList;
+
+    private File newSelectedImageFile; // Lưu trữ file ảnh mới được chọn (nếu có)
 
     @FXML
     public void initialize() {
@@ -108,7 +108,7 @@ public class ChinhSuaMonTrongThucDonUI {
         new Thread(loadTask).start();
     }
 
-    public void setMon(MonQLy mon) {
+    public void setMon(MonDTO mon) {
         this.mon = mon;
 
         if (mon == null) return;
@@ -116,7 +116,10 @@ public class ChinhSuaMonTrongThucDonUI {
         tenMonTextField.setText(mon.getTenMon());
         donGiaTextField.setText(String.valueOf(mon.getDonGia()));
         trangThaiCheckBox.setSelected("Bán".equals(mon.getTrangThai()));
-        anhMinhHoaImageView.setImage(ImageUtils.getMonImage(mon.getMaMon()));
+
+        // Sử dụng ImageUtils để tải ảnh từ resource path
+        Image existingImage = ImageUtils.loadFromResourcesOrDefault(mon.getAnhMinhHoa(), "/icons/loading.png");
+        anhMinhHoaImageView.setImage(existingImage);
 
         // Delay chọn danh mục nếu danh sách chưa load
         Task<Void> waitForComboBoxLoad = new Task<>() {
@@ -172,32 +175,40 @@ public class ChinhSuaMonTrongThucDonUI {
             return;
         }
 
-        // Chuẩn bị ảnh mới nếu có
-        Image image = anhMinhHoaImageView.getImage();
-        byte[] anhBytes = null;
-        if (image != null) {
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "jpg", baos);
-                mon.setAnhMinhHoa(baos.toByteArray());
-                anhBytes = baos.toByteArray();
-            } catch (IOException e) {
-                MessageUtils.showErrorMessage("Lỗi khi xử lý ảnh minh họa!");
-                return;
-            } catch (IllegalArgumentException e) {
-                MessageUtils.showErrorMessage("Ảnh chưa được load!");
-                return;
-            }
-        }
-
-        MonQLy monUpdate = new MonQLy();
+        MonDTO monUpdate = new MonDTO();
         monUpdate.setMaMon(mon.getMaMon());
         monUpdate.setTenMon(tenMon);
         monUpdate.setDonGia(donGia);
         monUpdate.setTrangThai(trangThaiCheckBox.isSelected() ? "Bán" : "Không bán");
         monUpdate.setMaDanhMuc(selectedDanhMuc.getMaDanhMuc());
+        
+        // Xử lý ảnh minh họa
+        if (this.newSelectedImageFile != null) { // Nếu người dùng đã chọn ảnh mới
+            String originalFileName = newSelectedImageFile.getName();
+            String fileExtension = "";
+            int lastDotIndex = originalFileName.lastIndexOf('.');
+            if (lastDotIndex > 0 && lastDotIndex < originalFileName.length() - 1) {
+                fileExtension = originalFileName.substring(lastDotIndex);
+            }
+            String newImageName = UUID.randomUUID().toString() + fileExtension;
+            Path targetDirectory = Paths.get("src/main/resources/images/mon");
 
-        monUpdate.setAnhMinhHoa(anhBytes != null ? anhBytes : mon.getAnhMinhHoa());
-
+            try {
+                if (!Files.exists(targetDirectory)) {
+                    Files.createDirectories(targetDirectory);
+                }
+                Path targetPath = targetDirectory.resolve(newImageName);
+                Files.copy(newSelectedImageFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+                monUpdate.setAnhMinhHoa("/images/mon/" + newImageName);
+            } catch (IOException e) {
+                e.printStackTrace();
+                MessageUtils.showErrorMessage("Lỗi khi lưu ảnh minh họa mới! " + e.getMessage());
+                return;
+            }
+        } else { // Giữ lại ảnh cũ nếu không chọn ảnh mới
+            monUpdate.setAnhMinhHoa(this.mon.getAnhMinhHoa());
+        }
+        
         //debug
         System.out.println("Cập nhật món: " + monUpdate.getTenMon());
         System.out.println("Đơn giá: " + monUpdate.getDonGia());
@@ -251,17 +262,19 @@ public class ChinhSuaMonTrongThucDonUI {
         File file = fileChooser.showOpenDialog(tenMonTextField.getScene().getWindow());
 
         if (file != null) {
+            this.newSelectedImageFile = file; // Lưu file ảnh mới được chọn
             try {
                 Image img = new Image(file.toURI().toString());
                 anhMinhHoaImageView.setImage(img);
             } catch (Exception e) {
                 e.printStackTrace();
+                this.newSelectedImageFile = null; // Reset nếu có lỗi
                 MessageUtils.showErrorMessage("Không thể tải ảnh: " + e.getMessage());
             }
         }
     }
 
-    private Task<Void> updateRequest(MonQLy mon) {
+    private Task<Void> updateRequest(MonDTO mon) {
         return new Task<>() {
             @Override
             protected Void call() throws Exception {

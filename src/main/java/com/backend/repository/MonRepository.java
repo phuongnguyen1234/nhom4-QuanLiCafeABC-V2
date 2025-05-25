@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.backend.dto.MonQLy;
+import com.backend.dto.MonDTO;
 import com.backend.model.DanhMuc;
 import com.backend.model.Mon;
 
@@ -24,7 +24,7 @@ public interface MonRepository extends JpaRepository<Mon, String> {
     List<Mon> findByDanhMucIn(List<DanhMuc> danhMucList);
 
     //them va cap nhat mon
-    Mon save(MonQLy mon);
+    Mon save(MonDTO mon);
 
     
 

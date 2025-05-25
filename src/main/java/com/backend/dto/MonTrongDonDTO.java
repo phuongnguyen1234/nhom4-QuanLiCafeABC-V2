@@ -3,7 +3,7 @@ package com.backend.dto;
 public class MonTrongDonDTO {
     private String maMon;
     private String tenMon;
-    private byte[] anhMinhHoa;
+    private String anhMinhHoa;
     private int donGia;
     private String maDanhMuc;
     private String tenDanhMuc;
@@ -13,7 +13,7 @@ public class MonTrongDonDTO {
 
     public MonTrongDonDTO(){}
 
-    public MonTrongDonDTO(String maMon, String tenMon, byte[] anhMinhHoa, int donGia, String maDanhMuc,
+    public MonTrongDonDTO(String maMon, String tenMon, String anhMinhHoa, int donGia, String maDanhMuc,
     String tenDanhMuc, int soLuong, String yeuCauKhac, int tamTinh) {
         this.maMon = maMon;
         this.tenMon = tenMon;
@@ -42,11 +42,11 @@ public class MonTrongDonDTO {
         this.tenMon = tenMon;
     }
 
-    public byte[] getAnhMinhHoa() {
+    public String getAnhMinhHoa() {
         return anhMinhHoa;
     }
 
-    public void setAnhMinhHoa(byte[] anhMinhHoa) {
+    public void setAnhMinhHoa(String anhMinhHoa) {
         this.anhMinhHoa = anhMinhHoa;
     }
 

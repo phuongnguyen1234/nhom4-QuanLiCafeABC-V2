@@ -1,15 +1,23 @@
 package com.frontend;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.backend.dto.DanhMucMonKhongAnhDTO;
-import com.backend.dto.MonKhongAnhDTO;
-import com.backend.dto.MonQLy;
+import com.backend.dto.MonDTO;
+import com.backend.model.DanhMuc;
+import com.backend.model.Mon;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -32,16 +40,16 @@ public class QuanLiThucDonUI {
     private Button btnDanhMuc, btnThemMon, btnQuayLai, btnTimKiem;
 
     @FXML
-    private TableColumn<MonQLy, Integer> colSTT, colDonGia;
+    private TableColumn<MonDTO, Integer> colSTT, colDonGia;
 
     @FXML
-    private TableColumn<MonQLy, String> colMaMon, colTenMon, colTrangThai, colDanhMuc;
+    private TableColumn<MonDTO, String> colMaMon, colTenMon, colTrangThai, colDanhMuc;
 
     @FXML
-    private TableColumn<MonQLy, Void> colHanhDong;
+    private TableColumn<MonDTO, Void> colHanhDong;
 
     @FXML
-    private TableView<MonQLy> tableViewMon;
+    private TableView<MonDTO> tableViewMon;
 
     @FXML
     private Pagination phanTrang;
@@ -49,23 +57,27 @@ public class QuanLiThucDonUI {
     @FXML
     private TextField timMonTheoTenTextField;
 
-    private final ObservableList<MonQLy> list = FXCollections.observableArrayList();
+    private final ObservableList<MonDTO> list = FXCollections.observableArrayList();
 
-    private List<DanhMucMonKhongAnhDTO> listDanhMuc = new ArrayList<>();
+    private List<DanhMuc> listDanhMuc = new ArrayList<>();
 
     private TrangChuUI trangChuUI;
 
     private QuanLiDanhMucUI quanLiDanhMucUI;
 
+    private final HttpClient client = HttpClient.newHttpClient();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     // phan trang
     private static final int ROWS_PER_PAGE = 50;
-    private List<MonQLy> danhSachGoc = new ArrayList<>();
+    private List<MonDTO> allMonList = new ArrayList<>(); // Danh sách chứa tất cả món, không bị thay đổi bởi tìm kiếm
+    private List<MonDTO> danhSachGoc = new ArrayList<>(); // Danh sách hiện tại để hiển thị và phân trang (sẽ trỏ tới allMonList hoặc kết quả lọc)
 
     public void setTrangChuUI(TrangChuUI trangChuUI) {
         this.trangChuUI = trangChuUI;
     }
 
-    public List<DanhMucMonKhongAnhDTO> getListDanhMuc() {
+    public List<DanhMuc> getListDanhMuc() {
         return listDanhMuc;
     }
 
@@ -124,29 +136,26 @@ public class QuanLiThucDonUI {
         timMonTheoTenTextField.setOnAction(event -> timKiem());
     }
 
-    public void setListMon(List<DanhMucMonKhongAnhDTO> listDanhMuc) {
+    public void setListMon(List<DanhMuc> listDanhMuc) {
         this.listDanhMuc = listDanhMuc;
-        danhSachGoc.clear();
+        this.allMonList.clear(); // Xóa danh sách tất cả món cũ
+        // this.danhSachGoc.clear(); // Không cần clear ở đây nữa, sẽ được gán lại
 
-        for (DanhMucMonKhongAnhDTO danhMuc : listDanhMuc) {
-            List<MonKhongAnhDTO> listMon = danhMuc.getMonList();
-            for (MonKhongAnhDTO mon : listMon) {
-                MonQLy monQLy = new MonQLy();
-                monQLy.setMaMon(mon.getMaMon());
-                monQLy.setTenMon(mon.getTenMon());
-                monQLy.setDonGia(mon.getDonGia());
-                monQLy.setTrangThai(mon.getTrangThai());
-                monQLy.setAnhMinhHoa(null);
-                monQLy.setMaDanhMuc(danhMuc.getMaDanhMuc());
-                monQLy.setTenDanhMuc(danhMuc.getTenDanhMuc());
-                danhSachGoc.add(monQLy);
+        for (DanhMuc danhMuc : listDanhMuc) {
+            List<Mon> listMon = danhMuc.getMonList();
+            for (Mon mon : listMon) {
+                mon.setDanhMuc(danhMuc); // Gán danh mục cho món
+                MonDTO dto = MonDTO.convertToMonDTO(mon);
+                this.allMonList.add(dto);
             }
         }
 
+        // Ban đầu, danh sách hiển thị là toàn bộ danh sách món
+        this.danhSachGoc = new ArrayList<>(this.allMonList);
         setupPagination(); // gọi lại phân trang
     }
 
-    public void sua(MonQLy mon) {
+    public void sua(MonDTO mon) {
         // mo dialog danh muc
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/chinhSuaMonTrongThucDon.fxml"));
@@ -164,6 +173,7 @@ public class QuanLiThucDonUI {
 
             // Hiển thị và chờ người dùng đóng dialog
             dialogStage.showAndWait();
+            reloadDanhSachMon(); // Tải lại danh sách món sau khi sửa
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -208,6 +218,7 @@ public class QuanLiThucDonUI {
 
             // Hiển thị và chờ người dùng đóng dialog
             dialogStage.showAndWait();
+            reloadDanhSachMon(); // Tải lại danh sách món sau khi thêm
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -222,28 +233,21 @@ public class QuanLiThucDonUI {
     public void timKiem() {
         String tenMon = timMonTheoTenTextField.getText().trim().toLowerCase();
         if (tenMon.isEmpty()) {
-            setListMon(listDanhMuc);
+            // Nếu ô tìm kiếm rỗng, hiển thị lại tất cả món từ allMonList
+            this.danhSachGoc = new ArrayList<>(this.allMonList);
+            setupPagination();
             return;
         }
 
-        List<MonQLy> ketQua = new ArrayList<>();
-        for (DanhMucMonKhongAnhDTO danhMuc : listDanhMuc) {
-            for (MonKhongAnhDTO mon : danhMuc.getMonList()) {
-                if (mon.getTenMon().toLowerCase().contains(tenMon)) {
-                    MonQLy monQLy = new MonQLy();
-                    monQLy.setMaMon(mon.getMaMon());
-                    monQLy.setTenMon(mon.getTenMon());
-                    monQLy.setDonGia(mon.getDonGia());
-                    monQLy.setTrangThai(mon.getTrangThai());
-                    monQLy.setAnhMinhHoa(null);
-                    monQLy.setMaDanhMuc(danhMuc.getMaDanhMuc());
-                    monQLy.setTenDanhMuc(danhMuc.getTenDanhMuc());
-                    ketQua.add(monQLy);
-                }
+        List<MonDTO> ketQua = new ArrayList<>();
+        // Tìm kiếm trên danh sách allMonList (chứa tất cả MonDTO đã được chuyển đổi)
+        for (MonDTO monDTO : this.allMonList) {
+            if (monDTO.getTenMon().toLowerCase().contains(tenMon)) {
+                ketQua.add(monDTO); // Thêm trực tiếp MonDTO đã có
             }
         }
 
-        danhSachGoc = ketQua;
+        this.danhSachGoc = ketQua; // danhSachGoc bây giờ là kết quả đã lọc
         setupPagination();
     }
 
@@ -251,7 +255,7 @@ public class QuanLiThucDonUI {
         int fromIndex = pageIndex * ROWS_PER_PAGE;
         int toIndex = Math.min(fromIndex + ROWS_PER_PAGE, danhSachGoc.size());
 
-        List<MonQLy> pageData = danhSachGoc.subList(fromIndex, toIndex);
+        List<MonDTO> pageData = danhSachGoc.subList(fromIndex, toIndex);
         tableViewMon.setItems(FXCollections.observableArrayList(pageData));
     }
 
@@ -265,4 +269,52 @@ public class QuanLiThucDonUI {
             capNhatTrang(newIndex.intValue());
         });
     }
+
+    private void reloadDanhSachMon() {
+        setDisableItems(true); // Vô hiệu hóa các nút trong khi tải dữ liệu
+        Task<List<DanhMuc>> task = new Task<>() {
+            @Override
+            protected List<DanhMuc> call() throws Exception {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(new URI("http://localhost:8080/danh-muc/all"))
+                        .GET()
+                        .build();
+
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() == 200) {
+                    return objectMapper.readValue(response.body(), new TypeReference<>() {});
+                } else {
+                    throw new IOException("HTTP Error: " + response.statusCode());
+                }
+            }
+        };
+
+        // Đặt sự kiện thành công
+        task.setOnSucceeded(event -> {
+            List<DanhMuc> danhMucList = task.getValue();
+            setListMon(danhMucList); // Cập nhật danh sách món
+            setDisableItems(false);
+        });
+
+        // Đặt sự kiện thất bại
+        task.setOnFailed(event -> {
+            Throwable exception = task.getException();
+            System.err.println("Error loading data: " + exception.getMessage());
+            exception.printStackTrace();
+            setDisableItems(false);
+        });
+
+        new Thread(task).start();
+    }
+
+    private void setDisableItems(boolean disable) {
+        tableViewMon.setDisable(disable);
+        phanTrang.setDisable(disable);
+        btnDanhMuc.setDisable(disable);
+        btnThemMon.setDisable(disable);
+        btnQuayLai.setDisable(disable);
+        btnTimKiem.setDisable(disable);
+        timMonTheoTenTextField.setDisable(disable);
+    }
+
 }

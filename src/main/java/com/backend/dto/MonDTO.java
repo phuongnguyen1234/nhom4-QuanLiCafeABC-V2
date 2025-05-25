@@ -1,17 +1,19 @@
 package com.backend.dto;
 
-public class MonQLy {
+import com.backend.model.Mon;
+
+public class MonDTO {
     private String maMon;
     private String tenMon;
-    private byte[] anhMinhHoa;
+    private String anhMinhHoa;
     private String trangThai;
     private int donGia;
     private int maDanhMuc;
     private String tenDanhMuc;
 
-    public MonQLy(){}
+    public MonDTO(){}
 
-    public MonQLy(String maMon, String tenMon, byte[] anhMinhHoa, String trangThai, int donGia, int maDanhMuc, String tenDanhMuc) {
+    public MonDTO(String maMon, String tenMon, String anhMinhHoa, String trangThai, int donGia, int maDanhMuc, String tenDanhMuc) {
         this.maMon = maMon;
         this.tenMon = tenMon;
         this.anhMinhHoa = anhMinhHoa;
@@ -37,11 +39,11 @@ public class MonQLy {
         this.tenMon = tenMon;
     }
 
-    public byte[] getAnhMinhHoa() {
+    public String getAnhMinhHoa() {
         return anhMinhHoa;
     }
 
-    public void setAnhMinhHoa(byte[] anhMinhHoa) {
+    public void setAnhMinhHoa(String anhMinhHoa) {
         this.anhMinhHoa = anhMinhHoa;
     }
 
@@ -75,6 +77,18 @@ public class MonQLy {
 
     public void setTenDanhMuc(String tenDanhMuc) {
         this.tenDanhMuc = tenDanhMuc;
+    }
+
+    public static MonDTO convertToMonDTO(Mon mon) {
+        return new MonDTO(
+            mon.getMaMon(),
+            mon.getTenMon(),
+            mon.getAnhMinhHoa(),
+            mon.getTrangThai(),
+            mon.getDonGia(),
+            mon.getDanhMuc().getMaDanhMuc(),
+            mon.getDanhMuc().getTenDanhMuc()
+        );
     }
 
 }

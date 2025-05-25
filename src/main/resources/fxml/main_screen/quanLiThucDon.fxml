@@ -27,7 +27,7 @@
             <TableColumn fx:id="colTrangThai" prefWidth="130.0" resizable="false" text="Trạng thái" />
             <TableColumn fx:id="colDonGia" prefWidth="134.0" resizable="false" text="Đơn giá" />
             <TableColumn fx:id="colDanhMuc" prefWidth="165.0" resizable="false" text="Danh mục" />
-            <TableColumn fx:id="colHanhDong" maxWidth="1.7976931348623157E308" prefWidth="178.0" resizable="false" />
+            <TableColumn fx:id="colHanhDong" maxWidth="1.7976931348623157E308" prefWidth="174.0" resizable="false" />
          </columns>
       </TableView>
       <AnchorPane prefHeight="150.0" prefWidth="1300.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">

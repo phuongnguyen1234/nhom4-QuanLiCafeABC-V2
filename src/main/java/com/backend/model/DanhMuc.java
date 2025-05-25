@@ -2,6 +2,8 @@ package com.backend.model;
 
 import java.util.List;
 
+import com.backend.dto.DanhMucKhongMonDTO;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -84,4 +86,14 @@ public class DanhMuc {
     public void setMonList(List<Mon> monList) {
         this.monList = monList;
     }    
+
+    public static DanhMuc convertToDanhMuc(DanhMucKhongMonDTO danhMucDTO) {
+        return new DanhMuc(
+            danhMucDTO.getMaDanhMuc(),
+            danhMucDTO.getTenDanhMuc(),
+            danhMucDTO.getLoai(),
+            danhMucDTO.getTrangThai(),
+            null // monList is not set here
+        );
+    }
 }
