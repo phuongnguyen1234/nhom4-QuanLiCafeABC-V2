@@ -1,0 +1,45 @@
+/* Nút Xem */
+.button-view {
+    -fx-background-color: #2196F3; /* Màu xanh dương */
+    -fx-text-fill: white;          /* Màu chữ trắng */
+    -fx-padding: 5px 10px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+.button-view:hover {
+    -fx-background-color: #1976D2; /* Màu khi rê chuột */
+}
+
+/* Nút Sửa */
+.button-edit {
+    -fx-background-color: #FF9800; /* Màu cam */
+    -fx-text-fill: white;
+    -fx-padding: 5px 10px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    -fx-width: 40px;
+    -fx-height: 40px;
+}
+.button-edit:hover {
+    -fx-background-color: #F57C00; /* Màu khi rê chuột */
+}
+
+/* Nút Xóa */
+.button-delete {
+    -fx-background-color: #F44336; /* Màu đỏ */
+    -fx-text-fill: white;
+    -fx-padding: 5px 10px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+.button-delete:hover {
+    -fx-background-color: #D32F2F; /* Màu khi rê chuột */
+}
+
+/* an HBox */
+.hBox{
+    -fx-background-color: transparent;
+}

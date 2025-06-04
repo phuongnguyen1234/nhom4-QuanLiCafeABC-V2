@@ -1,0 +1,23 @@
+.gradient{
+    -fx-background-color: linear-gradient(to bottom right, #0f6789, #286155);
+}
+
+.login-btn{
+    -fx-background-color: linear-gradient(to bottom right, #098c53, #246861);
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+
+.login-btn:hover{
+    -fx-background-color: linear-gradient(to bottom right, #0fb565, #399a8f);
+}
+
+.textfield{
+    -fx-background-color: transparent;
+    -fx-border-color:linear-gradient(to bottom right, #0f6789, #286155);
+    -fx-border-width: 0.8px
+}
+
+.textfield:focused{
+    -fx-border-width: 1px
+}
