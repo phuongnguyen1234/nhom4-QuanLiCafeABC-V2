@@ -11,6 +11,6 @@ import com.backend.model.DoanhThu;
 public interface DoanhThuRepository extends JpaRepository<DoanhThu, Integer> {
     // Custom query methods can be added here if needed
     // For example, to find all DoanhThu records or by specific criteria
-
+    
     List<DoanhThu> findByThangAndNam(int Thang, int Nam);
 }

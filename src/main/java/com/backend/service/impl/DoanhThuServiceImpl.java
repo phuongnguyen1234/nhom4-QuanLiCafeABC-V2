@@ -23,6 +23,7 @@ public class DoanhThuServiceImpl implements DoanhThuService {
         int thang = now.getMonthValue();
         int nam = now.getYear();
         List<DoanhThu> list = doanhThuRepository.findByThangAndNam(thang, nam);
+        if (list.isEmpty()) return 0;
         return list.get(0).getTongDoanhThu(); 
     }
 
@@ -33,6 +34,7 @@ public class DoanhThuServiceImpl implements DoanhThuService {
         int thang = now.getMonthValue();
         int nam = now.getYear();
         List<DoanhThu> list = doanhThuRepository.findByThangAndNam(thang, nam);
+        if (list.isEmpty()) return 0;
         return list.get(0).getSoDon();
     }
     @Override
@@ -41,6 +43,7 @@ public class DoanhThuServiceImpl implements DoanhThuService {
         int thang = now.getMonthValue();
         int nam = now.getYear();
         List<DoanhThu> list = doanhThuRepository.findByThangAndNam(thang, nam);
+        if (list.isEmpty()) return 0;
         return list.get(0).getSoMon();
     }
 

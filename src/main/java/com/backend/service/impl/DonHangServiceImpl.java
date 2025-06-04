@@ -2,7 +2,6 @@ package com.backend.service.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,18 +109,19 @@ public class DonHangServiceImpl implements DonHangService {
     }
     @Override
     public List<NhanVien> getTop3NhanVienTheoThang() {
-        LocalDateTime dateTime = LocalDateTime.now(); // hoặc lấy từ nơi khác
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-        String formattedMonth = dateTime.format(formatter);
-        List<String> maNhanVienList = donHangRepository.findTop3MaNhanVienTheoThang(formattedMonth);
-        return nhanVienRepository.findAllById(maNhanVienList);
+        LocalDate now = LocalDate.now();
+        int thang = now.getMonthValue();
+        int nam = now.getYear();
+        if (donHangRepository.top3MaNhanVienTheoThang(thang, nam).isEmpty()) return null;
+        return nhanVienRepository.findAllById(donHangRepository.top3MaNhanVienTheoThang(thang, nam));
     }
     @Override
     public List<String> getTop5MonBanChayTheoThang() {
         LocalDate now = LocalDate.now();
         int thang = now.getMonthValue();
         int nam = now.getYear();
-        return donHangRepository.findTop5MonTheoThangNam(thang, nam);
+        if (donHangRepository.top5MonTheoThangNam(thang, nam).isEmpty()) return null;
+        return donHangRepository.top5MonTheoThangNam(thang, nam);
     }
 }
 
