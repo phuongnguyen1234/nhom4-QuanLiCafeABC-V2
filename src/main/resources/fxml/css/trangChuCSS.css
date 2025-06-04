@@ -1,0 +1,26 @@
+.header{
+    -fx-background-color: linear-gradient(to bottom right, #098c53, #246861);
+}
+
+.nav-form{
+    -fx-background-color: linear-gradient(to bottom right, #0f6789, #286155);
+}
+
+.function-btn{
+    -fx-background-color: linear-gradient(to bottom right, #1ec07a, #237e75);
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+
+.function-btn:hover{
+    -fx-background-color: linear-gradient(to bottom right, #2ace7f, #399a8f);
+}
+
+.logout-btn{
+    -fx-background-color: linear-gradient(to bottom right, #1ec07a, #237e75);
+    -fx-background-radius: 5px;
+}
+
+.logout-btn:hover{
+    -fx-background-color: rgb(255, 45, 45);
+}

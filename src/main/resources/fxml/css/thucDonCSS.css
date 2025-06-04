@@ -1,0 +1,186 @@
+.white-bg{
+    -fx-background-color: #fff;
+}
+
+.radius{
+    -fx-background-radius: 8px;
+}
+
+.transparent{
+    -fx-background-color: transparent;
+}
+
+.shadow{
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 5, 0, 0, 0);
+}
+
+.category-label{
+    -fx-border-color: #286155;
+    -fx-border-width: 0 0 0 5px;
+    -fx-border-padding: 0 0 0 10px;
+    -fx-padding: 0 0 0 10px;
+    -fx-font-size: 25px;
+    -fx-font-family: "Open Sans Semibold";
+    -fx-text-fill: linear-gradient(to bottom right, #0f6789, #286155);
+    -fx-background-color: linear-gradient(to bottom right,#aee2d8 ,#ffffff);
+    -fx-pref-width: 698px;
+}
+
+.table-view{
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-border-color: linear-gradient(to bottom right, #0f6789, #286155);
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 5px;
+}
+
+.table-view .column-header-background{
+    -fx-background-color: linear-gradient(to bottom right, #0f6789, #286155);
+    -fx-border-radius: 5px;
+    -fx-background-inset: 0 0 0 0;
+}
+
+.table-view .column-header, .filter{
+    -fx-background-color: transparent;
+    -fx-size: 30px;
+}
+
+.table-view .column-header .label{
+    -fx-font-size: 13px;
+    -fx-text-fill: #fff;
+}
+
+/*.table-view .table-cell{
+    -fx-padding: 5px;
+    -fx-font-family: "Open Sans";
+    -fx-font-size: 13px;
+} */
+
+.btn{
+    -fx-background-color: linear-gradient(to bottom right, #098c53, #246861);
+}
+
+.btn:hover{
+    -fx-background-color: linear-gradient(to bottom right, #0fb565, #399a8f);
+    -fx-cursor: hand;
+}
+
+.font-size-18{
+    -fx-font-size: 18px;
+}
+
+.font-size-16{
+    -fx-font-size: 16px;
+}
+
+.font-size-14{
+    -fx-font-size: 14px;
+}
+
+.font-size-20{
+    -fx-font-size: 20px;
+}
+
+.font-family{
+    -fx-font-family: "Open Sans";
+}
+
+.btn-sua{
+    -fx-background-color: #1f9eed;
+    -fx-text-fill: white;
+    -fx-min-width: 30px;
+    -fx-padding: 5 10 5 10;
+    -fx-cursor: hand;
+}
+
+.btn-xoa{
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+    -fx-min-width: 30px;
+    -fx-padding: 5 10 5 10;
+    -fx-cursor: hand;
+}
+
+.combobox{
+    -fx-background-color: #fff;
+    -fx-border-color: #286155;
+    -fx-border-radius: 5px;
+    -fx-border-width: 1.5px;
+    -fx-cursor: hand;
+}
+
+.combobox2{
+    -fx-background-color: #fff;
+    -fx-border-color: #bfbfbf;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-cursor: hand;
+}
+
+.text-field{
+    -fx-border-color: #286155;
+    -fx-border-radius: 5px;
+}
+
+.pagination .pagination-control .toggle-button{
+    -fx-background-color: transparent;
+    -fx-border-color: linear-gradient(to bottom right, #098c53, #246861);
+    -fx-border-radius: 3px;
+}
+
+.pagination .pagination-control .toggle-button:hover{
+    -fx-background-color: linear-gradient(to bottom right, #098c53, #246861);
+    -fx-text-fill: #fff;
+    -fx-cursor: hand;
+    -fx-border-radius: 3px;
+}
+
+.pagination > .pagination-control > .control-box > .left-arrow-button{
+    -fx-background-color: linear-gradient(to bottom right, #098c53, #246861);
+    -fx-border-radius: 3px;
+    -fx-text-fill: #fff;
+}
+
+.pagination > .pagination-control > .control-box > .right-arrow-button{
+    -fx-background-color: linear-gradient(to bottom right, #098c53, #246861);
+    -fx-border-radius: 3px;
+    -fx-text-fill: #fff;
+}
+
+.pagination .pagination-control .toggle-button:selected{
+    -fx-background-color: linear-gradient(to bottom right, #098c53, #246861);
+    -fx-text-fill: #fff;
+    -fx-border-radius: 3px;
+}
+
+.pagination > .pagination-control > .control-box > .left-arrow-button{
+    -fx-background-color: linear-gradient(to bottom right, #098c53, #246861);;
+    -fx-border-radius: 3px;
+    -fx-text-fill: #fff;
+}
+
+.pagination > .pagination-control > .control-box > .right-arrow-button:hover{
+    -fx-background-color: linear-gradient(to bottom right, #0fb565, #399a8f);
+    -fx-border-radius: 3px;
+    -fx-text-fill: #fff;
+    -fx-cursor: hand;
+
+}
+
+.pagination > .pagination-control > .control-box > .left-arrow-button:hover{
+    -fx-background-color: linear-gradient(to bottom right, #0fb565, #399a8f);
+    -fx-border-radius: 3px;
+    -fx-text-fill: #fff;
+    -fx-cursor: hand;
+}
+
+#tableViewDanhMuc .table-cell, #tableViewMon .table-cell{
+    -fx-font-family: "Open Sans";
+    -fx-font-size: 18px;
+    -fx-alignment: center;
+}
+
+#tableViewDatHang .table-cell, #tableViewDonHang .table-cell {
+    -fx-font-family: "Open Sans";
+    -fx-font-size: 14px;
+}
