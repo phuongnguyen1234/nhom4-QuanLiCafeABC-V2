@@ -98,7 +98,7 @@
                         <Font name="Open Sans" size="18.0" />
                      </font>
                   </Label>
-                  <CheckBox fx:id="hienNVNghiViecCheckBox" mnemonicParsing="false" onAction="#hienNVNghiViec" />
+                  <CheckBox fx:id="hienNVNghiViecCheckBox" mnemonicParsing="false" />
                </children>
             </HBox>
          </children>

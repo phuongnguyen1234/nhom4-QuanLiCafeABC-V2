@@ -4,8 +4,6 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -13,13 +11,12 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="600.0" stylesheets="@../css/nhanVienCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ThongTinNhanVienUI">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="787.0" prefWidth="600.0" stylesheets="@../css/nhanVienCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ThongTinNhanVienUI">
    <children>
       <VBox spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
@@ -231,78 +228,30 @@
                   <Insets top="20.0" />
                </VBox.margin>
             </Label>
-
-            <GridPane hgap="10.0" vgap="10.0" VBox.vgrow="NEVER">
+      
+                  <GridPane hgap="10.0" vgap="10.0" VBox.vgrow="NEVER">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="255.0" minWidth="10.0" prefWidth="155.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="345.0" minWidth="10.0" prefWidth="345.0" />
                </columnConstraints>
                <rowConstraints>
                   <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
                </rowConstraints>
-
-               <children>
+      
+                     <children>
                   <!-- Các Label thông tin -->
                   <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="0">
                      <font>
                         <Font name="Open Sans Semibold" size="20.0" />
                      </font>
                   </Label>
-
-                  <Label text="Mật khẩu:" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                     <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
-                     </font>
-                  </Label>
-
-                  <!-- Dữ liệu thông tin đăng nhập -->
-                  <Text fx:id="textEmail" text="Email người dùng" wrappingWidth="346.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            
+                              <!-- Dữ liệu thông tin đăng nhập -->
+                  <Text fx:id="textEmail" text="Email người dùng" wrappingWidth="343.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                      <font>
                         <Font name="Open Sans" size="20.0" />
                      </font>
                   </Text>
-
-                  <HBox alignment="CENTER_LEFT" prefHeight="29.0" prefWidth="335.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                     <children>
-                        <!-- StackPane để chứa cả PasswordField và TextField -->
-                        <StackPane alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0">
-                           <!-- PasswordField -->
-                           <PasswordField fx:id="passwordField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
-                              <font>
-                                 <Font name="Open Sans Semibold" size="20.0" />
-                              </font>
-                              <style>
-                                 -fx-background-color: transparent;
-                                 -fx-border-color: #246861;-fx-border-width: 1.5px;</style>
-                           </PasswordField>
-
-                           <!-- TextField để hiển thị mật khẩu -->
-                           <TextField fx:id="textField" editable="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0" visible="false">
-                              <font>
-                                 <Font name="Open Sans Semibold" size="20.0" />
-                              </font>
-                              <style>
-                                 -fx-background-color: transparent;
-                                 -fx-border-width: 0px;
-                              </style>
-                           </TextField>
-                        </StackPane>
-                        <!-- Nút hiện mật khẩu -->
-                        <Button fx:id="btnHienMatKhau" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#hienMatKhau" prefHeight="30.0" prefWidth="30.0" styleClass="btn">
-                           <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icons/eye.png" />
-                                 </image>
-                              </ImageView>
-                           </graphic>
-                           <cursor>
-                              <Cursor fx:constant="HAND" />
-                           </cursor>
-                        </Button>
-                     </children>
-                  </HBox>
                </children>
             </GridPane>
 
@@ -328,7 +277,7 @@
       </HBox>
 
       <!--nút quay lại-->
-      <Button fx:id="btnQuayLai" layoutX="248.0" layoutY="695.0" mnemonicParsing="false" onAction="#quayLai" styleClass="btn" text="Quay lại" textFill="WHITE">
+      <Button fx:id="btnQuayLai" layoutX="251.0" layoutY="718.0" mnemonicParsing="false" onAction="#quayLai" styleClass="btn" text="Quay lại" textFill="WHITE">
          <font>
             <Font name="Open Sans Semibold" size="20.0" />
          </font>

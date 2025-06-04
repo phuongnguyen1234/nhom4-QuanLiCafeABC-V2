@@ -22,7 +22,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="680.0" stylesheets="@quanLiHoSoCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ThemNhanVienUI">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="680.0" stylesheets="@../css/nhanVienCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ThemNhanVienUI">
    <children>
       <VBox layoutX="6.0" layoutY="31.0" prefHeight="720.0" prefWidth="462.0" spacing="5.0" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="218.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -151,13 +151,12 @@
                   <Insets top="15.0" />
                </VBox.margin>
             </Label>
-            <GridPane prefHeight="210.0" prefWidth="452.0" vgap="10.0">
+            <GridPane prefHeight="203.0" prefWidth="452.0" vgap="10.0">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="255.0" minWidth="10.0" prefWidth="179.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="287.0" minWidth="10.0" prefWidth="273.0" />
                </columnConstraints>
                <rowConstraints>
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -210,17 +209,6 @@
                         <Font name="Open Sans" size="16.0" />
                      </font>
                   </TextField>
-                  <Label prefHeight="29.0" prefWidth="245.0" text="Trạng thái đi làm:" GridPane.rowIndex="4">
-                     <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
-                     </font>
-                  </Label>
-                  <ComboBox fx:id="viTriComboBox1" prefHeight="80.0" prefWidth="284.0" promptText="Chọn trạng thái" visibleRowCount="4" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                     <styleClass>
-                        <String fx:value="combobox" />
-                        <String fx:value="font-size-16" />
-                     </styleClass>
-                  </ComboBox>
                </children>
             </GridPane>
 
@@ -279,7 +267,7 @@
       <!--ảnh chân dung-->
       <ImageView fx:id="anhChanDungImageView" fitHeight="240.0" fitWidth="180.0" layoutX="486.0" layoutY="14.0" pickOnBounds="true">
          <image>
-            <Image url="@../icons/profile.png" />
+            <Image url="@../../icons/profile.png" />
          </image>
       </ImageView>
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="750.0" stylesheets="@dangNhapCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.NhapOTPUI">
+   <children>
+      <Label layoutX="270.0" layoutY="20.0" text="Quên mật khẩu" />
+      <VBox layoutX="60.0" layoutY="168.0" spacing="20.0" AnchorPane.leftAnchor="60.0" AnchorPane.rightAnchor="60.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="normal-text" text="Vui lòng nhập mã OTP đã được gửi vào email của bạn. Mã OTP sẽ hết hạn sau khi bạn đóng ứng dụng. " wrappingWidth="630.6689453125" />
+            <TextField fx:id="maOTPTextField" alignment="CENTER" prefHeight="40.0" styleClass="otp-field" />
+            <Button fx:id="btnXacNhanMaOTP" mnemonicParsing="false" onAction="#xacNhanMaOTP" prefHeight="45.0" prefWidth="696.0" styleClass="btn" text="Xác nhận mã OTP" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

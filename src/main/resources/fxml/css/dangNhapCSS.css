@@ -2,22 +2,53 @@
     -fx-background-color: linear-gradient(to bottom right, #0f6789, #286155);
 }
 
-.login-btn{
+.btn{
     -fx-background-color: linear-gradient(to bottom right, #098c53, #246861);
     -fx-background-radius: 5px;
     -fx-cursor: hand;
+    -fx-text-fill: white;
+    -fx-font-family: "Open Sans Semibold";
+    -fx-font-size: 18px;
 }
 
-.login-btn:hover{
+.btn:hover{
     -fx-background-color: linear-gradient(to bottom right, #0fb565, #399a8f);
 }
 
 .textfield{
     -fx-background-color: transparent;
     -fx-border-color:linear-gradient(to bottom right, #0f6789, #286155);
-    -fx-border-width: 0.8px
+    -fx-border-width: 0 0 0.8px 0;
+    -fx-font-family: "Open Sans";
+    -fx-font-size: 14px;
+    -fx-padding: 0 10px 0 10px;
 }
 
-.textfield:focused{
-    -fx-border-width: 1px
+.label{
+    -fx-text-fill: #286155;
+    -fx-font-size: 28px;
+    -fx-font-family: "Open Sans Semibold";
+}
+
+.show-password{
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.password-field{
+    -fx-padding: 0 30px 0 10px;
+}
+
+.normal-text{
+    -fx-font-size: 14px;
+    -fx-font-family: "Open Sans";
+}
+
+.otp-field{
+    -fx-background-color: transparent;
+    -fx-border-color:linear-gradient(to bottom right, #0f6789, #286155);
+    -fx-border-width: 0 0 0.8px 0;
+    -fx-font-family: "Open Sans";
+    -fx-font-size: 20px;
+    -fx-padding: 0 10px 0 10px;
 }

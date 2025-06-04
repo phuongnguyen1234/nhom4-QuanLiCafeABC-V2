@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.backend.dto.NhanVienDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -23,7 +24,7 @@ public class NhanVien {
     private String hoTen;
 
     @Column(name = "AnhChanDung")
-    private byte[] anhChanDung;
+    private String anhChanDung;
 
     @Column(name = "GioiTinh")
     private String gioiTinh;
@@ -73,7 +74,7 @@ public class NhanVien {
 
     public NhanVien(){}
 
-    public NhanVien(String maNhanVien, String hoTen, byte[] anhChanDung, String gioiTinh, 
+    public NhanVien(String maNhanVien, String hoTen, String anhChanDung, String gioiTinh, 
     LocalDate ngaySinh, String queQuan, String diaChi, String soDienThoai, String loaiNhanVien, String viTri,
     LocalDate thoiGianVaoLam, int mucLuong, String trangThai, String email, String matKhau, String trangThaiHoatDong) {
         this.maNhanVien = maNhanVien;
@@ -111,11 +112,11 @@ public class NhanVien {
         this.hoTen = hoTen;
     }
 
-    public byte[] getAnhChanDung() {
+    public String getAnhChanDung() {
         return anhChanDung;
     }
 
-    public void setAnhChanDung(byte[] anhChanDung) {
+    public void setAnhChanDung(String anhChanDung) {
         this.anhChanDung = anhChanDung;
     }
 
@@ -229,5 +230,27 @@ public class NhanVien {
 
     public void setDonHangList(List<DonHang> donHangList) {
         this.donHangList = donHangList;
+    }
+
+    public static NhanVien convertToEntity(NhanVienDTO dto) {
+        NhanVien nhanVien = new NhanVien();
+        nhanVien.setMaNhanVien(dto.getMaNhanVien());
+        nhanVien.setHoTen(dto.getTenNhanVien());
+        nhanVien.setAnhChanDung(dto.getAnhChanDung());
+        nhanVien.setGioiTinh(dto.getGioiTinh());
+        nhanVien.setNgaySinh(dto.getNgaySinh());
+        nhanVien.setQueQuan(dto.getQueQuan());
+        nhanVien.setDiaChi(dto.getDiaChi());
+        nhanVien.setSoDienThoai(dto.getSoDienThoai());
+        nhanVien.setLoaiNhanVien(dto.getLoaiNhanVien());
+        nhanVien.setViTri(dto.getViTri());
+        nhanVien.setThoiGianVaoLam(dto.getThoiGianVaoLam());
+        nhanVien.setMucLuong(dto.getMucLuong());
+        nhanVien.setTrangThai(dto.getTrangThai()); // Trạng thái làm việc (Đi làm, Nghỉ việc)
+        nhanVien.setEmail(dto.getEmail());
+        // Mật khẩu sẽ được xử lý riêng (mã hóa)
+        // nhanVien.setMatKhau(dto.getMatKhau()); 
+        nhanVien.setTrangThaiHoatDong(dto.getTrangThaiHoatDong());
+        return nhanVien;
     }
 }

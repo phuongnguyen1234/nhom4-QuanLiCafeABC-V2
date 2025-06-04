@@ -3,10 +3,12 @@ package com.backend.dto;
 import java.time.LocalDate;
 import java.util.Arrays;
 
+import com.backend.model.NhanVien;
+
 public class NhanVienDTO {
     private String maNhanVien;
     private String tenNhanVien;
-    private byte[] anhChanDung;
+    private String anhChanDung;
     private String gioiTinh;
     private LocalDate ngaySinh;
     private String queQuan;
@@ -16,16 +18,16 @@ public class NhanVienDTO {
     private String viTri;
     private LocalDate thoiGianVaoLam;
     private int mucLuong;
+    private String trangThai;
     private String email;
     private String matKhau;
-    private String quyenTruyCap;
     private String trangThaiHoatDong;
 
     public NhanVienDTO(){}
 
-    public NhanVienDTO(String maNhanVien, String tenNhanVien, byte[] anhChanDung, String gioiTinh, 
+    public NhanVienDTO(String maNhanVien, String tenNhanVien, String anhChanDung, String gioiTinh, 
     LocalDate ngaySinh, String queQuan, String diaChi, String soDienThoai, String loaiNhanVien, String viTri,
-    LocalDate thoiGianVaoLam, int mucLuong, String email, String matKhau, String quyenTruyCap, String trangThaiHoatDong) {
+    LocalDate thoiGianVaoLam, int mucLuong, String trangThai, String email, String matKhau, String trangThaiHoatDong) {
         this.maNhanVien = maNhanVien;
         this.tenNhanVien = tenNhanVien;
         this.anhChanDung = anhChanDung;
@@ -38,9 +40,9 @@ public class NhanVienDTO {
         this.viTri = viTri;
         this.thoiGianVaoLam = thoiGianVaoLam;
         this.mucLuong = mucLuong;
+        this.trangThai = trangThai;
         this.email = email;
         this.matKhau = matKhau;
-        this.quyenTruyCap = quyenTruyCap;
         this.trangThaiHoatDong = trangThaiHoatDong;
     }
 
@@ -61,11 +63,11 @@ public class NhanVienDTO {
         this.tenNhanVien = tenNhanVien;
     }
 
-    public byte[] getAnhChanDung() {
+    public String getAnhChanDung() {
         return anhChanDung;
     }
 
-    public void setAnhChanDung(byte[] anhChanDung) {
+    public void setAnhChanDung(String anhChanDung) {
         this.anhChanDung = anhChanDung;
     }
 
@@ -140,6 +142,13 @@ public class NhanVienDTO {
     public void setMucLuong(int mucLuong) {
         this.mucLuong = mucLuong;
     }
+    public String getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
+    }
 
     public String getEmail() {
         return email;
@@ -157,14 +166,6 @@ public class NhanVienDTO {
         this.matKhau = matKhau;
     }
 
-    public String getQuyenTruyCap() {
-        return quyenTruyCap;
-    }
-
-    public void setQuyenTruyCap(String quyenTruyCap) {
-        this.quyenTruyCap = quyenTruyCap;
-    }
-
     public String getTrangThaiHoatDong() {
         return trangThaiHoatDong;
     }
@@ -176,10 +177,30 @@ public class NhanVienDTO {
     @Override
     public String toString() {
         return "NhanVienDTO [maNhanVien=" + maNhanVien + ", tenNhanVien=" + tenNhanVien + ", anhChanDung="
-                + Arrays.toString(anhChanDung) + ", gioiTinh=" + gioiTinh + ", ngaySinh=" + ngaySinh + ", queQuan="
+                + anhChanDung + ", gioiTinh=" + gioiTinh + ", ngaySinh=" + ngaySinh + ", queQuan="
                 + queQuan + ", diaChi=" + diaChi + ", soDienThoai=" + soDienThoai + ", loaiNhanVien=" + loaiNhanVien + ", viTri=" + viTri
                 + ", thoiGianVaoLam=" + thoiGianVaoLam + ", mucLuong=" + mucLuong + ", email=" + email + ", matKhau="
-                + matKhau + ", quyenTruyCap=" + quyenTruyCap + ", trangThaiHoatDong=" + trangThaiHoatDong + "]";
+                + matKhau + ", trangThaiHoatDong=" + trangThaiHoatDong + "]";
     }
     
+     public static NhanVienDTO convertToDTO(NhanVien nhanVien) {
+        NhanVienDTO dto = new NhanVienDTO();
+        dto.setMaNhanVien(nhanVien.getMaNhanVien());
+        dto.setTenNhanVien(nhanVien.getHoTen());
+        dto.setAnhChanDung(nhanVien.getAnhChanDung());
+        dto.setGioiTinh(nhanVien.getGioiTinh());
+        dto.setNgaySinh(nhanVien.getNgaySinh());
+        dto.setQueQuan(nhanVien.getQueQuan());
+        dto.setDiaChi(nhanVien.getDiaChi());
+        dto.setSoDienThoai(nhanVien.getSoDienThoai());
+        dto.setLoaiNhanVien(nhanVien.getLoaiNhanVien());
+        dto.setViTri(nhanVien.getViTri());
+        dto.setThoiGianVaoLam(nhanVien.getThoiGianVaoLam());
+        dto.setMucLuong(nhanVien.getMucLuong());
+        dto.setTrangThai(nhanVien.getTrangThai()); // Trạng thái làm việc (Đi làm, Nghỉ việc)
+        dto.setEmail(nhanVien.getEmail());
+        dto.setMatKhau(null); // Không trả về mật khẩu
+        dto.setTrangThaiHoatDong(nhanVien.getTrangThaiHoatDong());
+        return dto;
+    }
 }
