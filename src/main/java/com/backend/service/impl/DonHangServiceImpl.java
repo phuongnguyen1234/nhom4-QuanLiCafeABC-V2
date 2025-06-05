@@ -1,6 +1,8 @@
 package com.backend.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -101,6 +103,26 @@ public class DonHangServiceImpl implements DonHangService {
         int number = Integer.parseInt(currentMaxCode.substring(prefix.length()));
         number++;
         return String.format("%s%04d", prefix, number);
+    }
+    @Override
+    public int getTongDoanhThuHomNay() {
+        return donHangRepository.tinhDoanhThuHomNay();
+    }
+    @Override
+    public List<NhanVien> getTop3NhanVienTheoThang() {
+        LocalDate now = LocalDate.now();
+        int thang = now.getMonthValue();
+        int nam = now.getYear();
+        if (donHangRepository.top3MaNhanVienTheoThang(thang, nam).isEmpty()) return null;
+        return nhanVienRepository.findAllById(donHangRepository.top3MaNhanVienTheoThang(thang, nam));
+    }
+    @Override
+    public List<String> getTop5MonBanChayTheoThang() {
+        LocalDate now = LocalDate.now();
+        int thang = now.getMonthValue();
+        int nam = now.getYear();
+        if (donHangRepository.top5MonTheoThangNam(thang, nam).isEmpty()) return null;
+        return donHangRepository.top5MonTheoThangNam(thang, nam);
     }
 }
 

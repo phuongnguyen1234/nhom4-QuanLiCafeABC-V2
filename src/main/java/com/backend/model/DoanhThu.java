@@ -18,10 +18,10 @@ public class DoanhThu {
     private int maDoanhThu;
 
     @Column(name = "Thang")
-    private int Thang;
+    private int thang;
 
     @Column(name = "Nam")
-    private int Nam;
+    private int nam;
 
     @Column(name = "TongDoanhThu")
     private int tongDoanhThu;
@@ -47,8 +47,8 @@ public class DoanhThu {
     public DoanhThu(int maDoanhThu, int thang, int nam, int tongDoanhThu, double tangTruongDoanhThu, int soDon,
             int soMon, double trungBinhMoiDon, LocalDateTime thoiGianTongHopDoanhThu) {
         this.maDoanhThu = maDoanhThu;
-        Thang = thang;
-        Nam = nam;
+        this.thang = thang;
+        this.nam = nam;
         this.tongDoanhThu = tongDoanhThu;
         this.tangTruongDoanhThu = tangTruongDoanhThu;
         this.soDon = soDon;
@@ -66,19 +66,19 @@ public class DoanhThu {
     }
 
     public int getThang() {
-        return Thang;
+        return thang;
     }
 
     public void setThang(int thang) {
-        Thang = thang;
+        this.thang = thang;
     }
 
     public int getNam() {
-        return Nam;
+        return nam;
     }
 
     public void setNam(int nam) {
-        Nam = nam;
+        this.nam = nam;
     }
 
     public int getTongDoanhThu() {

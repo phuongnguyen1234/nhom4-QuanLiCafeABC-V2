@@ -19,7 +19,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="900.0" prefWidth="1300.0" styleClass="white-bg" stylesheets="@../css/thongKeCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ThongKeUI">
+<AnchorPane prefHeight="900.0" prefWidth="1300.0" styleClass="white-bg" stylesheets="@../css/thongKeCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ThongKeUI">
    <children>
       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="210.0" prefWidth="1300.0">
          <children>
@@ -115,7 +115,7 @@
                               <Image url="@../../icons/file.png" />
                            </image>
                         </ImageView>
-                        <VBox layoutX="74.0" prefHeight="114.0" prefWidth="232.0" spacing="10.0">
+                        <VBox layoutX="80.0" layoutY="1.0" prefHeight="114.0" prefWidth="232.0" spacing="10.0">
                            <children>
                               <Text fx:id="tieuDeSoDonDaTaoThangTruocText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Số đơn đã tạo tháng X" wrappingWidth="200.556640625">
                                  <font>

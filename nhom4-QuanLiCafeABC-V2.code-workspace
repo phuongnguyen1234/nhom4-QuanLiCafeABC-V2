@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "nhom4-QuanLiCafeABC-V2",
+			"path": "."
+		}
+	],
+	"settings": {
+		"java.compile.nullAnalysis.mode": "automatic"
+	}
+}
