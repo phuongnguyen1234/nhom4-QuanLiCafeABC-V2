@@ -1,6 +1,5 @@
 package com.frontend;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -10,9 +9,9 @@ import java.time.Duration;
 
 import com.backend.dto.NhanVienDTO;
 import com.backend.model.NhanVien;
+import com.backend.quanlicapheabc.QuanlicapheabcApplication;
 import com.backend.utils.ImageUtils;
-import com.backend.quanlicapheabc.QuanlicapheabcApplication; // Import để lấy CookieManager
-import com.backend.utils.MessageUtils;
+import com.backend.utils.MessageUtils; // Import để lấy CookieManager
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -59,7 +58,9 @@ public class TrangChuUI {
 
     private NhanVienDTO currentUser; // Lưu thông tin người dùng hiện tại
 
-    private NhanVien nhanVien;
+    public NhanVienDTO getNhanVien(){
+        return this.currentUser;
+    }
 
     public TrangChuUI getTrangChuUI() {
         return this;
@@ -126,8 +127,8 @@ public class TrangChuUI {
             e.printStackTrace();
             System.out.println("Lỗi khi khởi tạo giao diện: " + e.getMessage());
         } */
-        thucDon();
-
+        // thucDon(); // Không gọi ở đây nữa, currentUser sẽ là null.
+        // Giao diện mặc định (ví dụ: Thực đơn) sẽ được load trong setCurrentUser sau khi người dùng được xác thực.
     }
 
     @FXML
@@ -138,19 +139,16 @@ public class TrangChuUI {
 
             // Lấy controller từ FXML đã tải
             ThucDonUI screenController = loader.getController();
-            // Truyền đối tượng TaoDonGoiDoMoiController đã khởi tạo từ trước
-            //screenController.setThucDonUI(taoDonController);
-            //screenController.setCapNhatThucDonController(capNhatThucDonController);
             
             screenController.setTrangChuUI(this);
-            //screenController.setNhanVien(nhanVien);
 
-            // Hiển thị danh sách đồ uống trong đơn hàng
-            screenController.hienThiDanhSachMonTrongDon();
-
-            // Hiển thị thực đơn
-            //screenController.hienThiThucDon(taoDonController.layThucDon("all"));
-            //screenController.datLai();
+            // Đảm bảo currentUser đã được thiết lập trước khi truyền vào ThucDonUI
+            if (currentUser != null) {
+                screenController.setNhanVienDTO(currentUser);
+                // Ví dụ: xác định quyền quản lý thực đơn dựa trên vai trò
+                boolean coQuyenQuanLiThucDon = "CHỦ_QUÁN".equalsIgnoreCase(currentUser.getViTri().toUpperCase().replace(" ", "_"));
+                screenController.setQuyenQuanLiThucDon(coQuyenQuanLiThucDon); // Cần thêm phương thức này vào ThucDonUI
+            }
 
             // Đặt nội dung vào phần center của BorderPane
             mainBorderPane.setCenter(content);
@@ -170,9 +168,10 @@ public class TrangChuUI {
             // Lấy controller từ FXML đã tải
             HoaDonUI screenController = loader.getController();
 
-            //screenController.setDonHangController(donHangController);
-            //screenController.setNhanVien(nhanVien);
-            //screenController.hienThiDanhSachDonHang(donHangController.loadDonHangFromDatabase());
+            // Truyền currentUser cho HoaDonUI (nếu cần)
+            if (currentUser != null) {
+                screenController.setCurrentUser(currentUser);
+            }
             // Đặt nội dung vào phần center của BorderPane
             mainBorderPane.setCenter(content);
         } catch (Exception e) {
@@ -232,7 +231,7 @@ public class TrangChuUI {
             mainBorderPane.setCenter(content);
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Không thể tải file FXML: /fxml/main_screen/dashboard.fxml");
+            System.err.println("Không thể tải file FXML: /fxml/main_screen/thongKe.fxml");
         }
     }
 
@@ -263,6 +262,8 @@ public class TrangChuUI {
                 // Hoặc ImageUtils đã log lỗi, profileImage sẽ giữ ảnh cũ (nếu có) hoặc trống
             }
             thietLapQuyenTruyCap(currentUser.getViTri());
+            // Load giao diện ThucDonUI làm giao diện mặc định sau khi người dùng đã được thiết lập
+            thucDon(); // Gọi thucDon() ở đây đảm bảo currentUser đã có giá trị
             // Thiết lập xử lý sự kiện đóng cửa sổ
             Platform.runLater(() -> { // Đảm bảo chạy trên JavaFX Application Thread và sau khi scene được gắn vào window
                 Stage currentStage = (Stage) mainBorderPane.getScene().getWindow();

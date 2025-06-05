@@ -1,10 +1,32 @@
 package com.frontend;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import com.backend.dto.ThongKeDTO;
+import com.backend.quanlicapheabc.QuanlicapheabcApplication;
+import com.backend.utils.MessageUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
@@ -36,16 +58,12 @@ public class ThongKeUI {
 
     @FXML
     private Hyperlink hplinkXemChiTiet;
-/* 
-    private PhanTichHoatDongController controller;
 
-    public void setPhanTichHoatDongController(PhanTichHoatDongController controller){
-        this.controller = controller;
-    }
-
-    public PhanTichHoatDongController getController(){
-        return controller;
-    }
+    private final HttpClient client = HttpClient.newBuilder()
+            .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
+            .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
+            .build();
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @FXML
     public void initialize(){
@@ -60,114 +78,147 @@ public class ThongKeUI {
         bienDongDoanhThuLineChart.getData().clear();
         khoangThoiGianDatDonNhieuNhatThangTruocBarChart.getData().clear();
 
-        // Tạo danh sách các mốc thời gian từ 6:00 đến 23:00
-        List<String> timeLabels = new ArrayList<>();
-        for (int i = 6; i <= 23; i++) {
-            timeLabels.add(String.format("%02d:00", i));  // Định dạng giờ như "06:00", "07:00"...
-        }
-        timeLabels.add("00:00");  // Thêm 00:00 sáng hôm sau
+        // Cấu hình trục X cho biểu đồ cột
+        String[] slots = {
+            "00-02", "02-04", "04-06", "06-08", "08-10", "10-12",
+            "12-14", "14-16", "16-18", "18-20", "20-22", "22-00"
+        };
+        barXAxis.setCategories(FXCollections.observableArrayList(slots));
 
-        // Cấu hình trục X
-        barXAxis.setCategories(FXCollections.observableArrayList(timeLabels));
-
+        hienThiSoLieuThongKe();
     }
 
-    public void hienThiSoLieuThongKe(){
-    //hien thi so lieu 
-        tieuDeDoanhThuHomNayText.setText("Doanh thu hôm nay " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        doanhThuHomNayText.setText(String.valueOf(controller.layDoanhThuHomNay()));
+    public void hienThiSoLieuThongKe() {
+        Task<ThongKeDTO> task = new Task<>() {
+            @Override
+            protected ThongKeDTO call() throws Exception {
+                return layDuLieuThongKe();
+            }
+        };
 
-        String thangTruoc = LocalDate.now().minusMonths(1).getMonthValue() + "/" + LocalDate.now().minusMonths(1).getYear();
+        task.setOnSucceeded(event -> {
+            ThongKeDTO dto = task.getValue();
+            if (dto != null) {
+                Platform.runLater(() -> {
+                    // Hiển thị số liệu tổng quan
+                    tieuDeDoanhThuHomNayText.setText("Doanh thu hôm nay (" + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + ")");
+                    doanhThuHomNayText.setText(String.format("%,d VND", dto.getDoanhThuHomNay()));
 
-        tieuDeDoanhThuThangTruocText.setText("Doanh thu tháng " + thangTruoc);
-        doanhThuThangTruocText.setText(String.valueOf(controller.layDoanhThuThangTruoc()));
+                    LocalDate prevMonth = LocalDate.now().minusMonths(1);
+                    String thangTruocFormatted = prevMonth.format(DateTimeFormatter.ofPattern("MM/yyyy"));
 
-        tieuDeSoMonBanRaThangTruocText.setText("Số cà phê bán ra tháng " + thangTruoc);
-        soMonBanRaThangTruocText.setText(String.valueOf(controller.laySoCaPheBanRaThangTruoc()));
+                    tieuDeDoanhThuThangTruocText.setText("Doanh thu tháng " + thangTruocFormatted);
+                    doanhThuThangTruocText.setText(String.format("%,d VND", dto.getTongDoanhThuThangTruoc()));
 
-        tieuDeSoDonDaTaoThangTruocText.setText("Số đơn đã tạo tháng " + thangTruoc);
-        soDonDaTaoThangTruocText.setText(String.valueOf(controller.laySoDonDaTaoThangTruoc()));
+                    tieuDeSoMonBanRaThangTruocText.setText("Số món bán ra tháng " + thangTruocFormatted);
+                    soMonBanRaThangTruocText.setText(String.valueOf(dto.getSoMon()));
 
-    //top 5 ca phe ban chay thang truoc
-        List<Map<String, Object>> top5CaPhe = controller.layTop5CaPheBanChayThangTruoc();
-        top5CaPheBanChayNhatThangTruocLabel.setText("Top 5 cà phê bán chạy nhất tháng "+thangTruoc);
+                    tieuDeSoDonDaTaoThangTruocText.setText("Số đơn đã tạo tháng " + thangTruocFormatted);
+                    soDonDaTaoThangTruocText.setText(String.valueOf(dto.getSoDon()));
 
-        if (top5CaPhe.size() > 0) {
-            tenMonTop1Text.setText((String) top5CaPhe.get(0).get("TenCaPhe"));
-            soMonTop1Text.setText(String.valueOf(top5CaPhe.get(0).get("TongSoLuong")));
+                    // Top 5 món bán chạy tháng trước
+                    top5CaPheBanChayNhatThangTruocLabel.setText("Top 5 món bán chạy nhất tháng " + thangTruocFormatted);
+                    List<Map.Entry<String, Integer>> top5MonList = dto.getTop5MonBanChay().entrySet().stream()
+                            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                            .limit(5)
+                            .collect(Collectors.toList());
+
+                    Text[] tenMonTexts = {tenMonTop1Text, tenMonTop2Text, tenMonTop3Text, tenMonTop4Text, tenMonTop5Text};
+                    Text[] soMonTexts = {soMonTop1Text, soMonTop2Text, soMonTop3Text, soMonTop4Text, soMonTop5Text};
+                    for (int i = 0; i < tenMonTexts.length; i++) {
+                        if (i < top5MonList.size()) {
+                            tenMonTexts[i].setText(top5MonList.get(i).getKey());
+                            soMonTexts[i].setText(String.valueOf(top5MonList.get(i).getValue()));
+                        } else {
+                            tenMonTexts[i].setText("-");
+                            soMonTexts[i].setText("-");
+                        }
+                    }
+
+                    // Top 3 nhân viên tạo đơn nhiều nhất tháng trước
+                    top3NhanVienTaoDonNhieuNhatThangTruocLabel.setText("Top 3 nhân viên tạo đơn nhiều nhất tháng " + thangTruocFormatted);
+                    List<Map.Entry<String, Integer>> top3NhanVienList = dto.getTop3NhanVien().entrySet().stream()
+                            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                            .limit(3)
+                            .collect(Collectors.toList());
+
+                    Text[] tenNhanVienTexts = {tenNhanVienTop1Text, tenNhanVienTop2Text, tenNhanVienTop3Text};
+                    Text[] soDonNhanVienTexts = {soDonTop1Text, soDonTop2Text, soDonTop3Text};
+                    for (int i = 0; i < tenNhanVienTexts.length; i++) {
+                        if (i < top3NhanVienList.size()) {
+                            tenNhanVienTexts[i].setText(top3NhanVienList.get(i).getKey());
+                            soDonNhanVienTexts[i].setText(String.valueOf(top3NhanVienList.get(i).getValue()));
+                        } else {
+                            tenNhanVienTexts[i].setText("-");
+                            soDonNhanVienTexts[i].setText("-");
+                        }
+                    }
+
+                    // Biểu đồ đường biến động doanh thu 6 tháng gần nhất
+                    bienDongDoanhThuLineChart.getData().clear();
+                    XYChart.Series<String, Integer> lineSeries = new XYChart.Series<>();
+                    lineSeries.setName("Doanh thu");
+                    if (dto.getDoanhThuTrongThoiGian() != null) {
+                        // Sắp xếp theo key (tháng-năm) để đảm bảo thứ tự đúng trên biểu đồ
+                        dto.getDoanhThuTrongThoiGian().entrySet().stream()
+                           .sorted(Map.Entry.comparingByKey())
+                           .forEach(entry -> lineSeries.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue())));
+                    }
+                    bienDongDoanhThuLineChart.getData().add(lineSeries);
+                    LocalDate sixMonthsAgo = LocalDate.now().minusMonths(5);
+                    bienDongDoanhThuLineChart.setTitle("Biến động doanh thu từ " +
+                        sixMonthsAgo.format(DateTimeFormatter.ofPattern("MM/yyyy")) + " - " +
+                        LocalDate.now().format(DateTimeFormatter.ofPattern("MM/yyyy")));
+
+
+                    // Biểu đồ cột khoảng thời gian đặt đơn nhiều nhất tháng trước
+                    khoangThoiGianDatDonNhieuNhatThangTruocBarChart.getData().clear();
+                    XYChart.Series<String, Integer> barSeries = new XYChart.Series<>();
+                    barSeries.setName("Số đơn");
+                     if (dto.getKhoangThoiGianDatDonNhieuNhat() != null) {
+                        // Sắp xếp các slot theo thứ tự đã định nghĩa để hiển thị đúng trên biểu đồ
+                        String[] slotOrder = {
+                            "00-02", "02-04", "04-06", "06-08", "08-10", "10-12",
+                            "12-14", "14-16", "16-18", "18-20", "20-22", "22-00"
+                        };
+                        Map<String, Integer> thoiGianData = dto.getKhoangThoiGianDatDonNhieuNhat();
+                        for (String slotKey : slotOrder) {
+                            barSeries.getData().add(new XYChart.Data<>(slotKey, thoiGianData.getOrDefault(slotKey, 0)));
+                        }
+                    }
+                    khoangThoiGianDatDonNhieuNhatThangTruocBarChart.getData().add(barSeries);
+                    khoangThoiGianDatDonNhieuNhatThangTruocBarChart.setTitle("Khoảng thời gian đặt đơn nhiều nhất tháng " + thangTruocFormatted);
+                });
+            } else {
+                MessageUtils.showErrorMessage("Không thể tải dữ liệu thống kê.");
+            }
+        });
+
+        task.setOnFailed(event -> {
+            MessageUtils.showErrorMessage("Lỗi khi tải dữ liệu thống kê: " + task.getException().getMessage());
+            task.getException().printStackTrace();
+        });
+
+        new Thread(task).start();
+    }
+
+    @FXML
+    public void xemChiTiet(){
+        MessageUtils.showInfoMessage("Chức năng đang được cập nhật. Vui lòng thử lại sau!");
+    }
+
+    private ThongKeDTO layDuLieuThongKe() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/doanh-thu/tong-quan"))
+                .GET()
+                .timeout(Duration.ofSeconds(15))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() == 200) {
+            return objectMapper.readValue(response.body(), ThongKeDTO.class);
+        } else {
+            System.err.println("Lỗi khi lấy dữ liệu thống kê: " + response.statusCode() + " - " + response.body());
+            throw new IOException("Lỗi khi lấy dữ liệu thống kê: " + response.statusCode() + " - " + response.body());
         }
-        if (top5CaPhe.size() > 1) {
-            tenMonTop2Text.setText((String) top5CaPhe.get(1).get("TenCaPhe"));
-            soMonTop2Text.setText(String.valueOf(top5CaPhe.get(1).get("TongSoLuong")));
-        }
-        if (top5CaPhe.size() > 2) {
-            tenMonTop3Text.setText((String) top5CaPhe.get(2).get("TenCaPhe"));
-            soMonTop3Text.setText(String.valueOf(top5CaPhe.get(2).get("TongSoLuong")));
-        }
-        if (top5CaPhe.size() > 3) {
-            tenMonTop4Text.setText((String) top5CaPhe.get(3).get("TenCaPhe"));
-            soMonTop4Text.setText(String.valueOf(top5CaPhe.get(3).get("TongSoLuong")));
-        }
-        if (top5CaPhe.size() > 4) {
-            tenMonTop5Text.setText((String) top5CaPhe.get(4).get("TenCaPhe"));
-            soMonTop5Text.setText(String.valueOf(top5CaPhe.get(4).get("TongSoLuong")));
-        }
-
-    //top 3 nhan vien tao nhieu don nhat thang truoc
-        List<Map<String, Object>> top3NhanVien = controller.layTop3NhanVienTaoDonNhieuNhatThangTruoc();
-        top3NhanVienTaoDonNhieuNhatThangTruocLabel.setText("Top 3 nhân viên thu ngân tạo đơn nhiều nhất tháng "+thangTruoc);
-
-        if (top3NhanVien.size() > 0) {
-            tenNhanVienTop1Text.setText((String) top3NhanVien.get(0).get("TenNhanVien"));
-            soDonTop1Text.setText(String.valueOf(top3NhanVien.get(0).get("SoDon")));
-        }
-        if (top3NhanVien.size() > 1) {
-            tenNhanVienTop2Text.setText((String) top3NhanVien.get(1).get("TenNhanVien"));
-            soDonTop2Text.setText(String.valueOf(top3NhanVien.get(1).get("SoDon")));
-        }
-
-        if (top3NhanVien.size() > 2) {
-            tenNhanVienTop3Text.setText((String) top3NhanVien.get(2).get("TenNhanVien"));
-            soDonTop3Text.setText(String.valueOf(top3NhanVien.get(2).get("SoDon")));
-        }
-
-    //bieu do duong bien dong doanh thu 6 thang
-        List<Map<String, Object>> doanhThuList = controller.layBienDongDoanhThu6Thang();
-    
-        ObservableList<XYChart.Data<String, Integer>> lineData = FXCollections.observableArrayList();
-        
-        for (Map<String, Object> item : doanhThuList) {
-            int thang = (int) item.get("Thang");
-            double doanhThu = (double) item.get("DoanhThu");
-            lineData.add(new XYChart.Data<>(String.valueOf(thang), (int) doanhThu));
-        }
-        
-        XYChart.Series<String, Integer> lineSeries = new XYChart.Series<>();
-        lineSeries.setName("Doanh thu");
-        lineSeries.setData(lineData);
-        
-        bienDongDoanhThuLineChart.getData().clear();
-        bienDongDoanhThuLineChart.getData().add(lineSeries);
-        String sauThangTruoc = LocalDate.now().minusMonths(6).getMonthValue() + "/" + LocalDate.now().minusMonths(1).getYear();
-        bienDongDoanhThuLineChart.setTitle("Biến động doanh thu tháng "+sauThangTruoc+" - "+thangTruoc);
-
-    //bieu do cot khoang thoi gian dat don nhieu nhat thang truoc
-        List<Map<String, Object>> thoiGianDatDonList = controller.layKhoangThoiGianDatDonNhieuNhatThangTruoc();
-        
-        ObservableList<XYChart.Data<String, Integer>> barData = FXCollections.observableArrayList();
-        
-        for (Map<String, Object> item : thoiGianDatDonList) {
-            int gio = (int) item.get("Gio");
-            int soDon = (int) item.get("SoDon");
-            barData.add(new XYChart.Data<>(String.format("%02d:00", gio), soDon));
-        }
-        
-        XYChart.Series<String, Integer> barSeries = new XYChart.Series<>();
-        barSeries.setName("Số đơn");
-        barSeries.setData(barData);
-        
-        khoangThoiGianDatDonNhieuNhatThangTruocBarChart.getData().clear();
-        khoangThoiGianDatDonNhieuNhatThangTruocBarChart.getData().add(barSeries);
-        khoangThoiGianDatDonNhieuNhatThangTruocBarChart.setTitle("Khoảng thời gian khách đặt đơn nhiều nhất tháng "+thangTruoc);
-    } */
+    }
 }

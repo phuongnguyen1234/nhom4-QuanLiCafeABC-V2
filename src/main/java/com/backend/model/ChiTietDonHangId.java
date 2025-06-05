@@ -19,6 +19,14 @@ public class ChiTietDonHangId {
         this.maMon = maMon;
     }
 
+    public String getMaDonHang() {
+        return maDonHang;
+    }
+
+    public String getMaMon() {
+        return maMon;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

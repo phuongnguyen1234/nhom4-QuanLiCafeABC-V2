@@ -4,8 +4,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 import com.backend.dto.DanhMucKhongMonDTO;
+import com.backend.quanlicapheabc.QuanlicapheabcApplication;
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -15,7 +17,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 
 public class ThemDanhMucUI {
     @FXML
@@ -31,6 +32,12 @@ public class ThemDanhMucUI {
     private AnchorPane mainAnchorPane;
 
     private QuanLiDanhMucUI quanLiDanhMucUI;
+
+    private final HttpClient client = HttpClient.newBuilder()
+            .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
+            .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
+            .build();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void setQuanLiDanhMucUI(QuanLiDanhMucUI quanLiDanhMucUI) {
         this.quanLiDanhMucUI = quanLiDanhMucUI;
@@ -101,10 +108,8 @@ public class ThemDanhMucUI {
         return new Task<>() {
             @Override
             protected Void call() throws Exception {
-                ObjectMapper mapper = new ObjectMapper();
-                String json = mapper.writeValueAsString(danhMuc);
+                String json = objectMapper.writeValueAsString(danhMuc);
 
-                HttpClient client = HttpClient.newHttpClient();
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:8080/danh-muc/create"))
                         .POST(HttpRequest.BodyPublishers.ofString(json))

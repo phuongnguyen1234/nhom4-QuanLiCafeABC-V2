@@ -47,8 +47,8 @@ public class SecurityConfig {
             .addFilterBefore(jsonToFormLoginParameterFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/auth/login", "/public/**", "/error").permitAll() // Cho phép truy cập không cần xác thực
-                .requestMatchers("/nhanvien/**").hasRole("CHU_QUAN")
-                .requestMatchers("/don-hang/**", "/doanh-thu/**","/danh-muc/**", "/mon/**").hasAnyRole("THU_NGAN", "CHU_QUAN") // Thu ngân hoặc chủ quán có thể đặt hàng
+                .requestMatchers("/nhan-vien/**", "/bang-luong/**", "/doanh-thu/**").hasRole("CHU_QUAN")
+                .requestMatchers("/danh-muc/**", "/mon/**", "/don-hang/**").hasAnyRole("THU_NGAN", "CHU_QUAN") // Thu ngân hoặc chủ quán có thể đặt hàng
                 .anyRequest().authenticated() // Các request khác cần xác thực
             )
             .formLogin(formLogin -> formLogin

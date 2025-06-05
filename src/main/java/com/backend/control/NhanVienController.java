@@ -1,5 +1,7 @@
 package com.backend.control;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.dto.NhanVienDTO;
 import com.backend.service.NhanVienService;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/nhanvien")
+@RequestMapping("/nhan-vien")
 @CrossOrigin(origins = "*") // Cho phép frontend truy cập từ domain khác 
 public class NhanVienController {
     @Autowired

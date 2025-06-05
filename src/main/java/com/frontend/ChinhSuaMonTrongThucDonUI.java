@@ -10,11 +10,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
 import com.backend.dto.DanhMucKhongMonDTO;
 import com.backend.dto.MonDTO;
+import com.backend.quanlicapheabc.QuanlicapheabcApplication;
 import com.backend.utils.HttpUtils;
 import com.backend.utils.ImageUtils;
 import com.backend.utils.MessageUtils;
@@ -57,6 +59,12 @@ public class ChinhSuaMonTrongThucDonUI {
     private List<DanhMucKhongMonDTO> danhMucList;
 
     private File newSelectedImageFile; // Lưu trữ file ảnh mới được chọn (nếu có)
+
+    private final HttpClient client = HttpClient.newBuilder()
+            .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
+            .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
+            .build();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @FXML
     public void initialize() {
@@ -279,10 +287,8 @@ public class ChinhSuaMonTrongThucDonUI {
             @Override
             protected Void call() throws Exception {
                 try {
-                    ObjectMapper mapper = new ObjectMapper();
-                    String json = mapper.writeValueAsString(mon);
+                    String json = objectMapper.writeValueAsString(mon);
 
-                    HttpClient client = HttpClient.newHttpClient();
                     HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:8080/mon/" + mon.getMaMon()))
                         .method("PATCH", HttpRequest.BodyPublishers.ofString(json))

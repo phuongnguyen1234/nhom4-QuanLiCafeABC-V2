@@ -10,6 +10,6 @@ import com.backend.model.ChiTietDonHangId;
 
 @Repository
 public interface ChiTietDonHangRepository extends JpaRepository<ChiTietDonHang, ChiTietDonHangId> {
-    List<ChiTietDonHang> findByMaDonHang(String maDonHang);
+    List<ChiTietDonHang> findByDonHang_MaDonHang(String maDonHang);
 }
 

@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 import com.backend.dto.DanhMucKhongMonDTO;
 import com.backend.dto.DonHangDTO;
 import com.backend.dto.MonTrongDonDTO;
+import com.backend.dto.NhanVienDTO;
 import com.backend.model.DanhMuc;
 import com.backend.model.Mon;
 import com.backend.model.NhanVien;
@@ -94,9 +96,12 @@ public class ThucDonUI {
 
     private final ObservableList<MonTrongDonDTO> danhSachMonTrongDon = FXCollections.observableArrayList();
 
-    private NhanVien nhanVien = new NhanVien();
+    private NhanVienDTO nhanVien;
 
-    private final HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client = HttpClient.newBuilder()
+            .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
+            .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
+            .build();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     List<DanhMucKhongMonDTO> tatCaDanhMucList = new ArrayList<>();
@@ -119,15 +124,29 @@ public class ThucDonUI {
         this.trangChuUI = trangChuUI;
     }
 
-    public void setNhanVien(NhanVien nhanVien){
+    public void setNhanVienDTO(NhanVienDTO nhanVien) {
         this.nhanVien = nhanVien;
     }
 
+    private boolean coQuyenQuanLiThucDon = false; // Mặc định không có quyền
+
+    public void setQuyenQuanLiThucDon(boolean coQuyen) {
+        this.coQuyenQuanLiThucDon = coQuyen;
+        capNhatTrangThaiNutQuanLy(); // Cập nhật trạng thái nút khi quyền thay đổi
+    }
+
+    private void capNhatTrangThaiNutQuanLy() {
+        if (btnQuanLiThucDon != null) { // Đảm bảo nút đã được khởi tạo từ FXML
+            // Nút quản lý thực đơn chỉ được enable nếu có quyền VÀ danh mục đã tải xong
+            boolean danhMucDaTaiXong = loadingLabel != null && !loadingLabel.isVisible();
+            btnQuanLiThucDon.setDisable(!(this.coQuyenQuanLiThucDon && danhMucDaTaiXong));
+        }
+    }
     @FXML
     public void initialize() {
         //hien thi loading
         loadingLabel.setVisible(true);
-        btnQuanLiThucDon.setDisable(true);
+        capNhatTrangThaiNutQuanLy();
         danhMucCombobox.setDisable(true);
 
         // Cấu hình các cột trong TableView
@@ -209,7 +228,8 @@ public class ThucDonUI {
                 .collect(Collectors.toList());
             hienThiThucDon(danhMucCoMonHoatDongList);
 
-            btnQuanLiThucDon.setDisable(false);
+            loadingLabel.setVisible(false); // Đánh dấu danh mục đã tải xong
+            capNhatTrangThaiNutQuanLy(); // Cập nhật lại trạng thái nút quản lý
             danhMucCombobox.setDisable(false);
         });
 
@@ -231,6 +251,8 @@ public class ThucDonUI {
 
         loadDanhMucTask.setOnFailed(e -> {
             loadingLabel.setText("Tải dữ liệu thất bại!");
+            loadingLabel.setVisible(true); // Giữ label loading hiển thị nếu lỗi
+            capNhatTrangThaiNutQuanLy(); // Cập nhật lại trạng thái nút (vẫn sẽ disable)
             loadDanhMucTask.getException().printStackTrace();
         });
 
@@ -263,6 +285,9 @@ public class ThucDonUI {
 
         // Gắn dữ liệu TableView với danh sách món trong đơn
         tableViewDatHang.setItems(danhSachMonTrongDon);
+
+        // Cập nhật trạng thái nút Thanh toán ban đầu (khi danh sách rỗng)
+        hienThiDanhSachMonTrongDon();
     }
 
     public void sua(MonTrongDonDTO mon) {
@@ -365,11 +390,7 @@ public class ThucDonUI {
     }
 
     @FXML
-    private void thanhToan() {
-        //test
-        nhanVien.setMaNhanVien("NV000");
-        nhanVien.setHoTen("Admin");
-        
+    private void thanhToan() {        
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/chiTietDonHangDeThanhToan.fxml"));
             Parent root = loader.load();
@@ -380,7 +401,7 @@ public class ThucDonUI {
             //set thong tin don hang
             donHang = new DonHangDTO();
             donHang.setMaNhanVien(nhanVien.getMaNhanVien());
-            donHang.setHoTen(nhanVien.getHoTen());
+            donHang.setHoTen(nhanVien.getTenNhanVien());
             donHang.setDanhSachMonTrongDon(danhSachMonTrongDon);
             int tongTien = 0;
             for (MonTrongDonDTO monDTO : danhSachMonTrongDon) {

@@ -5,12 +5,14 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.backend.dto.MonDTO;
 import com.backend.model.DanhMuc;
 import com.backend.model.Mon;
+import com.backend.quanlicapheabc.QuanlicapheabcApplication;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -65,7 +67,10 @@ public class QuanLiThucDonUI {
 
     private QuanLiDanhMucUI quanLiDanhMucUI;
 
-    private final HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client = HttpClient.newBuilder()
+            .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
+            .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
+            .build();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // phan trang

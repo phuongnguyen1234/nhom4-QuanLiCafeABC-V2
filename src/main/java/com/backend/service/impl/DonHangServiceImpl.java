@@ -1,20 +1,12 @@
 package com.backend.service.impl;
 
-<<<<<<< HEAD
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-=======
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
->>>>>>> origin/manh-hoadon
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.dto.DonHangDTO;
 import com.backend.dto.MonTrongDonDTO;
@@ -69,11 +61,7 @@ public class DonHangServiceImpl implements DonHangService {
         // Tạm tính tổng tiền
         int tongTien = 0;
 
-<<<<<<< HEAD
         // ⚠️ LƯU ĐƠN HÀNG TRƯỚC để đảm bảo có trong DB
-=======
-        //LƯU ĐƠN HÀNG TRƯỚC để đảm bảo có trong DB
->>>>>>> origin/manh-hoadon
         donHang = donHangRepository.save(donHang);
         // Lặp danh sách món
         for (MonTrongDonDTO monDTO : donHangDTO.getDanhSachMonTrongDon()) {
@@ -118,7 +106,6 @@ public class DonHangServiceImpl implements DonHangService {
         return String.format("%s%04d", prefix, number);
     }
     @Override
-<<<<<<< HEAD
     public int getTongDoanhThuHomNay() {
         return donHangRepository.tinhDoanhThuHomNay();
     }
@@ -138,41 +125,78 @@ public class DonHangServiceImpl implements DonHangService {
         if (donHangRepository.top5MonTheoThangNam(thang, nam).isEmpty()) return null;
         return donHangRepository.top5MonTheoThangNam(thang, nam);
     }
-=======
-    public List<DonHang> getAllDonHang() {
-        return donHangRepository.findAll();
+
+    @Override
+    public List<DonHangDTO> getAllDonHang() {
+        return donHangRepository.findAll().stream().map(donHang -> {
+            DonHangDTO donHangDTO = new DonHangDTO();
+            donHangDTO.setMaDonHang(donHang.getMaDonHang());
+            donHangDTO.setMaNhanVien(donHang.getNhanVien().getMaNhanVien());
+            donHangDTO.setHoTen(donHang.getHoTen()); // Hoặc donHang.getNhanVien().getHoTen() tùy theo logic
+            donHangDTO.setThoiGianDatHang(donHang.getThoiGianDatHang());
+            donHangDTO.setTongTien(donHang.getTongTien());
+
+            List<MonTrongDonDTO> monTrongDonDTOList = donHang.getChiTietDonHang().stream().map(chiTiet -> {
+                MonTrongDonDTO monDTO = new MonTrongDonDTO();
+                monDTO.setMaMon(chiTiet.getMon().getMaMon());
+                monDTO.setTenMon(chiTiet.getTenMon());
+                monDTO.setSoLuong(chiTiet.getSoLuong());
+                monDTO.setDonGia(chiTiet.getDonGia());
+                monDTO.setYeuCauKhac(chiTiet.getYeuCauKhac());
+                monDTO.setTamTinh(chiTiet.getTamTinh());
+                return monDTO;
+            }).toList();
+            donHangDTO.setDanhSachMonTrongDon(monTrongDonDTOList);
+            return donHangDTO;
+        }).toList();
     }
+
 
     // Lấy đơn hàng theo ID
     @Override
-    public Optional<DonHang> getDonHangById(String maDonHang) {
-        return donHangRepository.findById(maDonHang);
+    @Transactional(readOnly = true) // Đảm bảo session Hibernate vẫn mở để tải lazy collection
+    public Optional<DonHangDTO> getDonHangById(String maDonHang) {
+        return donHangRepository.findById(maDonHang).map(this::convertToDonHangDTO);
     }
 
-    // Xóa đơn hàng
     @Override
-    public void deleteDonHang(String maDonHang) {
-        donHangRepository.deleteById(maDonHang);
+    public List<DonHangDTO> filterByNgay(LocalDate ngay) {
+        LocalDateTime startOfDay = ngay.atStartOfDay();
+        LocalDateTime endOfDay = ngay.atTime(23, 59, 59, 999999999);
+
+        return donHangRepository.findByThoiGianDatHangBetween(startOfDay, endOfDay)
+                .stream()
+                .map(this::convertToDonHangDTO) 
+                .toList();
     }
 
-    // Phân trang
-    @Override
-    public Page<DonHang> getAllDonHangPaginated(Pageable pageable) {
-        return donHangRepository.findAll(pageable);
+    // Phương thức helper để chuyển đổi DonHang sang DonHangDTO
+    private DonHangDTO convertToDonHangDTO(DonHang donHang) {
+        if (donHang == null) {
+            return null;
+        }
+        DonHangDTO dto = new DonHangDTO();
+        dto.setMaDonHang(donHang.getMaDonHang());
+        if (donHang.getNhanVien() != null) {
+            dto.setMaNhanVien(donHang.getNhanVien().getMaNhanVien());
+        }
+        dto.setHoTen(donHang.getHoTen()); // Giả sử DonHang lưu trực tiếp họ tên nhân viên tạo đơn
+        dto.setThoiGianDatHang(donHang.getThoiGianDatHang());
+        dto.setTongTien(donHang.getTongTien());
+
+        List<MonTrongDonDTO> monTrongDonList = donHang.getChiTietDonHang().stream().map(ctdh -> {
+            MonTrongDonDTO monDTO = new MonTrongDonDTO();
+            monDTO.setMaMon(ctdh.getMon().getMaMon());
+            monDTO.setTenMon(ctdh.getTenMon());
+            monDTO.setSoLuong(ctdh.getSoLuong());
+            monDTO.setDonGia(ctdh.getDonGia());
+            monDTO.setYeuCauKhac(ctdh.getYeuCauKhac());
+            monDTO.setTamTinh(ctdh.getTamTinh());
+            // Các trường khác của MonTrongDonDTO có thể được set ở đây nếu cần
+            return monDTO;
+        }).toList();
+        dto.setDanhSachMonTrongDon(monTrongDonList);
+        return dto;
     }
 
-    // Lọc theo thời gian
-    //@Override
-    //public List<DonHang> filterByDate(LocalDateTime start, LocalDateTime end) {
-    //    return donHangRepository.findByThoiGianDatHangBetween(start, end);
-    //}
-
-    // Tìm kiếm theo mã đơn hoặc tên nhân viên
-    //@Override
-    //public List<DonHang> searchDonHang(String keyword) {
-    //    return donHangRepository.findByMaDonHangContainingOrNhanVien_HoTenContaining(keyword, keyword);
-    //}
->>>>>>> origin/manh-hoadon
 }
-
-

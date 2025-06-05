@@ -1,11 +1,30 @@
 package com.frontend;
 
-import com.backend.dto.ChiTietDonHangDTO;
+import java.io.File;
+import java.io.FileOutputStream; // Keep this import for PDF generation
 
+import com.backend.dto.DonHangDTO;
+import com.backend.dto.MonTrongDonDTO;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import javafx.collections.FXCollections; // Import MonTrongDonDTO
+import javafx.event.ActionEvent; // Import FXCollections
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 
 public class ChiTietDonHangUI {
@@ -14,97 +33,39 @@ public class ChiTietDonHangUI {
     private Text lblMaDonHang, lblTenNhanVien, lblTongTien, lblThoiGianDat;
 
     @FXML
-    private TableView<ChiTietDonHangDTO> tableChiTietDonHang;
+    private TableView<MonTrongDonDTO> tableChiTietDonHang; // Change TableView type to MonTrongDonDTO
 
     @FXML
-    private TableColumn<ChiTietDonHangDTO, String> colSTT, colTenCaPhe, colYeuCauDacBiet;
+    private TableColumn<MonTrongDonDTO, String> colSTT, colTenMon, colYeuCauKhac; // Change TableColumn types
 
     @FXML
-    private TableColumn<ChiTietDonHangDTO, Integer> colSoLuong, colDonGia, colTamTinh;
+    private TableColumn<MonTrongDonDTO, Integer> colSoLuong, colDonGia, colTamTinh; // Change TableColumn types
 
     @FXML
     private Button btnQuayLai;
-/* 
-    private DonHangController donHangController;
-
-    private Connection conn;
-
-    private DonHangScreen donHangScreen;
 
     private DonHangDTO donHang;
-
-    public void setDonHangController(DonHangController donHangController){
-        this.donHangController = donHangController;
-    }
-
-    public DonHangController getDonHangController(){
-        return donHangController;
-    }
-
-    public ChiTietDonHangScreen(){
-        try {
-            conn = DBConnection.getConnection();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void setDonHangScreen(DonHangScreen donHangScreen){
-        this.donHangScreen = donHangScreen;
-    }
 
     public void initData(DonHangDTO donHang) {
         this.donHang = donHang;
         lblMaDonHang.setText("Mã đơn hàng: "+donHang.getMaDonHang());
-        lblTenNhanVien.setText("Nhân viên tạo đơn: "+donHang.getTenNhanVien());
-        lblTongTien.setText("Tổng tiền: " + donHang.getTongTien());
+        lblTenNhanVien.setText("Nhân viên tạo đơn: "+donHang.getHoTen());
+        lblTongTien.setText("Tổng tiền: " + donHang.getTongTien() + " VND");
         lblThoiGianDat.setText("Thời gian đặt hàng: " + donHang.getThoiGianDatHang());
 
         colSTT.setCellValueFactory(param ->
             new javafx.beans.property.SimpleStringProperty(String.valueOf(tableChiTietDonHang.getItems().indexOf(param.getValue()) + 1)));
-        colTenCaPhe.setCellValueFactory(new PropertyValueFactory<>("tenCaPhe"));
+        colTenMon.setCellValueFactory(new PropertyValueFactory<>("tenMon")); 
         colSoLuong.setCellValueFactory(new PropertyValueFactory<>("soLuong"));
         colDonGia.setCellValueFactory(new PropertyValueFactory<>("donGia"));
-        colYeuCauDacBiet.setCellValueFactory(new PropertyValueFactory<>("yeuCauDacBiet"));
-        colTamTinh.setCellValueFactory(new PropertyValueFactory<>("tamTinh"));
+        colYeuCauKhac.setCellValueFactory(new PropertyValueFactory<>("yeuCauKhac")); 
+        colTamTinh.setCellValueFactory(new PropertyValueFactory<>("tamTinh")); 
 
-        loadChiTietDonHang(donHang.getMaDonHang());
+        tableChiTietDonHang.setItems(FXCollections.observableArrayList(donHang.getDanhSachMonTrongDon())); // Set table items from DTO
 
         tableChiTietDonHang.getColumns().forEach(column -> {
             column.setReorderable(false);
         });
-    }
-
-    private void loadChiTietDonHang(String maDonHang) {
-        // Cập nhật câu lệnh SQL để lấy thêm tên cà phê và đơn giá cà phê từ bảng CAPHE
-        String sql = "SELECT ct.MaCaPhe, cp.TenCaPhe, cp.DonGia, ct.SoLuong, ct.YeuCauDacBiet, ct.TamTinh " +
-                "FROM CHITIETDONHANG ct " +
-                "JOIN CAPHE cp ON ct.MaCaPhe = cp.MaCaPhe " +
-                "WHERE ct.MaDonHang = ?";
-
-        ObservableList<ChiTietDonHangDTO> chiTietList = FXCollections.observableArrayList();
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, maDonHang);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                String maCaPhe = rs.getString("MaCaPhe");
-                String tenCaPhe = rs.getString("TenCaPhe"); // Lấy tên cà phê
-                int donGia = rs.getInt("DonGia"); // Lấy đơn giá cà phê
-                int soLuong = rs.getInt("SoLuong");
-                String yeuCauDacBiet = rs.getString("YeuCauDacBiet");
-                int tamTinh = rs.getInt("TamTinh");
-
-                // Cập nhật constructor của ChiTietDonHang nếu cần chứa thêm tên cà phê và đơn giá
-                ChiTietDonHangDTO chiTiet = new ChiTietDonHangDTO(maCaPhe, yeuCauDacBiet, soLuong, donGia, maDonHang, tenCaPhe, tamTinh);
-                chiTietList.add(chiTiet);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        tableChiTietDonHang.setItems(chiTietList);
     }
 
     @FXML
@@ -112,7 +73,7 @@ public class ChiTietDonHangUI {
         try {
             // Lấy dữ liệu từ giao diện
             String maDonHang = donHang.getMaDonHang();
-            String tenNhanVien = donHang.getTenNhanVien();
+            String tenNhanVien = donHang.getHoTen();
             String tongTien = String.valueOf(donHang.getTongTien());
             String thoiGianDat = donHang.getThoiGianDatHang().toString();
     
@@ -131,7 +92,7 @@ public class ChiTietDonHangUI {
             document.open();
     
             // Đường dẫn đến font hỗ trợ tiếng Việt (Arial Unicode hoặc Roboto)
-            String fontPath = "H:\\Documents\\TTCSN\\quanlicafe\\src\\main\\resources\\fonts\\Roboto-Regular.ttf"; // Thay đường dẫn này bằng file font thực tế
+            String fontPath = "/fonts/Roboto-Regular.ttf"; // Thay đường dẫn này bằng file font thực tế
             BaseFont baseFont = BaseFont.createFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             Font normalFont = new Font(baseFont, 12, Font.NORMAL);
             Font boldFont = new Font(baseFont, 12, Font.BOLD);
@@ -166,7 +127,7 @@ public class ChiTietDonHangUI {
             table.getDefaultCell().setBorder(0);  // Loại bỏ border của các ô mặc định
     
             // Danh sách các tiêu đề bảng
-            String[] headers = {"STT", "Tên cà phê", "Yêu cầu đặc biệt", "Số lượng", "Đơn giá", "Tạm tính"};
+            String[] headers = {"STT", "Tên món", "Yêu cầu khác", "Số lượng", "Đơn giá", "Tạm tính"};
 
             // Duyệt qua các tiêu đề và thêm vào bảng
             for (String header : headers) {
@@ -177,22 +138,22 @@ public class ChiTietDonHangUI {
 
             // Thêm dữ liệu bảng
             int stt = 1;
-            for (ChiTietDonHangDTO item : tableChiTietDonHang.getItems()) {
+            for (MonTrongDonDTO item : tableChiTietDonHang.getItems()) { // Iterate over MonTrongDonDTO
                 // Cột STT căn giữa
                 table.addCell(new PdfPCell(new Phrase(String.valueOf(stt++), normalFont)) {
                     {
                         setHorizontalAlignment(Element.ALIGN_CENTER);
                     }
                 });
-                // Cột Tên cà phê căn trái
-                table.addCell(new PdfPCell(new Phrase(item.getTenMon(), normalFont)) {
+                // Cột Tên món căn trái
+                table.addCell(new PdfPCell(new Phrase(item.getTenMon(), normalFont)) { //Sửa thành getTenMon
                     {
                         setHorizontalAlignment(Element.ALIGN_LEFT);
                     }
                 });
                 // Cột Yêu cầu đặc biệt căn trái
                 table.addCell(new PdfPCell(new Phrase(
-                        item.getYeuCauDacBiet() != null ? item.getYeuCauDacBiet() : "", normalFont)) {
+                        item.getYeuCauKhac() != null ? item.getYeuCauKhac() : "", normalFont)) { 
                     {
                         setHorizontalAlignment(Element.ALIGN_LEFT);
                     }
@@ -221,7 +182,7 @@ public class ChiTietDonHangUI {
             document.add(table);
     
             // Thêm tổng tiền
-            Paragraph total = new Paragraph("\nTổng tiền: " + tongTien, boldFont);
+            Paragraph total = new Paragraph("\nTổng tiền: " + tongTien + " VND", boldFont);
             total.setAlignment(Element.ALIGN_RIGHT);
             document.add(total);
     
@@ -251,5 +212,5 @@ public class ChiTietDonHangUI {
     void quayLai(ActionEvent event) {
         btnQuayLai.getScene().getWindow().hide();
     }
-*/
+
 }

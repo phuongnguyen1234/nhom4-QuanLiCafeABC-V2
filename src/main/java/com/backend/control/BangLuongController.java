@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +18,7 @@ import com.backend.dto.BangLuongDTO;
 import com.backend.service.BangLuongService;
 
 @RestController
-@RequestMapping("/api/bangluong")
+@RequestMapping("/bang-luong")
 public class BangLuongController {
 
     private final BangLuongService bangLuongService;
@@ -29,15 +28,19 @@ public class BangLuongController {
     }
 
     // Thêm mới bảng lương
-    @PostMapping
-    public ResponseEntity<BangLuongDTO> themBangLuong(@RequestBody BangLuongDTO dto) {
-        return ResponseEntity.ok(bangLuongService.themBangLuong(dto));
+    @PostMapping("/create")
+    public ResponseEntity<String> themBangLuong() {
+        int soLuong = bangLuongService.taoBangLuongThangHienTai();
+        if (soLuong == 0) {
+            return ResponseEntity.ok("Đã tồn tại bảng lương cho tất cả nhân viên tháng này.");
+        }
+        return ResponseEntity.ok("Đã tạo " + soLuong + " bảng lương mới.");
     }
 
     // Lấy tất cả bảng lương
-    @GetMapping
-    public ResponseEntity<List<BangLuongDTO>> layTatCaBangLuong() {
-        return ResponseEntity.ok(bangLuongService.layTatCaBangLuong());
+    @GetMapping("/thang-nay")
+    public ResponseEntity<List<BangLuongDTO>> layTatCaBangLuongThangNay() {
+        return ResponseEntity.ok(bangLuongService.layTatCaBangLuongThangNay());
     }
 
     // Tìm bảng lương theo mã
@@ -62,17 +65,10 @@ public class BangLuongController {
         }
     }
 
-    // Xoá bảng lương theo mã
-    @DeleteMapping("/{ma}")
-    public ResponseEntity<Void> xoaBangLuong(@PathVariable String ma) {
-        bangLuongService.xoaBangLuong(ma);
-        return ResponseEntity.noContent().build();
-    }
-
     // Lấy bảng lương theo tháng
     @GetMapping("/thang")
     public ResponseEntity<List<BangLuongDTO>> layBangLuongTheoThang(
-            @RequestParam("thang") @DateTimeFormat(pattern = "yyyy-MM") YearMonth thang) {
+            @RequestParam("thang") @DateTimeFormat(pattern = "yyyyMM") YearMonth thang) {
         List<BangLuongDTO> list = bangLuongService.layBangLuongTheoThang(thang);
         return ResponseEntity.ok(list);
     }

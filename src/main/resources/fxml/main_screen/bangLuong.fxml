@@ -94,16 +94,16 @@
                <!--bang du lieu-->
                   <TableView fx:id="tableViewBangLuong" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="635.0" prefWidth="1300.0">
                     <columns>
-                      <TableColumn fx:id="colMaBangLuong" editable="false" prefWidth="106.0" reorderable="false" resizable="false" sortable="false" text="Mã bảng lương" />
-                        <TableColumn fx:id="colHoTen" editable="false" prefWidth="164.0" reorderable="false" resizable="false" sortable="false" text="Họ tên" />
-                        <TableColumn fx:id="colThang" editable="false" prefWidth="76.0" reorderable="false" resizable="false" sortable="false" text="Tháng" />
-                        <TableColumn fx:id="colNgayCong" editable="false" prefWidth="74.0" reorderable="false" resizable="false" sortable="false" text="Ngày công" />
-                        <TableColumn fx:id="colNghiCoCong" editable="false" prefWidth="92.0" reorderable="false" resizable="false" sortable="false" text="Nghỉ có công" />
-                        <TableColumn fx:id="colNghiKhongCong" editable="false" prefWidth="113.0" reorderable="false" resizable="false" sortable="false" text="Nghỉ không công" />
-                        <TableColumn fx:id="colThuongDoanhThu" editable="false" prefWidth="129.0" reorderable="false" resizable="false" sortable="false" text="Thưởng doanh thu" />
-                        <TableColumn fx:id="colLuongThucNhan" editable="false" prefWidth="132.0" reorderable="false" resizable="false" sortable="false" text="Lương thực nhận" />
-                        <TableColumn fx:id="colGhiChu" prefWidth="334.0" reorderable="false" resizable="false" text="Ghi chú" />
-                        <TableColumn fx:id="colHanhDong" editable="false" prefWidth="78.0" reorderable="false" resizable="false" sortable="false" />
+                      <TableColumn fx:id="colMaBangLuong" editable="false" prefWidth="142.0" reorderable="false" resizable="false" sortable="false" text="Mã bảng lương" />
+                        <TableColumn fx:id="colHoTen" editable="false" prefWidth="165.0" reorderable="false" resizable="false" sortable="false" text="Họ tên" />
+                        <TableColumn fx:id="colThang" editable="false" prefWidth="99.0" reorderable="false" resizable="false" sortable="false" text="Tháng" />
+                        <TableColumn fx:id="colNgayCong" editable="false" prefWidth="73.0" reorderable="false" resizable="false" sortable="false" text="Ngày công" />
+                        <TableColumn fx:id="colNghiCoCong" editable="false" prefWidth="96.0" reorderable="false" resizable="false" sortable="false" text="Nghỉ có công" />
+                        <TableColumn fx:id="colNghiKhongCong" editable="false" prefWidth="115.0" reorderable="false" resizable="false" sortable="false" text="Nghỉ không công" />
+                        <TableColumn fx:id="colThuongDoanhThu" editable="false" prefWidth="123.0" reorderable="false" resizable="false" sortable="false" text="Thưởng doanh thu" />
+                        <TableColumn fx:id="colLuongThucNhan" editable="false" prefWidth="119.0" reorderable="false" resizable="false" sortable="false" text="Lương thực nhận" />
+                        <TableColumn fx:id="colGhiChu" prefWidth="276.0" reorderable="false" resizable="false" text="Ghi chú" />
+                        <TableColumn fx:id="colHanhDong" editable="false" prefWidth="90.0" reorderable="false" resizable="false" sortable="false" />
                     </columns>
                   </TableView>
       

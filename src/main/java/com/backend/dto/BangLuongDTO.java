@@ -1,20 +1,20 @@
 package com.backend.dto;
 
-import java.time.YearMonth;
+import java.time.LocalDate;
 
 public class BangLuongDTO {
     private String maBangLuong;
     private String maNhanVien;
-    private String tenNhanVien; // Tên nhân viên
+    private String hoTen; // Tên nhân viên
     private String loaiNhanVien;
     private String viTri;
     private int mucLuong;
-    private YearMonth thang;
-    private int soNgayCong;
-    private int soNgayNghiCoCong;
-    private int soNgayNghiKhongCong;
-    private int soGioLamThem;
-    private int soLuongDonDaTao;
+    private LocalDate thang;
+    private int ngayCong;
+    private int nghiCoCong;
+    private int nghiKhongCong;
+    private int gioLamThem;
+    private int donDaTao;
     private int thuongDoanhThu;
     private int luongThucNhan;
     private String ghiChu;
@@ -23,21 +23,21 @@ public class BangLuongDTO {
     public BangLuongDTO(){}
 
     // Constructor
-    public BangLuongDTO(String maBangLuong, String maNhanVien, String tenNhanVien, String loaiNhanVien, String viTri, int mucLuong, YearMonth thang, int soNgayCong,
-                                    int soNgayNghiCoCong, int soNgayNghiKhongCong, int soGioLamThem, int soLuongDonDaTao,
+    public BangLuongDTO(String maBangLuong, String maNhanVien, String hoTen, String loaiNhanVien, String viTri, int mucLuong, LocalDate thang, int ngayCong,
+                                    int nghiCoCong, int nghiKhongCong, int gioLamThem, int donDaTao,
                                     int thuongDoanhThu, int luongThucNhan, String ghiChu, String duocPhepChinhSua) {
         this.maBangLuong = maBangLuong;
         this.maNhanVien = maNhanVien;
-        this.tenNhanVien = tenNhanVien;
+        this.hoTen = hoTen;
         this.loaiNhanVien = loaiNhanVien;
         this.viTri = viTri;
         this.mucLuong = mucLuong;
         this.thang = thang;
-        this.soNgayCong = soNgayCong;
-        this.soNgayNghiCoCong = soNgayNghiCoCong;
-        this.soNgayNghiKhongCong = soNgayNghiKhongCong;
-        this.soGioLamThem = soGioLamThem;
-        this.soLuongDonDaTao = soLuongDonDaTao;
+        this.ngayCong = ngayCong;
+        this.nghiCoCong = nghiCoCong;
+        this.nghiKhongCong = nghiKhongCong;
+        this.gioLamThem = gioLamThem;
+        this.donDaTao = donDaTao;
         this.thuongDoanhThu = thuongDoanhThu;
         this.luongThucNhan = luongThucNhan;
         this.ghiChu = ghiChu;
@@ -61,12 +61,12 @@ public class BangLuongDTO {
         this.maNhanVien = maNhanVien;
     }
 
-    public String getTenNhanVien() {
-        return tenNhanVien;
+    public String getHoTen() {
+        return hoTen;
     }
 
-    public void setTenNhanVien(String tenNhanVien) {
-        this.tenNhanVien = tenNhanVien;
+    public void setHoTen(String hoTen) {
+        this.hoTen = hoTen;
     }
 
     public String getLoaiNhanVien() {
@@ -93,52 +93,52 @@ public class BangLuongDTO {
         this.mucLuong = mucLuong;
     }
 
-    public YearMonth getThang() {
+    public LocalDate getThang() {
         return thang;
     }
     
-    public void setThang(YearMonth thang) {
+    public void setThang(LocalDate thang) {
         this.thang = thang;
     }
     
-    public int getSoNgayCong() {
-        return soNgayCong;
+    public int getNgayCong() {
+        return ngayCong;
     }
     
-    public void setSoNgayCong(int soNgayCong) {
-        this.soNgayCong = soNgayCong;
+    public void setNgayCong(int ngayCong) {
+        this.ngayCong = ngayCong;
     }
     
-    public int getSoNgayNghiCoCong() {
-        return soNgayNghiCoCong;
+    public int getNghiCoCong() {
+        return nghiCoCong;
     }
     
-    public void setSoNgayNghiCoCong(int soNgayNghiCoCong) {
-        this.soNgayNghiCoCong = soNgayNghiCoCong;
+    public void setNghiCoCong(int nghiCoCong) {
+        this.nghiCoCong = nghiCoCong;
     }
     
-    public int getSoNgayNghiKhongCong() {
-        return soNgayNghiKhongCong;
+    public int getNghiKhongCong() {
+        return nghiKhongCong;
     }
     
-    public void setSoNgayNghiKhongCong(int soNgayNghiKhongCong) {
-        this.soNgayNghiKhongCong = soNgayNghiKhongCong;
+    public void setNghiKhongCong(int nghiKhongCong) {
+        this.nghiKhongCong = nghiKhongCong;
     }
     
-    public int getSoGioLamThem() {
-        return soGioLamThem;
+    public int getGioLamThem() {
+        return gioLamThem;
     }
     
-    public void setSoGioLamThem(int soGioLamThem) {
-        this.soGioLamThem = soGioLamThem;
+    public void setGioLamThem(int gioLamThem) {
+        this.gioLamThem = gioLamThem;
     }
 
-    public int getSoLuongDonDaTao() {
-        return soLuongDonDaTao;
+    public int getDonDaTao() {
+        return donDaTao;
     }
 
-    public void setSoLuongDonDaTao(int soLuongDonDaTao) {
-        this.soLuongDonDaTao = soLuongDonDaTao;
+    public void setDonDaTao(int donDaTao) {
+        this.donDaTao = donDaTao;
     }
     
     public int getThuongDoanhThu() {

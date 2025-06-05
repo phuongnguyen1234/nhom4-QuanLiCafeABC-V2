@@ -88,4 +88,12 @@ public class DonHang {
     public void setTongTien(int tongTien) {
         this.tongTien = tongTien;
     }
+
+    public List<ChiTietDonHang> getChiTietDonHang() {
+        return chiTietDonHangs;
+    }
+
+    public void setChiTietDonHang(List<ChiTietDonHang> chiTietDonHang) {
+        this.chiTietDonHangs = chiTietDonHang;
+    }
 }

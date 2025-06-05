@@ -3,19 +3,11 @@ package com.backend.service.impl;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-<<<<<<< HEAD
-=======
-import java.util.Optional;
->>>>>>> origin/manh-hoadon
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-<<<<<<< HEAD
 import com.backend.dto.MonDTO;
-=======
-import com.backend.dto.MonQLy;
->>>>>>> origin/manh-hoadon
 import com.backend.model.DanhMuc;
 import com.backend.model.Mon;
 import com.backend.repository.DanhMucRepository;
@@ -44,11 +36,7 @@ public class MonServiceImpl implements MonService {
     }
 
     @Override
-<<<<<<< HEAD
     public Mon createMon(MonDTO dto) {
-=======
-    public Mon createMon(MonQLy dto) {
->>>>>>> origin/manh-hoadon
         Mon mon = new Mon();
 
         // Tạo mã tự động nếu cần
@@ -70,11 +58,7 @@ public class MonServiceImpl implements MonService {
     }
 
     @Override
-<<<<<<< HEAD
     public Mon updateMon(MonDTO monUpdate) {
-=======
-    public Mon updateMon(MonQLy monUpdate) {
->>>>>>> origin/manh-hoadon
         Mon mon = new Mon();
         mon.setMaMon(monUpdate.getMaMon());
         mon.setTenMon(monUpdate.getTenMon());
@@ -89,18 +73,6 @@ public class MonServiceImpl implements MonService {
         return monRepository.save(mon);
     }
 
-<<<<<<< HEAD
-=======
-    @Override
-    public byte[] getImage(String maMon) throws Exception {
-        Optional<Mon> optionalMon = monRepository.findById(maMon);
-        if (optionalMon.isEmpty() || optionalMon.get().getAnhMinhHoa() == null) {
-            throw new Exception("Không tìm thấy ảnh minh họa cho món có mã: " + maMon);
-        }
-        return optionalMon.get().getAnhMinhHoa();
-    }
-
->>>>>>> origin/manh-hoadon
     private String generateNewMaMon() {
         List<Mon> allMon = monRepository.findAll();
 

@@ -1,7 +1,6 @@
 package com.frontend;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -14,17 +13,16 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import com.backend.quanlicapheabc.QuanlicapheabcApplication; // Import để lấy CookieManager
 import com.backend.dto.NhanVienDTO;
+import com.backend.quanlicapheabc.QuanlicapheabcApplication; // Import để lấy CookieManager
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.PasswordField;
@@ -314,7 +312,7 @@ String tenNhanVien = tenNhanVienTextField.getText().trim();
             protected Void call() throws Exception {
                 String json = objectMapper.writeValueAsString(newNhanVien);
                 HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:8080/nhanvien"))
+                        .uri(URI.create("http://localhost:8080/nhan-vien"))
                         .POST(HttpRequest.BodyPublishers.ofString(json))
                         .header("Content-Type", "application/json")
                         .build();

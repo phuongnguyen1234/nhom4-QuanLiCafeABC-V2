@@ -1,5 +1,6 @@
 package com.backend.model;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
@@ -24,7 +25,7 @@ public class BangLuong {
     private NhanVien nhanVien;
 
     @Column(name = "Thang")
-    private YearMonth thang;
+    private LocalDate thang;
 
     @Column(name = "NgayCong")
     private int ngayCong;
@@ -55,7 +56,7 @@ public class BangLuong {
 
     public BangLuong(){}
 
-    public BangLuong(String maBangLuong, NhanVien nhanVien, YearMonth thang, int ngayCong,
+    public BangLuong(String maBangLuong, NhanVien nhanVien, LocalDate thang, int ngayCong,
     int nghiCoCong, int nghiKhongCong, int gioLamThem, int donDaTao, int thuongDoanhThu,
     int luongThucNhan, String ghiChu, String duocPhepChinhSua) {
         // Constructor with parameters
@@ -89,11 +90,11 @@ public class BangLuong {
         this.nhanVien = nhanVien;
     }
     
-    public YearMonth getThang() {
+    public LocalDate getThang() {
         return thang;
     }
     
-    public void setThang(YearMonth thang) {
+    public void setThang(LocalDate thang) {
         this.thang = thang;
     }
     

@@ -10,10 +10,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.List;
 
 import com.backend.dto.DanhMucKhongMonDTO;
 import com.backend.dto.MonDTO;
+import com.backend.quanlicapheabc.QuanlicapheabcApplication;
 import com.backend.utils.HttpUtils;
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,6 +52,12 @@ public class ThemVaoThucDonUI {
     private List<DanhMucKhongMonDTO> danhMucList;
 
     private File selectedImageFile; // Lưu trữ file ảnh đã chọn
+
+    private final HttpClient client = HttpClient.newBuilder()
+            .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
+            .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
+            .build();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @FXML
     private AnchorPane mainAnchorPane;
@@ -256,10 +264,8 @@ public void themVaoThucDon() {
     return new Task<>() {
         @Override
         protected Void call() throws Exception {
-            ObjectMapper mapper = new ObjectMapper();
-            String json = mapper.writeValueAsString(mon);
+            String json = objectMapper.writeValueAsString(mon);
             System.out.println("JSON: " + json);
-            HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("http://localhost:8080/mon"))
                     .POST(HttpRequest.BodyPublishers.ofString(json))

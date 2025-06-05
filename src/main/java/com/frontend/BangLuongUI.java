@@ -1,14 +1,40 @@
 package com.frontend;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.Year;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import com.backend.dto.BangLuongDTO;
+import com.backend.quanlicapheabc.QuanlicapheabcApplication;
+import com.backend.utils.MessageUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class BangLuongUI {
     @FXML
@@ -29,28 +55,27 @@ public class BangLuongUI {
     @FXML
     private Pagination phanTrang;
 
+    @FXML
+    private Button btnTaoBangLuong;
+
+    private final HttpClient client = HttpClient.newBuilder()
+            .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
+            .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
+            .build();
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
     private static final int SO_DONG_MOI_TRANG = 50;
 
     private final ObservableList<BangLuongDTO> bangLuongList = FXCollections.observableArrayList();
 
-    /*private TaoVaChinhSuaBangLuongController taoLuongController;
-
-    public void setTaoLuongController(TaoVaChinhSuaBangLuongController taoLuongController){
-        this.taoLuongController = taoLuongController;
-    }
-
-    public TaoVaChinhSuaBangLuongController getTaoLuongController(){
-        return taoLuongController;
-    }
-
     public void initialize() {
         // Link columns with data from getters
         colMaBangLuong.setCellValueFactory(new PropertyValueFactory<>("maBangLuong"));
-        colHoTen.setCellValueFactory(new PropertyValueFactory<>("tenNhanVien"));
+        colHoTen.setCellValueFactory(new PropertyValueFactory<>("hoTen"));
         colThang.setCellValueFactory(new PropertyValueFactory<>("thang"));
-        colNgayCong.setCellValueFactory(new PropertyValueFactory<>("soNgayCong"));
-        colNghiCoCong.setCellValueFactory(new PropertyValueFactory<>("soNgayNghiCoCong"));
-        colNghiKhongCong.setCellValueFactory(new PropertyValueFactory<>("soNgayNghiKhongCong"));
+        colNgayCong.setCellValueFactory(new PropertyValueFactory<>("ngayCong"));
+        colNghiCoCong.setCellValueFactory(new PropertyValueFactory<>("nghiCoCong"));
+        colNghiKhongCong.setCellValueFactory(new PropertyValueFactory<>("nghiKhongCong"));
         colThuongDoanhThu.setCellValueFactory(new PropertyValueFactory<>("thuongDoanhThu"));
         colLuongThucNhan.setCellValueFactory(new PropertyValueFactory<>("luongThucNhan"));
         colGhiChu.setCellValueFactory(new PropertyValueFactory<>("ghiChu"));
@@ -109,6 +134,9 @@ public class BangLuongUI {
         phanTrang.currentPageIndexProperty().addListener((obs, oldIndex, newIndex) -> {
             capNhatTrang(newIndex.intValue());
         });
+
+        // Tải dữ liệu ban đầu khi khởi tạo giao diện
+        loc();
     }
 
     private void sua(BangLuongDTO bangLuong) {
@@ -116,18 +144,18 @@ public class BangLuongUI {
             return;
         }
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/chiTietBangLuongForm.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/chinhSuaBangLuong.fxml"));
             Parent root = loader.load();
     
-            ChinhSuaBangLuongScreen controller = loader.getController();
+            ChinhSuaBangLuongUI controller = loader.getController();
             controller.setBangLuong(bangLuong);
-            controller.setBangLuongScreen(this); // Truyền tham chiếu đến BangLuongScreen
     
             // Tạo và hiển thị dialog
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL); // Modal dialog
             stage.setTitle("Sửa bảng lương " + bangLuong.getMaBangLuong());
-            stage.setScene(new Scene(root, 500, 690));
+            // Kích thước có thể cần điều chỉnh cho phù hợp với nội dung của chinhSuaBangLuong.fxml
+            stage.setScene(new Scene(root)); 
             stage.setResizable(false);
             stage.show();
         } catch (Exception e) {
@@ -161,46 +189,87 @@ public class BangLuongUI {
 
     @FXML
     private void taoBangLuong() {
-        try {
-            // Gọi phương thức tạo bảng lương tháng này và nhận số lượng bảng lương được tạo mới
-            int soLuongBangLuongDuocTao = taoLuongController.taoBangLuongThangNay();
+        // Vô hiệu hóa UI tạm thời
+        tableViewBangLuong.setDisable(true);
+        phanTrang.setDisable(true);
 
-            if (soLuongBangLuongDuocTao > 0) {
-                // Hiển thị thông báo thành công nếu có bảng lương được tạo
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Thành công");
-                alert.setHeaderText(null);
-                alert.setContentText("Bảng lương tháng này đã được tạo thành công! Số lượng bảng lương mới: " + soLuongBangLuongDuocTao);
-                alert.showAndWait();
-                hienThiDanhSachBangLuong(taoLuongController.layDanhSachBangLuongThangNay());
-            } else {
-                // Hiển thị thông báo nếu không có bảng lương nào được tạo
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Thông báo");
-                alert.setHeaderText(null);
-                alert.setContentText("Tất cả nhân viên đã có bảng lương. Không có bảng lương nào được tạo mới.");
-                alert.showAndWait();
+        Task<String> task = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(new URI("http://localhost:8080/bang-luong/create"))
+                        .POST(HttpRequest.BodyPublishers.noBody()) // Không cần gửi body
+                        .build();
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() == 200 || response.statusCode() == 201) {
+                    return response.body(); // Trả về thông báo từ server
+                } else {
+                    throw new RuntimeException("Lỗi khi tạo bảng lương: " + response.statusCode() + " - " + response.body());
+                }
             }
-        } catch (Exception e) {
-            // Hiển thị thông báo lỗi nếu có ngoại lệ xảy ra
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Lỗi");
-            alert.setHeaderText("Không thể tạo bảng lương");
-            alert.setContentText("Đã xảy ra lỗi trong quá trình tạo bảng lương. Vui lòng thử lại sau.");
-            alert.showAndWait();
+        };
 
-            // Ghi lại log lỗi (nếu cần)
-            e.printStackTrace();
-        }
+        task.setOnSucceeded(event -> {
+            String responseMessage = task.getValue(); // lấy thông báo trả về từ server
+            MessageUtils.showInfoMessage(responseMessage); // hiển thị thông báo đúng nội dung
+            loc(); // Tải lại danh sách bảng lương sau khi tạo
+            tableViewBangLuong.setDisable(false);
+            phanTrang.setDisable(false);
+        });
+
+
+        task.setOnFailed(event -> {
+            MessageUtils.showErrorMessage("Lỗi tạo bảng lương");
+            task.getException().printStackTrace();
+            tableViewBangLuong.setDisable(false);
+            phanTrang.setDisable(false);
+        });
+
+        new Thread(task).start();
     }
 
     @FXML
     private void loc(){
-        try {
-            hienThiDanhSachBangLuong(taoLuongController.layDanhSachBangLuongTheoThoiGian(thangCombobox.getValue(), namCombobox.getValue()));
-        } catch (Exception e) {
-            e.printStackTrace();
+        String thang = thangCombobox.getValue();
+        String nam = namCombobox.getValue();
+
+        if (thang == null || nam == null) {
+            MessageUtils.showErrorMessage("Trường dữ liệu bị trống");
+            return;
         }
 
-    } */
+        tableViewBangLuong.setDisable(true);
+        phanTrang.setDisable(true);
+
+        Task<List<BangLuongDTO>> task = new Task<>() {
+            @Override
+            protected List<BangLuongDTO> call() throws Exception {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(new URI("http://localhost:8080/bang-luong/thang?thang=" + nam + thang))
+                        .GET()
+                        .build();
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() == 200) {
+                    return objectMapper.readValue(response.body(), new TypeReference<List<BangLuongDTO>>() {});
+                } else {
+                    throw new RuntimeException("Lỗi khi lọc bảng lương: " + response.statusCode() + " - " + response.body());
+                }
+            }
+        };
+
+        task.setOnSucceeded(event -> {
+            hienThiDanhSachBangLuong(task.getValue());
+            tableViewBangLuong.setDisable(false);
+            phanTrang.setDisable(false);
+        });
+
+        task.setOnFailed(event -> {
+            MessageUtils.showErrorMessage("Lỗi khi load bảng lương");
+            task.getException().printStackTrace();
+            tableViewBangLuong.setDisable(false);
+            phanTrang.setDisable(false);
+        });
+
+        new Thread(task).start();
+    } 
 }

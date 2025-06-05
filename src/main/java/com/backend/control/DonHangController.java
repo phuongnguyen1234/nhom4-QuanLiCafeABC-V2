@@ -1,10 +1,11 @@
 package com.backend.control;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,24 +35,24 @@ public class DonHangController {
     }
       // 2. Lấy đơn hàng theo ID
     @GetMapping("/{maDonHang}")
-public ResponseEntity<DonHang> getDonHangById(@PathVariable String maDonHang) {
-    return donHangService.getDonHangById(maDonHang)
-            .map(ResponseEntity::ok) // Nếu có giá trị -> trả về 200 OK
-            .orElse(ResponseEntity.notFound().build()); // Nếu rỗng -> trả về 404
-}
-
-    // 3. Lấy tất cả đơn hàng (phân trang)
-    @GetMapping
-    public ResponseEntity<Page<DonHang>> getAllDonHang(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(donHangService.getAllDonHangPaginated(Pageable.ofSize(size).withPage(page)));
+    public ResponseEntity<DonHangDTO> getDonHangById(@PathVariable String maDonHang) {
+        return donHangService.getDonHangById(maDonHang)
+                .map(ResponseEntity::ok) // Nếu có giá trị -> trả về 200 OK
+                .orElse(ResponseEntity.notFound().build()); // Nếu rỗng -> trả về 404
     }
 
-    // 4. Xóa đơn hàng
-    @DeleteMapping("/{maDonHang}")
-    public ResponseEntity<Void> deleteDonHang(@PathVariable String maDonHang) {
-        donHangService.deleteDonHang(maDonHang);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/all")
+    public ResponseEntity<List<DonHangDTO>> getAllDonHang() {
+        List<DonHangDTO> donHangs = donHangService.getAllDonHang();
+        return ResponseEntity.ok(donHangs); // Trả về 200 OK với danh sách đơn hàng
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<DonHangDTO>> filterDonHang(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ngay) {
+        List<DonHangDTO> donHangs = donHangService.filterByNgay(ngay);
+        if (donHangs.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(donHangs);
     }
 }

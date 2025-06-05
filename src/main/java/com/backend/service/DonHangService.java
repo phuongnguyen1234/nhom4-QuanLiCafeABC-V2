@@ -1,10 +1,8 @@
 package com.backend.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import com.backend.dto.DonHangDTO;
 import com.backend.model.DonHang;
@@ -12,16 +10,10 @@ import com.backend.model.NhanVien;
 
 public interface DonHangService {
     DonHang createDonHang(DonHangDTO donHangDTO);
-     List<DonHang> getAllDonHang();
+     List<DonHangDTO> getAllDonHang();
     
     // Mới: Lấy đơn hàng theo ID
-    Optional<DonHang> getDonHangById(String maDonHang);
-    
-    // Mới: Xóa đơn hàng
-    void deleteDonHang(String maDonHang);
-    
-    // Mới: Phân trang
-    Page<DonHang> getAllDonHangPaginated(Pageable pageable);
+    Optional<DonHangDTO> getDonHangById(String maDonHang);
     
     // Mới: Lọc theo khoảng thời gian
     //List<DonHang> filterByDate(LocalDateTime start, LocalDateTime end);
@@ -32,4 +24,5 @@ public interface DonHangService {
     int getTongDoanhThuHomNay();
     List<NhanVien> getTop3NhanVienTheoThang();
     List<String> getTop5MonBanChayTheoThang();
+    List<DonHangDTO> filterByNgay(LocalDate ngay);
 }

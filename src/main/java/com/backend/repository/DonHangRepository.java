@@ -2,7 +2,11 @@ package com.backend.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -42,4 +46,10 @@ public interface DonHangRepository extends JpaRepository<DonHang, String> {
     @Query("SELECT dh FROM DonHang dh JOIN dh.nhanVien nv " +
            "WHERE dh.maDonHang LIKE %:keyword% OR nv.hoTen LIKE %:keyword%")
     List<DonHang> searchDonHang(@Param("keyword") String keyword);
+
+    @EntityGraph(attributePaths = "chiTietDonHangs")
+    Optional<DonHang> findWithChiTietDonHangByMaDonHang(String maDonHang);
+
+    @Query("SELECT COUNT(dh) FROM DonHang dh WHERE dh.nhanVien.maNhanVien = :maNhanVien AND FUNCTION('MONTH', dh.thoiGianDatHang) = :month AND FUNCTION('YEAR', dh.thoiGianDatHang) = :year")
+    int countByNhanVienMaNhanVienAndThoiGianDatHangMonthAndThoiGianDatHangYear(@Param("maNhanVien") String maNhanVien, @Param("month") int month, @Param("year") int year);
 }

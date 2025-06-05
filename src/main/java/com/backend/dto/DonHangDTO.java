@@ -13,7 +13,7 @@ public class DonHangDTO {
 
     public DonHangDTO(){}
 
-    public DonHangDTO(String maDonHang, String hoTen, String tenNhanVien, List<MonTrongDonDTO> danhSachMonTrongDon, LocalDateTime thoiGianDatHang, int tongTien){
+    public DonHangDTO(String maDonHang, String hoTen, String maNhanVien, List<MonTrongDonDTO> danhSachMonTrongDon, LocalDateTime thoiGianDatHang, int tongTien){
         this.maDonHang = maDonHang;
         this.maNhanVien = maNhanVien;
         this.hoTen = hoTen;

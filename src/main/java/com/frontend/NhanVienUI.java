@@ -6,13 +6,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.backend.dto.NhanVienDTO;
-import com.backend.quanlicapheabc.QuanlicapheabcApplication; // Import để lấy CookieManager
-import com.backend.utils.MessageUtils;
+import com.backend.quanlicapheabc.QuanlicapheabcApplication;
+import com.backend.utils.MessageUtils; // Import để lấy CookieManager
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -26,7 +25,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
@@ -168,10 +166,10 @@ public class NhanVienUI {
                 // hoặc tất cả nhân viên khớp searchTerm. Việc lọc "chỉ nghỉ việc" sẽ thực hiện ở frontend.
                 if (!searchTerm.isEmpty()) {
                     // Endpoint này nên trả về tất cả nhân viên (active và inactive) khớp với tên
-                    endpoint = "http://localhost:8080/nhanvien/search?ten=" + searchTerm; 
+                    endpoint = "http://localhost:8080/nhan-vien/search?ten=" + searchTerm; 
                 } else {
                     // Endpoint này nên trả về tất cả nhân viên (active và inactive)
-                    endpoint = "http://localhost:8080/nhanvien/all"; 
+                    endpoint = "http://localhost:8080/nhan-vien/all"; 
                 }
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(endpoint))

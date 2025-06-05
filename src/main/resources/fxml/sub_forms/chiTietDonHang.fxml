@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="600.0" stylesheets="@thucDonCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ChiTietDonHangUI">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="600.0" stylesheets="@../css/hoaDonCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ChiTietDonHangUI">
    <children>
       <Text layoutX="238.0" layoutY="46.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Hóa đơn">
          <font>
@@ -43,8 +43,8 @@
             <TableView fx:id="tableChiTietDonHang" prefHeight="550.0" prefWidth="570.0">
                <columns>
                   <TableColumn fx:id="colSTT" prefWidth="34.0" resizable="false" text="STT" />
-                  <TableColumn fx:id="colTenCaPhe" prefWidth="169.0" resizable="false" text="Tên" />
-                  <TableColumn fx:id="colYeuCauDacBiet" prefWidth="139.0" resizable="false" text="Yêu cầu đặc biệt" />
+                  <TableColumn fx:id="colTenMon" prefWidth="169.0" resizable="false" text="Tên món" />
+                  <TableColumn fx:id="colYeuCauKhac" prefWidth="139.0" resizable="false" text="Yêu cầu khác" />
                   <TableColumn fx:id="colSoLuong" prefWidth="65.0" resizable="false" text="Số lượng" />
                   <TableColumn fx:id="colDonGia" prefWidth="82.0" resizable="false" text="Đơn giá" />
                   <TableColumn fx:id="colTamTinh" prefWidth="79.0" resizable="false" text="Tạm tính" />

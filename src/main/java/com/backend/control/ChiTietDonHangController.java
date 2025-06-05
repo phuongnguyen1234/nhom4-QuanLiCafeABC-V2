@@ -1,19 +1,9 @@
 package com.backend.control;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.dto.ChiTietDonHangDTO;
 import com.backend.service.ChiTietDonHangService;
 
 @RestController
@@ -25,7 +15,7 @@ public class ChiTietDonHangController {
     public ChiTietDonHangController(ChiTietDonHangService chiTietDonHangService) {
         this.chiTietDonHangService = chiTietDonHangService;
     }
-
+/* 
     // Lấy tất cả chi tiết đơn hàng theo mã đơn hàng
     @GetMapping("/don-hang/{maDonHang}")
     public ResponseEntity<List<ChiTietDonHangDTO>> getByMaDonHang(@PathVariable String maDonHang) {
@@ -61,5 +51,5 @@ public class ChiTietDonHangController {
     public ResponseEntity<Void> deleteChiTietDonHang(@PathVariable Long id) {
         chiTietDonHangService.delete(id);
         return ResponseEntity.noContent().build();
-    }
+    } */
 }

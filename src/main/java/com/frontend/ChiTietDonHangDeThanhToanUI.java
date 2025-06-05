@@ -4,9 +4,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 import com.backend.dto.DonHangDTO;
 import com.backend.dto.MonTrongDonDTO;
+import com.backend.quanlicapheabc.QuanlicapheabcApplication;
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -54,6 +56,12 @@ public class ChiTietDonHangDeThanhToanUI {
     public void setThucDonUI(ThucDonUI thucDonUI) {
         this.thucDonUI = thucDonUI;
     }
+
+    private final HttpClient client = HttpClient.newBuilder()
+            .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
+            .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
+            .build();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @FXML
     public void initialize() {
@@ -142,10 +150,8 @@ public class ChiTietDonHangDeThanhToanUI {
         return new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                ObjectMapper mapper = new ObjectMapper();
-                String json = mapper.writeValueAsString(donHang);
+                String json = objectMapper.writeValueAsString(donHang);
                 System.out.println("JSON: " + json);
-                HttpClient client = HttpClient.newHttpClient();
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:8080/don-hang/create"))
                         .POST(HttpRequest.BodyPublishers.ofString(json))
