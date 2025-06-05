@@ -1,5 +1,6 @@
 package com.backend.service.impl;
 
+<<<<<<< HEAD
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +8,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.backend.model.DoanhThu;
+=======
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+>>>>>>> origin/manh-hoadon
 import com.backend.repository.DoanhThuRepository;
 import com.backend.service.DoanhThuService;
 
@@ -18,6 +24,7 @@ public class DoanhThuServiceImpl implements DoanhThuService {
         this.doanhThuRepository = doanhThuRepository;
     }
 
+<<<<<<< HEAD
     // Lấy tổng doanh thu theo tháng và năm
     @Override
     public int getTongDoanhThuByThangAndNam() {
@@ -66,4 +73,6 @@ public class DoanhThuServiceImpl implements DoanhThuService {
         }
         return doanhThuList;
     }
+=======
+>>>>>>> origin/manh-hoadon
 }

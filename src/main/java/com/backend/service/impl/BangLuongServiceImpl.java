@@ -1,5 +1,6 @@
 package com.backend.service.impl;
 
+<<<<<<< HEAD
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -9,18 +10,26 @@ import org.springframework.stereotype.Service;
 
 import com.backend.dto.BangLuongDTO;
 import com.backend.model.BangLuong;
+=======
+import org.springframework.stereotype.Service;
+
+>>>>>>> origin/manh-hoadon
 import com.backend.repository.BangLuongRepository;
 import com.backend.service.BangLuongService;
 
 @Service
 public class BangLuongServiceImpl implements BangLuongService {
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/manh-hoadon
     private final BangLuongRepository bangLuongRepository;
 
     public BangLuongServiceImpl(BangLuongRepository bangLuongRepository) {
         this.bangLuongRepository = bangLuongRepository;
     }
 
+<<<<<<< HEAD
     @Override
     public BangLuongDTO themBangLuong(BangLuongDTO dto) {
         BangLuong entity = convertToEntity(dto);
@@ -87,3 +96,6 @@ public class BangLuongServiceImpl implements BangLuongService {
         return entity;
     }
 }
+=======
+}
+>>>>>>> origin/manh-hoadon

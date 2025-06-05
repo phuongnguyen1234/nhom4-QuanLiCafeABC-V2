@@ -1,10 +1,19 @@
 package com.backend.service.impl;
 
+<<<<<<< HEAD
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+=======
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+>>>>>>> origin/manh-hoadon
 import org.springframework.stereotype.Service;
 
 import com.backend.dto.DonHangDTO;
@@ -60,7 +69,11 @@ public class DonHangServiceImpl implements DonHangService {
         // Tạm tính tổng tiền
         int tongTien = 0;
 
+<<<<<<< HEAD
         // ⚠️ LƯU ĐƠN HÀNG TRƯỚC để đảm bảo có trong DB
+=======
+        //LƯU ĐƠN HÀNG TRƯỚC để đảm bảo có trong DB
+>>>>>>> origin/manh-hoadon
         donHang = donHangRepository.save(donHang);
         // Lặp danh sách món
         for (MonTrongDonDTO monDTO : donHangDTO.getDanhSachMonTrongDon()) {
@@ -105,6 +118,7 @@ public class DonHangServiceImpl implements DonHangService {
         return String.format("%s%04d", prefix, number);
     }
     @Override
+<<<<<<< HEAD
     public int getTongDoanhThuHomNay() {
         return donHangRepository.tinhDoanhThuHomNay();
     }
@@ -124,6 +138,41 @@ public class DonHangServiceImpl implements DonHangService {
         if (donHangRepository.top5MonTheoThangNam(thang, nam).isEmpty()) return null;
         return donHangRepository.top5MonTheoThangNam(thang, nam);
     }
+=======
+    public List<DonHang> getAllDonHang() {
+        return donHangRepository.findAll();
+    }
+
+    // Lấy đơn hàng theo ID
+    @Override
+    public Optional<DonHang> getDonHangById(String maDonHang) {
+        return donHangRepository.findById(maDonHang);
+    }
+
+    // Xóa đơn hàng
+    @Override
+    public void deleteDonHang(String maDonHang) {
+        donHangRepository.deleteById(maDonHang);
+    }
+
+    // Phân trang
+    @Override
+    public Page<DonHang> getAllDonHangPaginated(Pageable pageable) {
+        return donHangRepository.findAll(pageable);
+    }
+
+    // Lọc theo thời gian
+    //@Override
+    //public List<DonHang> filterByDate(LocalDateTime start, LocalDateTime end) {
+    //    return donHangRepository.findByThoiGianDatHangBetween(start, end);
+    //}
+
+    // Tìm kiếm theo mã đơn hoặc tên nhân viên
+    //@Override
+    //public List<DonHang> searchDonHang(String keyword) {
+    //    return donHangRepository.findByMaDonHangContainingOrNhanVien_HoTenContaining(keyword, keyword);
+    //}
+>>>>>>> origin/manh-hoadon
 }
 
 

@@ -1,5 +1,6 @@
 package com.backend.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,4 +31,15 @@ public interface DonHangRepository extends JpaRepository<DonHang, String> {
             """, 
             nativeQuery = true)
     List<String> top5MonTheoThangNam(@Param("thang") int thang, @Param("nam") int nam);
+
+    // Phân trang đơn hàng
+    Page<DonHang> findAll(Pageable pageable);
+    
+    // Lọc đơn hàng theo khoảng thời gian
+    List<DonHang> findByThoiGianDatHangBetween(LocalDateTime start, LocalDateTime end);
+    
+    // Tìm kiếm đơn hàng theo mã hoặc tên nhân viên (sử dụng JOIN)
+    @Query("SELECT dh FROM DonHang dh JOIN dh.nhanVien nv " +
+           "WHERE dh.maDonHang LIKE %:keyword% OR nv.hoTen LIKE %:keyword%")
+    List<DonHang> searchDonHang(@Param("keyword") String keyword);
 }
