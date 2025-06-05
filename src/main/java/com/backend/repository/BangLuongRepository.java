@@ -10,11 +10,18 @@ import com.backend.model.BangLuong;
 
 @Repository
 public interface BangLuongRepository extends JpaRepository<BangLuong, String> {
-    //lay danh sach bang luong theo thang 
-    public List<BangLuong> getBangLuongByThang(YearMonth thang);
 
-    //tao danh sach bang luong thang hien tai
-    @Override
-    <S extends BangLuong> List<S> saveAll(Iterable<S> entities);
+    // Lấy danh sách bảng lương theo tháng (giả định tháng là kiểu LocalDate)
+   List<BangLuong> getBangLuongByThang(YearMonth thang);
 
-}   
+    // Tìm bảng lương theo mã
+    BangLuong findByMaBangLuong(String maBangLuong);
+
+    // Xoá bảng lương theo mã
+    void deleteByMaBangLuong(String maBangLuong);
+ 
+    // Kiểm tra tồn tại
+    boolean existsByMaBangLuong(String maBangLuong);
+
+    
+}

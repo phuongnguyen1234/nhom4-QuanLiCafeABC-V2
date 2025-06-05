@@ -18,7 +18,6 @@ public class BangLuong {
     @Id
     @Column(name = "MaBangLuong")
     private String maBangLuong;
-
     @ManyToOne
     @JoinColumn(name = "MaNhanVien", referencedColumnName = "MaNhanVien")
     @JsonIgnore
