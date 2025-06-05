@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="750.0" stylesheets="@dangNhapCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.DatLaiMatKhauUI">
+   <children>
+      <Label layoutX="263.0" layoutY="20.0" text="Đặt lại mật khẩu" />
+      <VBox layoutY="140.0" spacing="20.0" AnchorPane.leftAnchor="60.0" AnchorPane.rightAnchor="60.0">
+         <children>
+            <AnchorPane>
+               <children>
+                  <PasswordField fx:id="mkMoiPWField" prefHeight="40.0" prefWidth="630.0" promptText="Mật khẩu mới" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <styleClass>
+                        <String fx:value="textfield" />
+                        <String fx:value="password-field" />
+                     </styleClass>
+                  </PasswordField>
+                  <TextField fx:id="hienMKMoiTextField" prefHeight="40.0" prefWidth="630.0" visible="false" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                     <styleClass>
+                        <String fx:value="password-field" />
+                        <String fx:value="textfield" />
+                     </styleClass>
+                  </TextField>
+                  <Hyperlink contentDisplay="GRAPHIC_ONLY" layoutX="597.0" layoutY="5.0" onAction="#xemMatKhauMoi" fx:id="xemMKMoiHyperlink">
+                     <graphic>
+                        <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@quanlicapheabc/src/main/resources/icons/view.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Hyperlink>
+               </children>
+            </AnchorPane>
+            <AnchorPane>
+               <children>
+                  <PasswordField prefHeight="40.0" prefWidth="630.0" promptText="Xác nhận mật khẩu mới" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" fx:id="xacNhanMKMoiPWField">
+                     <styleClass>
+                        <String fx:value="textfield" />
+                        <String fx:value="password-field" />
+                     </styleClass>
+                  </PasswordField>
+                  <TextField prefHeight="40.0" prefWidth="630.0" visible="false" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" fx:id="xacNhanMKMoiTextField">
+                     <styleClass>
+                        <String fx:value="password-field" />
+                        <String fx:value="textfield" />
+                     </styleClass>
+                  </TextField>
+                  <Hyperlink contentDisplay="GRAPHIC_ONLY" layoutX="597.0" layoutY="5.0" onAction="#xemXacNhanMatKhauMoi" fx:id="xemXacNhanMKMoiHyperlink">
+                     <graphic>
+                        <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@quanlicapheabc/src/main/resources/icons/view.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Hyperlink>
+               </children>
+            </AnchorPane>
+            <Button fx:id="btnDatLaiMatKhau" mnemonicParsing="false" onAction="#datLaiMatKhau" prefHeight="45.0" prefWidth="696.0" styleClass="btn" text="Đặt lại mật khẩu" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

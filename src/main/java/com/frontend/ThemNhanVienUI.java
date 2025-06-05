@@ -1,15 +1,41 @@
 package com.frontend;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.util.UUID;
+
+import com.backend.quanlicapheabc.QuanlicapheabcApplication; // Import để lấy CookieManager
+import com.backend.dto.NhanVienDTO;
+import com.backend.utils.MessageUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 public class ThemNhanVienUI {
     // Thông tin cá nhân
@@ -58,9 +84,6 @@ public class ThemNhanVienUI {
     private PasswordField matKhauPasswordField;
 
     @FXML
-    private ComboBox<String> quyenTruyCapComboBox;
-
-    @FXML
     private ImageView anhChanDungImageView;
 
     @FXML
@@ -72,39 +95,41 @@ public class ThemNhanVienUI {
     @FXML
     private Button btnQuayLai;
 
-/* 
-    private QuanLiHoSoScreen quanLiHoSoScreen;  // Thêm trường này
 
-    // Thêm các trường cho anhChanDung và maNhanVien
-    private byte[] anhChanDung;  // Biến lưu trữ ảnh
-    private String maNhanVien;  // Biến lưu trữ mã nhân viên
+    private NhanVienUI nhanVienUI;
+    private File selectedImageFile; // Lưu trữ file ảnh đã chọn
+    private final HttpClient client = HttpClient.newBuilder()
+            .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
+            .build();
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private ToggleGroup gioiTinhToggleGroup;
 
     // Phương thức để nhận tham chiếu từ màn hình chính
-    public void setMainScreen(QuanLiHoSoScreen quanLiHoSoScreen) {
-        this.quanLiHoSoScreen = quanLiHoSoScreen;
+    public void setNhanVienUI(NhanVienUI nhanVienUI) {
+        this.nhanVienUI = nhanVienUI;
     }
+
     @FXML
     public void initialize() {
+        gioiTinhToggleGroup = new ToggleGroup();
+        namRadioButton.setToggleGroup(gioiTinhToggleGroup);
+        nuRadioButton.setToggleGroup(gioiTinhToggleGroup);
     // Khởi tạo các giá trị cho ComboBox
     loaiNhanVienComboBox.getItems().addAll("Chủ quán", "Full-time", "Part-time");
     viTriComboBox.getItems().addAll("Chủ quán", "Thu ngân", "Pha chế", "Phục vụ");
-    quyenTruyCapComboBox.getItems().addAll("Admin", "User", "None");
 
     // Đặt các giá trị mặc định nếu cần thiết
     ngaySinhDatePicker.setValue(LocalDate.now());
     thoiGianVaoLamDatePicker.setValue(LocalDate.now());
 
     addComboBoxEvents(); // Thêm sự kiện cho ComboBox
-
 }
 
-    /**
- * Thêm sự kiện cho ComboBox.
- 
+    
+  //Thêm sự kiện cho ComboBox.
 private void addComboBoxEvents() {
     loaiNhanVienComboBox.setOnAction(event -> updateValuesFromLoaiNhanVien());
     viTriComboBox.setOnAction(event -> updateValuesFromViTri());
-    quyenTruyCapComboBox.setOnAction(event -> updateValuesFromQuyenTruyCap());
 }
 
 private void updateValuesFromLoaiNhanVien() {
@@ -113,7 +138,6 @@ private void updateValuesFromLoaiNhanVien() {
         switch (loaiNhanVien) {
             case "Chủ quán":
                 viTriComboBox.setValue("Chủ quán");
-                quyenTruyCapComboBox.setValue("Admin");
                 break;
             case "Full-time":
             case "Part-time":
@@ -121,65 +145,44 @@ private void updateValuesFromLoaiNhanVien() {
                 if ("Chủ quán".equals(viTriComboBox.getValue())) {
                     viTriComboBox.setValue("Thu ngân");
                 }
-                if ("Admin".equals(quyenTruyCapComboBox.getValue())) {
-                    quyenTruyCapComboBox.setValue("User");
-                }
                 break;
         }
     });
 }
 
-/**
- * Cập nhật giá trị dựa trên Vị Trí.
- 
+
+  //Cập nhật giá trị dựa trên Vị Trí.
 private void updateValuesFromViTri() {
     String viTri = viTriComboBox.getValue();
     updateComboBoxesSafely(() -> {
         switch (viTri) {
             case "Chủ quán":
                 loaiNhanVienComboBox.setValue("Chủ quán");
-                quyenTruyCapComboBox.setValue("Admin");
+                matKhauPasswordField.setDisable(false);
                 break;
             case "Thu ngân":
                 loaiNhanVienComboBox.setValue("Full-time");
-                quyenTruyCapComboBox.setValue("User");
+                matKhauPasswordField.setDisable(false);
                 break;
             case "Pha chế":
             case "Phục vụ":
                 loaiNhanVienComboBox.setValue("Full-time");
-                quyenTruyCapComboBox.setValue("None");
+                // Vô hiệu hóa và xóa trường mật khẩu
+                matKhauPasswordField.setDisable(true);
+                matKhauPasswordField.clear();
+                break;
+            default:
+                matKhauPasswordField.setDisable(false); // Mặc định cho phép nhập nếu không phải các trường hợp trên
                 break;
         }
     });
 }
 
-/**
- * Cập nhật giá trị dựa trên Quyền Truy Cập.
- 
-private void updateValuesFromQuyenTruyCap() {
-    String quyenTruyCap = quyenTruyCapComboBox.getValue();
-    updateComboBoxesSafely(() -> {
-        if ("Admin".equals(quyenTruyCap)) {
-            loaiNhanVienComboBox.setValue("Chủ quán");
-            viTriComboBox.setValue("Chủ quán");
-        } else if ("User".equals(quyenTruyCap)) {
-            loaiNhanVienComboBox.setValue("Full-time");
-            viTriComboBox.setValue("Thu ngân");
-        } else if ("None".equals(quyenTruyCap)) {
-            loaiNhanVienComboBox.setValue("Full-time");
-            viTriComboBox.setValue("Pha chế"); // Hoặc "Phục Vụ"
-        }
-    });
-}
-
-/**
- * Phương thức an toàn để cập nhật giá trị của ComboBox.
- 
+  //Phương thức an toàn để cập nhật giá trị của ComboBox.
 private void updateComboBoxesSafely(Runnable updateAction) {
     // Vô hiệu hóa sự kiện để tránh vòng lặp
     loaiNhanVienComboBox.setOnAction(null);
     viTriComboBox.setOnAction(null);
-    quyenTruyCapComboBox.setOnAction(null);
 
     // Thực hiện hành động cập nhật
     updateAction.run();
@@ -196,139 +199,148 @@ private void updateComboBoxesSafely(Runnable updateAction) {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.png", "*.gif"));
 
         // Lấy đường dẫn đến tệp ảnh mà người dùng chọn
-        File file = fileChooser.showOpenDialog(new Stage());
-
+        File file = fileChooser.showOpenDialog(btnChonAnh.getScene().getWindow());
+    
         if (file != null) {
+            this.selectedImageFile = file;
             try {
-                // Đọc tệp ảnh và chuyển thành byte[]
-                FileInputStream fis = new FileInputStream(file);
-                byte[] anhByte = new byte[(int) file.length()];
-                fis.read(anhByte);
-                fis.close();
-
                 // Cập nhật ảnh trong giao diện (hiển thị ảnh)
                 anhChanDungImageView.setImage(new javafx.scene.image.Image(file.toURI().toString()));
-
-                // Lưu ảnh vào thuộc tính anhChanDung
-                this.anhChanDung = anhByte;
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
+                MessageUtils.showErrorMessage("Lỗi tải ảnh! Không thể hiển thị ảnh đã chọn.");
+                this.selectedImageFile = null;
             }
         }
     }
 
-
     @FXML
     public void kichNutThemNhanVien() {
+String tenNhanVien = tenNhanVienTextField.getText().trim();
+        RadioButton selectedGioiTinhRadio = (RadioButton) gioiTinhToggleGroup.getSelectedToggle();
+        LocalDate ngaySinh = ngaySinhDatePicker.getValue();
+        String queQuan = queQuanTextField.getText().trim();
+        String diaChi = diaChiTextArea.getText().trim();
+        String soDienThoai = soDienThoaiTextField.getText().trim();
+        String loaiNhanVien = loaiNhanVienComboBox.getValue();
+        String viTri = viTriComboBox.getValue();
+        LocalDate thoiGianVaoLam = thoiGianVaoLamDatePicker.getValue();
+        String mucLuongStr = mucLuongTextField.getText().trim();
+        String email = emailTextField.getText().trim();
+        String matKhau = matKhauPasswordField.getText();
 
-
-    String tenNhanVien = tenNhanVienTextField.getText();
-    String gioiTinh = namRadioButton.isSelected() ? "Nam" : "Nữ";
-    LocalDate ngaySinh = ngaySinhDatePicker.getValue();
-    String queQuan = queQuanTextField.getText();
-    String diaChi = diaChiTextArea.getText();
-    String soDienThoai = soDienThoaiTextField.getText();
-    String loaiNhanVien = loaiNhanVienComboBox.getValue();
-    String viTri = viTriComboBox.getValue();
-    LocalDate thoiGianVaoLam = thoiGianVaoLamDatePicker.getValue();
-    String mucLuong = mucLuongTextField.getText();
-    String email = emailTextField.getText();
-    String matKhau = matKhauPasswordField.getText();
-    String quyenTruyCap = quyenTruyCapComboBox.getValue();
-
-    // Lấy trạng thái hoạt động mặc định là 0
-    String trangThaiHoatDong = "0";  
-
-    // Kiểm tra tính hợp lệ của các trường dữ liệu
-    if (tenNhanVien.isEmpty() || gioiTinh.isEmpty() || diaChi.isEmpty() || queQuan.isEmpty() ||email.isEmpty() || matKhau.isEmpty() || loaiNhanVien == null || viTri == null
-        || soDienThoai.isEmpty() || mucLuong.isEmpty() || ngaySinh == null || thoiGianVaoLam == null) {
-            showErrorAlert("Hãy nhập đầy đủ thông tin!");
-        return;
-    }
-
-    // Kiểm tra email
-    if (!email.matches("^[\\w\\.-]+@[\\w\\.-]+\\.\\w{2,}$")) {
-        showErrorAlert("Email không hợp lệ.");
-        return;
-    }
-
-    // Kiểm tra số điện thoại
-    if (!soDienThoai.matches("\\d{10}")) {
-        showErrorAlert("Số điện thoại phải gồm 10 chữ số.");
-        return;
-    }
-
-    // Kiểm tra email và số điện thoại có bị trùng lặp không
-    if (quanLiHoSoScreen.getQuanLiHoSoController().kiemTraEmailSoDienThoaiTrung(email, soDienThoai)) {
-        showErrorAlert("Email hoặc số điện thoại đã tồn tại trong hệ thống.");
-        return;
-    }
-
-    // Kiểm tra độ dài tên nhân viên
-    if (tenNhanVien.length() < 3) {
-        showErrorAlert("Tên nhân viên phải có ít nhất 3 ký tự.");
-        return;
-    }
-
-
-    // Kiểm tra mức lương
-    int mucLuongInt;
-    try {
-        mucLuongInt = Integer.parseInt(mucLuong);
-        if (mucLuongInt <= 0) {
-            showErrorAlert("Mức lương phải lớn hơn 0.");
+        // Kiểm tra các trường bắt buộc
+        if (tenNhanVien.isEmpty() || selectedGioiTinhRadio == null || diaChi.isEmpty() || queQuan.isEmpty() || email.isEmpty() || loaiNhanVien == null || viTri == null
+            || soDienThoai.isEmpty() || mucLuongStr.isEmpty() || ngaySinh == null || thoiGianVaoLam == null ) {
+            MessageUtils.showErrorMessage("Thiếu thông tin! Vui lòng nhập đầy đủ thông tin nhân viên.");
             return;
         }
-    } catch (NumberFormatException e) {
-        showErrorAlert("Mức lương không hợp lệ.");
-        return;
+
+        if (!email.matches("^[\\w\\.-]+@[\\w\\.-]+\\.\\w{2,}$")) {
+            MessageUtils.showErrorMessage("Email không hợp lệ! Vui lòng nhập địa chỉ email đúng định dạng.");
+            return;
+        }
+        if (!soDienThoai.matches("\\d{10}")) {
+            MessageUtils.showErrorMessage("Số điện thoại không hợp lệ! Số điện thoại phải gồm 10 chữ số.");
+            return;
+        }
+        if (tenNhanVien.length() < 3) {
+            MessageUtils.showErrorMessage("Tên quá ngắn! Tên nhân viên phải có ít nhất 3 ký tự.");
+            return;
+        }
+
+        int mucLuong;
+        try {
+            mucLuong = Integer.parseInt(mucLuongStr);
+            if (mucLuong <= 0) {
+                MessageUtils.showErrorMessage("Mức lương không hợp lệ! Mức lương phải là số dương.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            MessageUtils.showErrorMessage("Mức lương không hợp lệ! Vui lòng nhập mức lương là một số.");
+            return;
+        }
+
+        if (ngaySinh.isAfter(LocalDate.now().minusYears(16))) {
+            MessageUtils.showErrorMessage("Tuổi không hợp lệ! Nhân viên phải đủ 16 tuổi.");
+            return;
+        }
+        if (thoiGianVaoLam.isBefore(ngaySinh)) {
+            MessageUtils.showErrorMessage("Ngày vào làm không hợp lệ! Ngày vào làm phải sau ngày sinh.");
+            return;
+        }
+
+        NhanVienDTO newNhanVien = new NhanVienDTO();
+        newNhanVien.setTenNhanVien(tenNhanVien);
+        newNhanVien.setGioiTinh(selectedGioiTinhRadio.getText());
+        newNhanVien.setNgaySinh(ngaySinh);
+        newNhanVien.setQueQuan(queQuan);
+        newNhanVien.setDiaChi(diaChi);
+        newNhanVien.setSoDienThoai(soDienThoai);
+        newNhanVien.setLoaiNhanVien(loaiNhanVien);
+        newNhanVien.setViTri(viTri);
+        newNhanVien.setThoiGianVaoLam(thoiGianVaoLam);
+        newNhanVien.setMucLuong(mucLuong);
+        newNhanVien.setEmail(email);
+        newNhanVien.setMatKhau(matKhau); // Backend sẽ mã hóa mật khẩu này
+
+        if (selectedImageFile != null) {
+            try {
+                String originalFileName = selectedImageFile.getName();
+                String fileExtension = "";
+                int lastDotIndex = originalFileName.lastIndexOf('.');
+                if (lastDotIndex > 0 && lastDotIndex < originalFileName.length() - 1) {
+                    fileExtension = originalFileName.substring(lastDotIndex);
+                }
+                String newImageName = UUID.randomUUID().toString() + fileExtension;
+                Path targetDirectory = Paths.get("src/main/resources/images/nhanvien");
+                if (!Files.exists(targetDirectory)) {
+                    Files.createDirectories(targetDirectory);
+                }
+                Path targetPath = targetDirectory.resolve(newImageName);
+                Files.copy(selectedImageFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+                newNhanVien.setAnhChanDung("/images/nhanvien/" + newImageName);
+            } catch (IOException e) {
+                e.printStackTrace();
+                MessageUtils.showErrorMessage("Lỗi lưu ảnh! Không thể lưu ảnh chân dung: " + e.getMessage());
+                return;
+            }
+        } else {
+            newNhanVien.setAnhChanDung(null); // Hoặc một ảnh mặc định nếu có
+        }
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                String json = objectMapper.writeValueAsString(newNhanVien);
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:8080/nhanvien"))
+                        .POST(HttpRequest.BodyPublishers.ofString(json))
+                        .header("Content-Type", "application/json")
+                        .build();
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() != 201 && response.statusCode() != 200) { // 201 Created or 200 OK
+                    throw new IOException("Thêm nhân viên thất bại: " + response.statusCode() + " - " + response.body());
+                }
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            MessageUtils.showInfoMessage("Thành công! Thêm nhân viên thành công!");
+            if (nhanVienUI != null) {
+                nhanVienUI.loadNhanVienData(); // Tải lại danh sách nhân viên đang làm việc
+            }
+            closeDialog();
+        });
+
+        task.setOnFailed(e -> {
+            MessageUtils.showErrorMessage("Lỗi! Không thể thêm nhân viên: " + task.getException().getMessage());
+            task.getException().printStackTrace();
+        });
+
+        new Thread(task).start();
     }
-
-
-    // Kiểm tra độ tuổi (Nhân viên phải đủ 16 tuổi)
-    if (ngaySinh != null && ngaySinh.isAfter(LocalDate.now().minusYears(16))) {
-        showErrorAlert("Nhân viên phải đủ 16 tuổi.");
-        return;
-    }
-
-    // Kiểm tra ngày vào làm phải sau ngày sinh
-    if (thoiGianVaoLam != null && thoiGianVaoLam.isBefore(ngaySinh)) {
-        showErrorAlert("Ngày vào làm phải sau ngày sinh.");
-        return;
-    }
-
-
-    // Tạo đối tượng NhanVien từ các dữ liệu đã nhập
-    NhanVien nhanVien = new NhanVien(
-        maNhanVien, tenNhanVien, anhChanDung, gioiTinh, ngaySinh, queQuan, diaChi, soDienThoai,
-        loaiNhanVien, viTri, thoiGianVaoLam, Integer.parseInt(mucLuong), email, matKhau, quyenTruyCap, trangThaiHoatDong
-    );
-
-    // Gọi phương thức thêm nhân viên vào cơ sở dữ liệu
-    boolean isSuccess = quanLiHoSoScreen.getQuanLiHoSoController().themNhanVien(nhanVien);
-
-    if (isSuccess) {
-        // Nếu thêm thành công, hiển thị thông báo và làm mới bảng
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Thành công");
-        alert.setHeaderText("Nhân viên đã được thêm");
-        alert.showAndWait();
-
-        // Đóng cửa sổ thêm nhân viên
-        Stage stage = (Stage) btnThem.getScene().getWindow();
-        stage.close();
-
-        quanLiHoSoScreen.hienThiDanhSachNhanVien(quanLiHoSoScreen.getQuanLiHoSoController().layDanhSachNhanVien());
-
-    } else {
-        // Nếu thêm thất bại, hiển thị thông báo lỗi
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Lỗi");
-        alert.setHeaderText("Không thể thêm nhân viên");
-        alert.showAndWait();
-    }
-}
-
 
 // Phương thức hiển thị thông báo lỗi
 private void showErrorAlert(String message) {
@@ -342,12 +354,14 @@ private void showErrorAlert(String message) {
 
 @FXML
 public void quayLai() {
-    // Đóng cửa sổ hiện tại
+    closeDialog();
+}
+
+private void closeDialog() {
     Stage currentStage = (Stage) btnQuayLai.getScene().getWindow();
     currentStage.close();  // Đóng cửa sổ thêm nhân viên
 }
 
-*/
 }
 
 
