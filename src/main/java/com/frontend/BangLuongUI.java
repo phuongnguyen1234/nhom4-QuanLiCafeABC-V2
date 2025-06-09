@@ -27,12 +27,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -69,6 +71,10 @@ public class BangLuongUI {
     private final ObservableList<BangLuongDTO> bangLuongList = FXCollections.observableArrayList();
 
     public void initialize() {
+        Label label = new Label("Đang tải...");
+        label.setFont(Font.font("Open Sans", 18));
+        tableViewBangLuong.setPlaceholder(label);
+
         // Link columns with data from getters
         colMaBangLuong.setCellValueFactory(new PropertyValueFactory<>("maBangLuong"));
         colHoTen.setCellValueFactory(new PropertyValueFactory<>("hoTen"));

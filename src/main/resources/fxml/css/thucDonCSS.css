@@ -18,7 +18,7 @@
     -fx-border-color: #286155;
     -fx-border-width: 0 0 0 5px;
     -fx-border-padding: 0 0 0 10px;
-    -fx-padding: 0 0 0 10px;
+    -fx-padding: 0 0 0 8px;
     -fx-font-size: 25px;
     -fx-font-family: "Open Sans Semibold";
     -fx-text-fill: linear-gradient(to bottom right, #0f6789, #286155);
@@ -93,12 +93,20 @@
     -fx-cursor: hand;
 }
 
+.btn-sua:hover{
+    -fx-background-color: #1976d2;
+}
+
 .btn-xoa{
     -fx-background-color: #f44336;
     -fx-text-fill: white;
     -fx-min-width: 30px;
     -fx-padding: 5 10 5 10;
     -fx-cursor: hand;
+}
+
+.btn-xoa:hover{
+    -fx-background-color: #d32f2f;
 }
 
 .combobox{
@@ -182,5 +190,9 @@
 
 #tableViewDatHang .table-cell, #tableViewDonHang .table-cell {
     -fx-font-family: "Open Sans";
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #286155; /* Màu thanh trượt */
 }

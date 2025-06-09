@@ -1,7 +1,5 @@
 package com.backend.dto;
 
-import com.backend.model.Mon;
-
 public class MonDTO {
     private String maMon;
     private String tenMon;
@@ -78,17 +76,4 @@ public class MonDTO {
     public void setTenDanhMuc(String tenDanhMuc) {
         this.tenDanhMuc = tenDanhMuc;
     }
-
-    public static MonDTO convertToMonDTO(Mon mon) {
-        return new MonDTO(
-            mon.getMaMon(),
-            mon.getTenMon(),
-            mon.getAnhMinhHoa(),
-            mon.getTrangThai(),
-            mon.getDonGia(),
-            mon.getDanhMuc().getMaDanhMuc(),
-            mon.getDanhMuc().getTenDanhMuc()
-        );
-    }
-
 }

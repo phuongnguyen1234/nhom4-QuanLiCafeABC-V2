@@ -60,6 +60,8 @@ public class ChinhSuaMonTrongThucDonUI {
 
     private File newSelectedImageFile; // Lưu trữ file ảnh mới được chọn (nếu có)
 
+    private boolean dataChanged = false; // Biến để theo dõi thay đổi dữ liệu
+
     private final HttpClient client = HttpClient.newBuilder()
             .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
             .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
@@ -232,6 +234,7 @@ public class ChinhSuaMonTrongThucDonUI {
 
         requestTask.setOnSucceeded(event -> {
             MessageUtils.showInfoMessage("Cập nhật thành công!");
+            this.dataChanged = true; // Đánh dấu dữ liệu đã thay đổi
             btnCapNhat.setDisable(false);
             btnQuayLai.setDisable(false);
             mainAnchorPane.setDisable(false);
@@ -310,5 +313,9 @@ public class ChinhSuaMonTrongThucDonUI {
                 return null;
             }
         };
+    }
+
+    public boolean isDataChanged() {
+        return dataChanged;
     }
 }

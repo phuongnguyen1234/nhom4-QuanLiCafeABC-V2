@@ -1,7 +1,6 @@
 package com.backend.service.impl;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,6 @@ public class ChiTietDonHangServiceImpl implements ChiTietDonHangService {
     public ChiTietDonHangServiceImpl(ChiTietDonHangRepository chiTietDonHangRepository) {
         this.chiTietDonHangRepository = chiTietDonHangRepository;
     }
-    private final AtomicLong idCounter = new AtomicLong(1);
 
     @Override
     public List<ChiTietDonHang> findByMaDonHang(String maDonHang) {

@@ -35,6 +35,7 @@ public class MonServiceImpl implements MonService {
         return monRepository.findAll();
     }
 
+    //sua lai theo DTO moi
     @Override
     public Mon createMon(MonDTO dto) {
         Mon mon = new Mon();

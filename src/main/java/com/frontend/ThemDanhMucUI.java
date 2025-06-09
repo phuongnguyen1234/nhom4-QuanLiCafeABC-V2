@@ -67,18 +67,14 @@ public class ThemDanhMucUI {
         danhMuc.setLoai(loaiComboBox.getValue());
 
         // Đánh dấu đang xử lý
-        mainAnchorPane.setDisable(true);
-        btnThem.setDisable(true);
-        btnQuayLai.setDisable(true);
+        setDisableItems(true);
 
         Task<Void> task = createRequest(danhMuc);
 
         task.setOnSucceeded(e -> {
             quanLiDanhMucUI.loadDanhSachDanhMuc();
             MessageUtils.showInfoMessage("Thêm danh mục thành công");
-            btnThem.setDisable(false);
-            btnQuayLai.setDisable(false);
-            mainAnchorPane.setDisable(false);
+            setDisableItems(false);
             tenDanhMucTextField.getScene().getWindow().hide();
         });
 
@@ -86,9 +82,7 @@ public class ThemDanhMucUI {
             Throwable ex = task.getException();
             ex.printStackTrace();
             MessageUtils.showErrorMessage("Lỗi khi thêm: " + ex.getMessage());
-            btnThem.setDisable(false);
-            btnQuayLai.setDisable(false);
-            mainAnchorPane.setDisable(false);
+            setDisableItems(false);
         });
 
         task.setOnCancelled(e -> {
@@ -125,5 +119,9 @@ public class ThemDanhMucUI {
                 return null;
             }
         };
+    }
+
+    private void setDisableItems(boolean value){
+        mainAnchorPane.setDisable(value);
     }
 }

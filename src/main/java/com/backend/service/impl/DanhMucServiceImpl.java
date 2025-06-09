@@ -50,6 +50,7 @@ public class DanhMucServiceImpl implements DanhMucService {
         return danhMucRepository.save(danhMuc);
     }
 
+    //sua lai theo convert DTO moi
     @Override
     public List<DanhMucKhongMonDTO> getAllDanhMucKhongMon() {
         List<DanhMuc> danhMucs = danhMucRepository.findAll();

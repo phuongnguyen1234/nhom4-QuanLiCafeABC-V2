@@ -20,6 +20,7 @@ import com.backend.repository.DonHangRepository;
 import com.backend.repository.MonRepository;
 import com.backend.repository.NhanVienRepository;
 import com.backend.service.DonHangService;
+import com.backend.utils.DTOConversion;
 
 @Service
 public class DonHangServiceImpl implements DonHangService {
@@ -156,7 +157,7 @@ public class DonHangServiceImpl implements DonHangService {
     @Override
     @Transactional(readOnly = true) // Đảm bảo session Hibernate vẫn mở để tải lazy collection
     public Optional<DonHangDTO> getDonHangById(String maDonHang) {
-        return donHangRepository.findById(maDonHang).map(this::convertToDonHangDTO);
+        return donHangRepository.findById(maDonHang).map(DTOConversion::toDonHangDTO);
     }
 
     @Override
@@ -166,37 +167,7 @@ public class DonHangServiceImpl implements DonHangService {
 
         return donHangRepository.findByThoiGianDatHangBetween(startOfDay, endOfDay)
                 .stream()
-                .map(this::convertToDonHangDTO) 
+                .map(DTOConversion::toDonHangDTO) 
                 .toList();
     }
-
-    // Phương thức helper để chuyển đổi DonHang sang DonHangDTO
-    private DonHangDTO convertToDonHangDTO(DonHang donHang) {
-        if (donHang == null) {
-            return null;
-        }
-        DonHangDTO dto = new DonHangDTO();
-        dto.setMaDonHang(donHang.getMaDonHang());
-        if (donHang.getNhanVien() != null) {
-            dto.setMaNhanVien(donHang.getNhanVien().getMaNhanVien());
-        }
-        dto.setHoTen(donHang.getHoTen()); // Giả sử DonHang lưu trực tiếp họ tên nhân viên tạo đơn
-        dto.setThoiGianDatHang(donHang.getThoiGianDatHang());
-        dto.setTongTien(donHang.getTongTien());
-
-        List<MonTrongDonDTO> monTrongDonList = donHang.getChiTietDonHang().stream().map(ctdh -> {
-            MonTrongDonDTO monDTO = new MonTrongDonDTO();
-            monDTO.setMaMon(ctdh.getMon().getMaMon());
-            monDTO.setTenMon(ctdh.getTenMon());
-            monDTO.setSoLuong(ctdh.getSoLuong());
-            monDTO.setDonGia(ctdh.getDonGia());
-            monDTO.setYeuCauKhac(ctdh.getYeuCauKhac());
-            monDTO.setTamTinh(ctdh.getTamTinh());
-            // Các trường khác của MonTrongDonDTO có thể được set ở đây nếu cần
-            return monDTO;
-        }).toList();
-        dto.setDanhSachMonTrongDon(monTrongDonList);
-        return dto;
-    }
-
 }

@@ -2,7 +2,6 @@ package com.backend.model;
 
 import java.util.List;
 
-import com.backend.dto.MonDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -104,17 +103,5 @@ public class Mon {
 
     public void setDanhMuc(DanhMuc danhMuc) {
         this.danhMuc = danhMuc;
-    }
-
-    public static Mon convertToMon(MonDTO monDTO){
-        DanhMuc danhMuc = new DanhMuc(monDTO.getMaDanhMuc(), monDTO.getTenDanhMuc(), null, null, null);
-        return new Mon(
-            monDTO.getMaMon(),
-            monDTO.getTenMon(),
-            monDTO.getAnhMinhHoa(),
-            monDTO.getDonGia(),
-            monDTO.getTrangThai(),
-            danhMuc
-        );
     }
 }

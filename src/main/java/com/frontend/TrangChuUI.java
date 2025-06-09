@@ -8,12 +8,11 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 
 import com.backend.dto.NhanVienDTO;
-import com.backend.model.NhanVien;
 import com.backend.quanlicapheabc.QuanlicapheabcApplication;
 import com.backend.utils.ImageUtils;
-import com.backend.utils.MessageUtils; // Import để lấy CookieManager
+import com.backend.utils.MessageUtils;
 
-import javafx.application.Platform;
+import javafx.application.Platform; // Import để lấy CookieManager
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,15 +40,6 @@ public class TrangChuUI {
     @FXML
     private Text tenNguoiDungText;
 
-    //khoi tao 1 controller cho cac chuc nang
-    private ThucDonUI thucDonController = new ThucDonUI();
-    private QuanLiThucDonUI quanLiThucDonController = new QuanLiThucDonUI();
-    private QuanLiDanhMucUI quanLiDanhMucController = new QuanLiDanhMucUI();
-    private HoaDonUI hoaDonController = new HoaDonUI();
-    private NhanVienUI nhanVienController = new NhanVienUI();
-    private BangLuongUI bangLuongController = new BangLuongUI();
-    private ThongKeUI thongKeUI = new ThongKeUI();
-
     // HttpClient để gửi request đăng xuất
     private final HttpClient httpClient = HttpClient.newBuilder()
             .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng tường minh CookieManager đã chia sẻ
@@ -57,6 +47,7 @@ public class TrangChuUI {
             .build();
 
     private NhanVienDTO currentUser; // Lưu thông tin người dùng hiện tại
+    private Object currentCenterController; // Để lưu controller của view đang hiển thị ở center
 
     public NhanVienDTO getNhanVien(){
         return this.currentUser;
@@ -70,180 +61,71 @@ public class TrangChuUI {
         return mainBorderPane;
     }
 
-    @FXML
-    public void initialize() {
-       /*  try {
-            // Khai báo và lấy thông tin nhân viên (chỉ gọi 1 lần)
-            
-            nhanVien = SessionManager.getNhanVienByCurrentSession();
-            if (nhanVien != null) {
-                // Cập nhật tên người dùng
-                tenNguoiDungText.setText(nhanVien.getTenNhanVien());
+    // Phương thức helper để tải FXML và quản lý lifecycle của controller
+    private void loadCenterContent(String fxmlPath) {
+        // Gọi shutdownExecutor của controller cũ nếu đó là ThucDonUI
+        if (currentCenterController instanceof ThucDonUI) {
+            ((ThucDonUI) currentCenterController).shutdownExecutor();
+        }
+        // Thêm các kiểm tra tương tự nếu các controller khác cũng có executor cần đóng
+        // else if (currentCenterController instanceof AnotherControllerWithExecutor) {
+        //     ((AnotherControllerWithExecutor) currentCenterController).shutdownExecutor();
+        // }
 
-                // Cập nhật ảnh đại diện (nếu có)
-                byte[] anhChanDung = nhanVien.getAnhChanDung();
-                if (anhChanDung != null && anhChanDung.length > 0) {
-                    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(anhChanDung);
-                    profileImage.setImage(new Image(byteArrayInputStream));
-                } else {
-                    profileImage.setImage(new Image("/icons/profile.png"));
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Node content = loader.load();
+            currentCenterController = loader.getController(); // Lưu controller mới
+
+            // Cấu hình cho controller mới dựa trên loại của nó
+            if (currentCenterController instanceof ThucDonUI) {
+                ThucDonUI thucDonControllerInstance = (ThucDonUI) currentCenterController;
+                thucDonControllerInstance.setTrangChuUI(this);
+                if (currentUser != null) {
+                    thucDonControllerInstance.setNhanVienDTO(currentUser);
+                    boolean coQuyenQuanLiThucDon = "CHỦ_QUÁN".equalsIgnoreCase(currentUser.getViTri().toUpperCase().replace(" ", "_"));
+                    thucDonControllerInstance.setQuyenQuanLiThucDon(coQuyenQuanLiThucDon);
                 }
-
-                // Thiết lập quyền truy cập
-                if (nhanVien.getViTri().equalsIgnoreCase("Chủ quán")) {
-                    btnNhanVien.setDisable(true);
-                    btnBangLuong.setDisable(true);
-                    btnThongKe.setDisable(true);
-                } else if (nhanVien.getViTri().equalsIgnoreCase("Thu ngân")) {
-                    btnNhanVien.setDisable(false);
-                    btnBangLuong.setDisable(false);
-                    btnThongKe.setDisable(false);
+            } else if (currentCenterController instanceof HoaDonUI) {
+                HoaDonUI hoaDonControllerInstance = (HoaDonUI) currentCenterController;
+                if (currentUser != null) {
+                    hoaDonControllerInstance.setCurrentUser(currentUser);
                 }
-
-                // Đảm bảo mainBorderPane đã được khởi tạo
-                Platform.runLater(() -> {
-                    if (mainBorderPane != null) {
-                        Stage currentStage = (Stage) mainBorderPane.getScene().getWindow();
-                        currentStage.setOnCloseRequest(event -> {
-                            try {
-                                String currentSessionId = SessionManager.getCurrentSessionId();
-                                if(currentSessionId != null){
-                                    NhanVien nhanVienHienTai = SessionManager.getNhanVienByCurrentSession();
-                                    if(nhanVien!=null){
-                                        //NhanVienController.capNhatTrangThaiHoatDong(nhanVien.getEmail(), "0");
-                                    SessionManager.removeSession(SessionManager.getCurrentSessionId());
-                                    }
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            Platform.exit();
-                        });
-                    }
-                });
             }
-            
+            // Thêm các cấu hình cho các loại controller khác nếu cần
+
+            mainBorderPane.setCenter(content);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Lỗi khi khởi tạo giao diện: " + e.getMessage());
-        } */
-        // thucDon(); // Không gọi ở đây nữa, currentUser sẽ là null.
-        // Giao diện mặc định (ví dụ: Thực đơn) sẽ được load trong setCurrentUser sau khi người dùng được xác thực.
+            System.err.println("Không thể tải file FXML: " + fxmlPath);
+        }
     }
 
     @FXML
     public void thucDon() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_screen/thucDon.fxml"));
-            Node content = loader.load();
-
-            // Lấy controller từ FXML đã tải
-            ThucDonUI screenController = loader.getController();
-            
-            screenController.setTrangChuUI(this);
-
-            // Đảm bảo currentUser đã được thiết lập trước khi truyền vào ThucDonUI
-            if (currentUser != null) {
-                screenController.setNhanVienDTO(currentUser);
-                // Ví dụ: xác định quyền quản lý thực đơn dựa trên vai trò
-                boolean coQuyenQuanLiThucDon = "CHỦ_QUÁN".equalsIgnoreCase(currentUser.getViTri().toUpperCase().replace(" ", "_"));
-                screenController.setQuyenQuanLiThucDon(coQuyenQuanLiThucDon); // Cần thêm phương thức này vào ThucDonUI
-            }
-
-            // Đặt nội dung vào phần center của BorderPane
-            mainBorderPane.setCenter(content);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Không thể tải file FXML: /fxml/main_screen/thucDon.fxml");
-        }
+        loadCenterContent("/fxml/main_screen/thucDon.fxml");
     }
 
 
     @FXML
     private void hoaDon() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_screen/hoaDon.fxml"));
-            Node content = loader.load();
-            
-            // Lấy controller từ FXML đã tải
-            HoaDonUI screenController = loader.getController();
-
-            // Truyền currentUser cho HoaDonUI (nếu cần)
-            if (currentUser != null) {
-                screenController.setCurrentUser(currentUser);
-            }
-            // Đặt nội dung vào phần center của BorderPane
-            mainBorderPane.setCenter(content);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Không thể tải file FXML: /fxml/main_screen/hoaDon.fxml");
-        }
+        loadCenterContent("/fxml/main_screen/hoaDon.fxml");
     }
 
     @FXML
     private void nhanVien() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_screen/nhanVien.fxml"));
-            Node content = loader.load();
-
-            NhanVienUI screenController = loader.getController();
-
-            mainBorderPane.setCenter(content);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Không thể tải file FXML: /fxml/main_screen/nhanVien.fxml");
-        }
+        loadCenterContent("/fxml/main_screen/nhanVien.fxml");
     }
 
     @FXML
     private void bangLuong() {
-        // Tải nội dung FXML và lấy controller của nó
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_screen/bangLuong.fxml"));
-            Node content = loader.load();
-            
-            // Lấy controller từ FXML đã tải
-            BangLuongUI screenController = loader.getController();
-
-            //screenController.setTaoLuongController(taoLuongController);
-            //screenController.hienThiDanhSachBangLuong(taoLuongController.layDanhSachBangLuongThangNay());
-            // Đặt nội dung vào phần center của BorderPane
-            mainBorderPane.setCenter(content);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Không thể tải file FXML: /fxml/main_screen/bangLuong.fxml");
-        }
+        loadCenterContent("/fxml/main_screen/bangLuong.fxml");
     }
 
 
     @FXML
     private void thongKe() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_screen/thongKe.fxml"));
-            Node content = loader.load();
-            
-            // Lấy controller từ FXML đã tải
-            ThongKeUI screenController = loader.getController();
-
-            //screenController.setPhanTichHoatDongController(phanTichHoatDongController);
-            //screenController.hienThiSoLieuThongKe();
-            // Đặt nội dung vào phần center của BorderPane
-            mainBorderPane.setCenter(content);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Không thể tải file FXML: /fxml/main_screen/thongKe.fxml");
-        }
-    }
-
-    // Method to load center content based on action
-    private void loadCenterContent(String fxmlFile) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
-            Parent root = loader.load();
-            mainBorderPane.setCenter(root);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        loadCenterContent("/fxml/main_screen/thongKe.fxml");
     }
 
     // Phương thức này sẽ được gọi từ DangNhapUI sau khi đăng nhập thành công
@@ -296,10 +178,19 @@ public class TrangChuUI {
                                     throw e;
                                 }
                             }
+
+                            @Override
+                            protected void done() {
+                                super.done();
+                            }
                         };
 
                         closeLogoutTask.setOnSucceeded(e -> {
                             System.out.println(closeLogoutTask.getValue() ? "Đăng xuất tự động khi đóng cửa sổ thành công." : "Đăng xuất tự động khi đóng cửa sổ không thành công từ server (nếu có user).");
+                            // Đóng executor của controller hiện tại nếu là ThucDonUI
+                            if (currentCenterController instanceof ThucDonUI) {
+                                ((ThucDonUI) currentCenterController).shutdownExecutor();
+                            }
                             Platform.exit(); // Đóng ứng dụng JavaFX
                             System.exit(0);  // Đảm bảo tiến trình Java thoát hoàn toàn
                         });

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.backend.dto.DanhMucKhongMonDTO;
@@ -21,9 +22,10 @@ import com.backend.dto.MonTrongDonDTO;
 import com.backend.dto.NhanVienDTO;
 import com.backend.model.DanhMuc;
 import com.backend.model.Mon;
-import com.backend.model.NhanVien;
 import com.backend.quanlicapheabc.QuanlicapheabcApplication;
+import com.backend.utils.DTOConversion;
 import com.backend.utils.ImageUtils;
+import com.backend.utils.JavaFXUtils;
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,8 +40,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -57,7 +57,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 
@@ -87,7 +86,7 @@ public class ThucDonUI {
     private Button btnThanhToan, btnQuanLiThucDon;
 
     @FXML
-    private Label loadingLabel;
+    private HBox loadingHbox;
 
     @FXML
     private ScrollPane scrollPaneThucDon;
@@ -138,16 +137,17 @@ public class ThucDonUI {
     private void capNhatTrangThaiNutQuanLy() {
         if (btnQuanLiThucDon != null) { // Đảm bảo nút đã được khởi tạo từ FXML
             // Nút quản lý thực đơn chỉ được enable nếu có quyền VÀ danh mục đã tải xong
-            boolean danhMucDaTaiXong = loadingLabel != null && !loadingLabel.isVisible();
+            boolean danhMucDaTaiXong = !loadingHbox.isVisible();
             btnQuanLiThucDon.setDisable(!(this.coQuyenQuanLiThucDon && danhMucDaTaiXong));
         }
     }
     @FXML
     public void initialize() {
         //hien thi loading
-        loadingLabel.setVisible(true);
+        loadingHbox.setVisible(true);
         capNhatTrangThaiNutQuanLy();
         danhMucCombobox.setDisable(true);
+        tableViewDatHang.setPlaceholder(JavaFXUtils.createPlaceholder("Đơn trống!", "/icons/sad.png"));
 
         // Cấu hình các cột trong TableView
         colTenMon.setCellValueFactory(new PropertyValueFactory<>("tenMon"));
@@ -219,7 +219,7 @@ public class ThucDonUI {
             danhMucCombobox.setItems(FXCollections.observableArrayList(danhMucHienThiCombobox));
             danhMucCombobox.setValue(danhMucTatCa);
             // Ẩn label loading
-            loadingLabel.setVisible(false);
+            loadingHbox.setVisible(false);
 
             // Initial menu display: active DanhMuc with items, sorted
             List<DanhMuc> danhMucCoMonHoatDongList = this.allDanhMucWithItems.stream()
@@ -228,7 +228,7 @@ public class ThucDonUI {
                 .collect(Collectors.toList());
             hienThiThucDon(danhMucCoMonHoatDongList);
 
-            loadingLabel.setVisible(false); // Đánh dấu danh mục đã tải xong
+            loadingHbox.setVisible(false); // Đánh dấu danh mục đã tải xong
             capNhatTrangThaiNutQuanLy(); // Cập nhật lại trạng thái nút quản lý
             danhMucCombobox.setDisable(false);
         });
@@ -249,9 +249,13 @@ public class ThucDonUI {
             }
         });
 
-        loadDanhMucTask.setOnFailed(e -> {
-            loadingLabel.setText("Tải dữ liệu thất bại!");
-            loadingLabel.setVisible(true); // Giữ label loading hiển thị nếu lỗi
+        loadDanhMucTask.setOnFailed(e -> {   
+            // Cập nhật label trong HBox thành "Tải thất bại"
+            if (loadingHbox.getChildren().get(1) instanceof Label) {
+                ((Label) loadingHbox.getChildren().get(1)).setText("Tải thất bại");
+                ((ImageView) loadingHbox.getChildren().get(0)).setVisible(false);
+            }
+            loadingHbox.setVisible(true);
             capNhatTrangThaiNutQuanLy(); // Cập nhật lại trạng thái nút (vẫn sẽ disable)
             loadDanhMucTask.getException().printStackTrace();
         });
@@ -302,12 +306,7 @@ public class ThucDonUI {
             controller.setMonIndex(danhSachMonTrongDon.indexOf(mon));
             controller.setThucDonUI(this);
     
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Chỉnh sửa " + mon.getTenMon() + " trong đơn hàng");
-            stage.setScene(new Scene(root));
-            stage.setResizable(false);
-            stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/edit-text.png")));
+            Stage stage = JavaFXUtils.createDialog("Chỉnh sửa " + mon.getTenMon() + " trong đơn hàng", root, "/icons/edit-text.png");
             stage.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();
@@ -332,11 +331,7 @@ public class ThucDonUI {
                 System.out.println("Món đã được xóa: " + mon.getTenMon());
             } catch (Exception e) {
                 e.printStackTrace();
-                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                errorAlert.setTitle("Lỗi");
-                errorAlert.setHeaderText("Không thể xóa món.");
-                errorAlert.setContentText("Vui lòng thử lại sau.");
-                errorAlert.showAndWait();
+                MessageUtils.showErrorMessage("Loi! Khong the xoa mon ra khoi don");
             }
         } else {
             System.out.println("Người dùng đã hủy.");
@@ -413,14 +408,8 @@ public class ThucDonUI {
             controller.setThucDonUI(this);
 
             // Hiển thị dialog
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Hóa đơn");
-            stage.setScene(new Scene(root));
-            stage.setResizable(false);
-            stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/invoice.png")));
+            Stage stage = JavaFXUtils.createDialog("Hóa đơn", root, "/icons/invoice.png");
             stage.showAndWait();
-
         } catch (IOException e) {
             MessageUtils.showErrorMessage("Không thể mở hóa đơn.");
             e.printStackTrace();
@@ -433,24 +422,13 @@ public class ThucDonUI {
             Parent root = loader.load();
 
             ThemVaoDonUI controller = loader.getController();
-            MonTrongDonDTO monTrongDon = new MonTrongDonDTO();
-            monTrongDon.setTenMon(mon.getTenMon());
-            monTrongDon.setDonGia(mon.getDonGia());
-            monTrongDon.setMaMon(mon.getMaMon());
-            monTrongDon.setAnhMinhHoa(mon.getAnhMinhHoa()); // Thêm dòng này để truyền đường dẫn ảnh
-            monTrongDon.setYeuCauKhac("");
+            MonTrongDonDTO monTrongDon = DTOConversion.toMonTrongDonDTO(mon);
 
             controller.setMon(monTrongDon);
             controller.setThucDonUI(this);
 
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Thêm " + mon.getTenMon() + " vào đơn");
-            stage.setScene(new Scene(root));
-            stage.setResizable(false);
-            stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/add.png")));
+            Stage stage = JavaFXUtils.createDialog("Thêm " + mon.getTenMon() + " vào đơn", root, "/icons/add.png");
             stage.showAndWait();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -483,7 +461,7 @@ public class ThucDonUI {
         }
     
         // Cập nhật tổng tiền lên giao diện
-        tongTienText.setText("Tổng tiền: " + tongTien + " VND");
+        tongTienText.setText("Tổng tiền: " + String.format("%,d", tongTien) + " VND");
     }
 
     @FXML
@@ -529,6 +507,7 @@ public class ThucDonUI {
 
     private VBox taoMonBox(Mon mon) {
         VBox monBox = new VBox(6);
+        monBox.setPadding(new Insets(5, 0, 0, 0));
         monBox.setAlignment(Pos.TOP_CENTER);
         monBox.setPrefSize(160, 200);
         monBox.getStyleClass().addAll("white-bg", "shadow", "radius");
@@ -575,4 +554,25 @@ public class ThucDonUI {
         return monBox;
     }
 
+    /**
+     * Shuts down the imageLoaderExecutor.
+     * Should be called when this ThucDonUI instance is no longer needed.
+     */
+    public void shutdownExecutor() {
+        if (imageLoaderExecutor != null && !imageLoaderExecutor.isShutdown()) {
+            System.out.println("Shutting down ImageLoaderExecutor for ThucDonUI");
+            imageLoaderExecutor.shutdown(); // Disable new tasks from being submitted
+            try {
+                // Wait a while for existing tasks to terminate
+                if (!imageLoaderExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+                    imageLoaderExecutor.shutdownNow(); // Cancel currently executing tasks
+                    if (!imageLoaderExecutor.awaitTermination(5, TimeUnit.SECONDS))
+                        System.err.println("ImageLoaderExecutor did not terminate in ThucDonUI");
+                }
+            } catch (InterruptedException ie) {
+                imageLoaderExecutor.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
 }

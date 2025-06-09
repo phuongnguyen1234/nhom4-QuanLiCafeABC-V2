@@ -10,8 +10,10 @@ import com.backend.dto.DonHangDTO;
 import com.backend.dto.MonTrongDonDTO;
 import com.backend.quanlicapheabc.QuanlicapheabcApplication;
 import com.backend.utils.MessageUtils;
+import com.backend.utils.PdfUtils; // Import lớp tiện ích mới
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -21,6 +23,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -72,6 +75,17 @@ public class ChiTietDonHangDeThanhToanUI {
         colDonGia.setCellValueFactory(new PropertyValueFactory<>("donGia"));
         colTamTinh.setCellValueFactory(new PropertyValueFactory<>("tamTinh"));
 
+        Platform.runLater(() -> {
+            for (Node node : tableViewDonHang.lookupAll(".scroll-bar:horizontal")) {
+                if (node instanceof ScrollBar scrollBar) {
+                    scrollBar.setDisable(true);      // Vô hiệu hóa cuộn
+                    scrollBar.setOpacity(0);         // Ẩn khỏi mắt người dùng
+                    scrollBar.setPrefHeight(0);      // Không chiếm chỗ
+                    scrollBar.setMaxHeight(0);
+                }
+            }
+        });
+
         // Gắn dữ liệu TableView với danh sách món trong đơn
         tableViewDonHang.setItems(danhSachMonTrongDon);
     }
@@ -79,7 +93,7 @@ public class ChiTietDonHangDeThanhToanUI {
     public void setDonHang(DonHangDTO donHang){
         this.donHang = donHang;
         tenNhanVienText.setText("Nhân viên tạo đơn: " + donHang.getHoTen());
-        tongTienText.setText("Tổng tiền: " + donHang.getTongTien() + " VND");
+        tongTienText.setText("Tổng tiền: " + String.format("%,d", donHang.getTongTien()) + " VND");
     
         // Tải dữ liệu bảng từ danh sách các món trong đơn hàng
         ObservableList<MonTrongDonDTO> chiTietDon = FXCollections.observableArrayList(donHang.getDanhSachMonTrongDon());
@@ -114,6 +128,7 @@ public class ChiTietDonHangDeThanhToanUI {
                 btnQuayLai.setDisable(false);
                 MessageUtils.showInfoMessage("Tạo đơn thành công");
                 ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
+                PdfUtils.taoHoaDonPDF(donHang); // Gọi phương thức tiện ích để tạo PDF
                 thucDonUI.resetDonHang();
             });
 

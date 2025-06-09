@@ -28,7 +28,7 @@
                   <Font name="Open Sans Semibold" size="40.0" />
                </font>
             </Label>
-            <HBox alignment="CENTER" layoutX="14.0" layoutY="82.0" spacing="10.0">
+            <HBox alignment="CENTER" layoutY="82.0" maxHeight="-Infinity" prefHeight="115.0" prefWidth="1300.0" spacing="10.0">
                <children>
                   <AnchorPane prefHeight="115.0" prefWidth="120.0" styleClass="stat-box">
                      <children>
@@ -39,12 +39,12 @@
                         </ImageView>
                         <VBox layoutX="74.0" prefHeight="114.0" prefWidth="232.0" spacing="10.0">
                            <children>
-                              <Text fx:id="tieuDeDoanhThuHomNayText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Doanh thu hôm nay XX/XX/XXXX" wrappingWidth="207.90625">
+                              <Text fx:id="tieuDeDoanhThuHomNayText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Doanh thu hôm nay" wrappingWidth="207.90625">
                                  <font>
                                     <Font name="Open Sans Semibold" size="20.0" />
                                  </font>
                               </Text>
-                              <Text fx:id="doanhThuHomNayText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="0">
+                              <Text fx:id="doanhThuHomNayText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Đang tải...">
                                  <font>
                                     <Font name="Open Sans Semibold" size="25.0" />
                                  </font>
@@ -65,12 +65,12 @@
                         </ImageView>
                         <VBox layoutX="74.0" prefHeight="114.0" prefWidth="232.0" spacing="10.0">
                            <children>
-                              <Text fx:id="tieuDeDoanhThuThangTruocText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Doanh thu tháng X" wrappingWidth="169.0">
+                              <Text fx:id="tieuDeDoanhThuThangTruocText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Doanh thu tháng" wrappingWidth="169.0">
                                  <font>
                                     <Font name="Open Sans Semibold" size="20.0" />
                                  </font>
                               </Text>
-                              <Text fx:id="doanhThuThangTruocText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="0">
+                              <Text fx:id="doanhThuThangTruocText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Đang tải...">
                                  <font>
                                     <Font name="Open Sans Semibold" size="25.0" />
                                  </font>
@@ -91,12 +91,12 @@
                         </ImageView>
                         <VBox layoutX="74.0" prefHeight="114.0" prefWidth="232.0" spacing="10.0">
                            <children>
-                              <Text fx:id="tieuDeSoMonBanRaThangTruocText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Số món bán ra tháng X" wrappingWidth="204.826171875">
+                              <Text fx:id="tieuDeSoMonBanRaThangTruocText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Số món bán ra tháng" wrappingWidth="204.826171875">
                                  <font>
                                     <Font name="Open Sans Semibold" size="20.0" />
                                  </font>
                               </Text>
-                              <Text fx:id="soMonBanRaThangTruocText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="0">
+                              <Text fx:id="soMonBanRaThangTruocText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Đang tải...">
                                  <font>
                                     <Font name="Open Sans Semibold" size="25.0" />
                                  </font>
@@ -117,12 +117,12 @@
                         </ImageView>
                         <VBox layoutX="80.0" layoutY="1.0" prefHeight="114.0" prefWidth="232.0" spacing="10.0">
                            <children>
-                              <Text fx:id="tieuDeSoDonDaTaoThangTruocText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Số đơn đã tạo tháng X" wrappingWidth="200.556640625">
+                              <Text fx:id="tieuDeSoDonDaTaoThangTruocText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Số đơn đã tạo tháng" wrappingWidth="200.556640625">
                                  <font>
                                     <Font name="Open Sans Semibold" size="20.0" />
                                  </font>
                               </Text>
-                              <Text fx:id="soDonDaTaoThangTruocText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="0">
+                              <Text fx:id="soDonDaTaoThangTruocText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Đang tải...">
                                  <font>
                                     <Font name="Open Sans Semibold" size="25.0" />
                                  </font>
@@ -143,228 +143,240 @@
             <String fx:value="radius" />
          </styleClass>
       </AnchorPane>
-      <AnchorPane layoutX="17.0" layoutY="227.0" prefHeight="320.0" prefWidth="620.0">
-         <styleClass>
-            <String fx:value="radius" />
-            <String fx:value="shadow" />
-            <String fx:value="white-bg" />
-         </styleClass>
+      <GridPane hgap="15.0" layoutY="210.0" prefHeight="690.0" prefWidth="1300.0" vgap="15.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="220.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
          <children>
-            <LineChart fx:id="bienDongDoanhThuLineChart" layoutX="44.0" layoutY="-41.0" prefHeight="320.0" prefWidth="600.0" title="Biến động doanh thu tháng A - B" titleSide="BOTTOM" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <xAxis>
-                  <CategoryAxis fx:id="lineXAxis" side="BOTTOM" />
-               </xAxis>
-               <yAxis>
-                  <NumberAxis fx:id="lineYAxis" side="LEFT" />
-               </yAxis>
-            </LineChart>
-            <Hyperlink fx:id="hplinkXemChiTiet" layoutX="519.0" layoutY="289.0" onAction="#xemChiTiet" text="Xem chi tiết">
-               <font>
-                  <Font name="Open Sans Semibold" size="14.0" />
-               </font>
-            </Hyperlink>
-         </children>
-      </AnchorPane>
-      <AnchorPane layoutX="18.0" layoutY="560.0" prefHeight="320.0" prefWidth="620.0">
-         <styleClass>
-            <String fx:value="radius" />
-            <String fx:value="shadow" />
-            <String fx:value="white-bg" />
-         </styleClass>
-         <children>
-            <BarChart fx:id="khoangThoiGianDatDonNhieuNhatThangTruocBarChart" layoutX="27.0" layoutY="-61.0" prefHeight="339.0" prefWidth="620.0" title="Khoảng thời gian khách đặt đơn nhiều nhất tháng X" titleSide="BOTTOM" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <xAxis>
-                  <CategoryAxis fx:id="barXAxis" side="BOTTOM" />
-               </xAxis>
-               <yAxis>
-                  <NumberAxis fx:id="barYAxis" side="LEFT" />
-               </yAxis>
-            </BarChart>
-         </children>
-      </AnchorPane>
-      <AnchorPane layoutX="650.0" layoutY="227.0" prefHeight="320.0" prefWidth="620.0">
-         <styleClass>
-            <String fx:value="radius" />
-            <String fx:value="shadow" />
-            <String fx:value="white-bg" />
-         </styleClass>
-         <children>
-            <Label fx:id="top5CaPheBanChayNhatThangTruocLabel" layoutX="106.0" layoutY="14.0" prefHeight="36.0" prefWidth="408.0" text="Top 5 món bán chạy nhất tháng X" textAlignment="CENTER">
-               <font>
-                  <Font name="Open Sans Semibold" size="25.0" />
-               </font>
-            </Label>
-            <GridPane fx:id="top5CaPheBanChayNhatThangTruocGridPane" alignment="CENTER_LEFT" layoutY="64.0" prefHeight="250.0" prefWidth="630.0" vgap="10.0" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-               <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="310.0" minWidth="10.0" prefWidth="61.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="545.0" minWidth="10.0" prefWidth="451.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="545.0" minWidth="10.0" prefWidth="79.0" />
-               </columnConstraints>
-               <rowConstraints>
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
-               </rowConstraints>
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" />
-               </padding>
+            <AnchorPane prefHeight="320.0" prefWidth="620.0">
+               <styleClass>
+                  <String fx:value="radius" />
+                  <String fx:value="shadow" />
+                  <String fx:value="white-bg" />
+               </styleClass>
                <children>
-                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../../icons/medal.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="1">
-                     <image>
-                        <Image url="@../../icons/medal%20(1).png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="2">
-                     <image>
-                        <Image url="@../../icons/medal%20(2).png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="3">
-                     <image>
-                        <Image url="@../../icons/medal%20(3).png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="4">
-                     <image>
-                        <Image url="@../../icons/medal%20(3).png" />
-                     </image>
-                  </ImageView>
-                  <Text fx:id="tenMonTop1Text" fill="#e1bd30" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1">
+                  <LineChart fx:id="bienDongDoanhThuLineChart" layoutX="44.0" layoutY="-41.0" prefHeight="320.0" prefWidth="600.0" title="Biến động doanh thu tháng A - B" titleSide="BOTTOM" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <xAxis>
+                        <CategoryAxis fx:id="lineXAxis" side="BOTTOM" />
+                     </xAxis>
+                     <yAxis>
+                        <NumberAxis fx:id="lineYAxis" side="LEFT" />
+                     </yAxis>
+                  </LineChart>
+                  <Hyperlink fx:id="hplinkXemChiTiet" layoutX="519.0" layoutY="289.0" onAction="#xemChiTiet" text="Xem chi tiết">
                      <font>
-                        <Font name="Open Sans Semibold" size="25.0" />
+                        <Font name="Open Sans Semibold" size="14.0" />
                      </font>
-                  </Text>
-                  <Text fx:id="tenMonTop2Text" fill="#5b5b5b" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                     <font>
-                        <Font name="Open Sans Semibold" size="25.0" />
-                     </font>
-                  </Text>
-                  <Text fx:id="tenMonTop3Text" fill="#cd805f" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                     <font>
-                        <Font name="Open Sans Semibold" size="25.0" />
-                     </font>
-                  </Text>
-                  <Text fx:id="tenMonTop4Text" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                     <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
-                     </font>
-                  </Text>
-                  <Text fx:id="tenMonTop5Text" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                     <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
-                     </font>
-                  </Text>
-                  <Text fx:id="soMonTop1Text" fill="#e1bd30" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2">
-                     <font>
-                        <Font name="Open Sans Semibold" size="25.0" />
-                     </font>
-                  </Text>
-                  <Text fx:id="soMonTop2Text" fill="#5b5b5b" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                     <font>
-                        <Font name="Open Sans Semibold" size="25.0" />
-                     </font>
-                  </Text>
-                  <Text fx:id="soMonTop3Text" fill="#cd805f" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2" GridPane.rowIndex="2">
-                     <font>
-                        <Font name="Open Sans Semibold" size="25.0" />
-                     </font>
-                  </Text>
-                  <Text fx:id="soMonTop4Text" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2" GridPane.rowIndex="3">
-                     <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
-                     </font>
-                  </Text>
-                  <Text fx:id="soMonTop5Text" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2" GridPane.rowIndex="4">
-                     <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
-                     </font>
-                  </Text>
+                  </Hyperlink>
                </children>
-            </GridPane>
-         </children>
-      </AnchorPane>
-      <AnchorPane layoutX="650.0" layoutY="560.0" prefHeight="320.0" prefWidth="620.0">
-         <styleClass>
-            <String fx:value="radius" />
-            <String fx:value="shadow" />
-            <String fx:value="white-bg" />
-         </styleClass>
-         <children>
-            <Label fx:id="top3NhanVienTaoDonNhieuNhatThangTruocLabel" layoutX="111.0" layoutY="7.0" prefHeight="75.0" prefWidth="398.0" text="Top 3 nhân viên thu ngân tạo đơn nhiều nhất tháng X" textAlignment="CENTER" wrapText="true">
-               <font>
-                  <Font name="Open Sans Semibold" size="25.0" />
-               </font>
-            </Label>
-            <GridPane fx:id="top3NhanVienTaoDonNhieuNhatThangTruocGridPane" alignment="CENTER_LEFT" layoutY="101.0" prefHeight="176.0" prefWidth="600.0" vgap="10.0" AnchorPane.bottomAnchor="43.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-               <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="310.0" minWidth="10.0" prefWidth="61.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="545.0" minWidth="10.0" prefWidth="451.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="545.0" minWidth="10.0" prefWidth="79.0" />
-               </columnConstraints>
-               <rowConstraints>
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
-               </rowConstraints>
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" />
-               </padding>
+            </AnchorPane>
+            <AnchorPane prefHeight="320.0" prefWidth="620.0" GridPane.columnIndex="1">
+               <styleClass>
+                  <String fx:value="radius" />
+                  <String fx:value="shadow" />
+                  <String fx:value="white-bg" />
+               </styleClass>
                <children>
-                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../../icons/medal.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="1">
-                     <image>
-                        <Image url="@../../icons/medal%20(1).png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="2">
-                     <image>
-                        <Image url="@../../icons/medal%20(2).png" />
-                     </image>
-                  </ImageView>
-                  <Text fx:id="tenNhanVienTop1Text" fill="#e1bd30" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1">
+                  <Label fx:id="top5CaPheBanChayNhatThangTruocLabel" layoutX="106.0" layoutY="14.0" prefHeight="36.0" prefWidth="408.0" text="Top 5 món bán chạy nhất tháng X" textAlignment="CENTER">
                      <font>
                         <Font name="Open Sans Semibold" size="25.0" />
                      </font>
-                  </Text>
-                  <Text fx:id="tenNhanVienTop2Text" fill="#5b5b5b" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                     <font>
-                        <Font name="Open Sans Semibold" size="25.0" />
-                     </font>
-                  </Text>
-                  <Text fx:id="tenNhanVienTop3Text" fill="#cd805f" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                     <font>
-                        <Font name="Open Sans Semibold" size="25.0" />
-                     </font>
-                  </Text>
-                  <Text fx:id="soDonTop1Text" fill="#e1bd30" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2">
-                     <font>
-                        <Font name="Open Sans Semibold" size="25.0" />
-                     </font>
-                  </Text>
-                  <Text fx:id="soDonTop2Text" fill="#5b5b5b" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                     <font>
-                        <Font name="Open Sans Semibold" size="25.0" />
-                     </font>
-                  </Text>
-                  <Text fx:id="soDonTop3Text" fill="#cd805f" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2" GridPane.rowIndex="2">
-                     <font>
-                        <Font name="Open Sans Semibold" size="25.0" />
-                     </font>
-                  </Text>
+                  </Label>
+                  <GridPane fx:id="top5CaPheBanChayNhatThangTruocGridPane" alignment="CENTER_LEFT" layoutY="64.0" prefHeight="250.0" prefWidth="630.0" vgap="10.0" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="310.0" minWidth="10.0" prefWidth="61.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="545.0" minWidth="10.0" prefWidth="451.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="545.0" minWidth="10.0" prefWidth="79.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" />
+                     </padding>
+                     <children>
+                        <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../icons/medal.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="1">
+                           <image>
+                              <Image url="@../../icons/medal%20(1).png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="2">
+                           <image>
+                              <Image url="@../../icons/medal%20(2).png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="3">
+                           <image>
+                              <Image url="@../../icons/medal%20(3).png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="4">
+                           <image>
+                              <Image url="@../../icons/medal%20(3).png" />
+                           </image>
+                        </ImageView>
+                        <Text fx:id="tenMonTop1Text" fill="#e1bd30" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1">
+                           <font>
+                              <Font name="Open Sans Semibold" size="25.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="tenMonTop2Text" fill="#5b5b5b" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <font>
+                              <Font name="Open Sans Semibold" size="25.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="tenMonTop3Text" fill="#cd805f" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="Open Sans Semibold" size="25.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="tenMonTop4Text" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                           <font>
+                              <Font name="Open Sans Semibold" size="20.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="tenMonTop5Text" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                           <font>
+                              <Font name="Open Sans Semibold" size="20.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="soMonTop1Text" fill="#e1bd30" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2">
+                           <font>
+                              <Font name="Open Sans Semibold" size="25.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="soMonTop2Text" fill="#5b5b5b" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                           <font>
+                              <Font name="Open Sans Semibold" size="25.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="soMonTop3Text" fill="#cd805f" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="Open Sans Semibold" size="25.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="soMonTop4Text" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                           <font>
+                              <Font name="Open Sans Semibold" size="20.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="soMonTop5Text" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                           <font>
+                              <Font name="Open Sans Semibold" size="20.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </GridPane>
                </children>
-            </GridPane>
+            </AnchorPane>
+            <AnchorPane prefHeight="320.0" prefWidth="620.0" GridPane.rowIndex="1">
+               <styleClass>
+                  <String fx:value="radius" />
+                  <String fx:value="shadow" />
+                  <String fx:value="white-bg" />
+               </styleClass>
+               <children>
+                  <BarChart fx:id="khoangThoiGianDatDonNhieuNhatThangTruocBarChart" layoutX="27.0" layoutY="-61.0" prefHeight="339.0" prefWidth="620.0" title="Khoảng thời gian khách đặt đơn nhiều nhất tháng X" titleSide="BOTTOM" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <xAxis>
+                        <CategoryAxis fx:id="barXAxis" side="BOTTOM" />
+                     </xAxis>
+                     <yAxis>
+                        <NumberAxis fx:id="barYAxis" side="LEFT" />
+                     </yAxis>
+                  </BarChart>
+               </children>
+            </AnchorPane>
+            <AnchorPane prefHeight="320.0" prefWidth="620.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <styleClass>
+                  <String fx:value="radius" />
+                  <String fx:value="shadow" />
+                  <String fx:value="white-bg" />
+               </styleClass>
+               <children>
+                  <Label fx:id="top3NhanVienTaoDonNhieuNhatThangTruocLabel" layoutX="111.0" layoutY="7.0" prefHeight="75.0" prefWidth="398.0" text="Top 3 nhân viên thu ngân tạo đơn nhiều nhất tháng X" textAlignment="CENTER" wrapText="true">
+                     <font>
+                        <Font name="Open Sans Semibold" size="25.0" />
+                     </font>
+                  </Label>
+                  <GridPane fx:id="top3NhanVienTaoDonNhieuNhatThangTruocGridPane" alignment="CENTER_LEFT" layoutY="101.0" prefHeight="176.0" prefWidth="600.0" vgap="10.0" AnchorPane.bottomAnchor="43.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="310.0" minWidth="10.0" prefWidth="61.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="545.0" minWidth="10.0" prefWidth="451.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="545.0" minWidth="10.0" prefWidth="79.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" />
+                     </padding>
+                     <children>
+                        <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../icons/medal.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="1">
+                           <image>
+                              <Image url="@../../icons/medal%20(1).png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="2">
+                           <image>
+                              <Image url="@../../icons/medal%20(2).png" />
+                           </image>
+                        </ImageView>
+                        <Text fx:id="tenNhanVienTop1Text" fill="#e1bd30" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1">
+                           <font>
+                              <Font name="Open Sans Semibold" size="25.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="tenNhanVienTop2Text" fill="#5b5b5b" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <font>
+                              <Font name="Open Sans Semibold" size="25.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="tenNhanVienTop3Text" fill="#cd805f" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="324.763671875" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="Open Sans Semibold" size="25.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="soDonTop1Text" fill="#e1bd30" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2">
+                           <font>
+                              <Font name="Open Sans Semibold" size="25.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="soDonTop2Text" fill="#5b5b5b" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                           <font>
+                              <Font name="Open Sans Semibold" size="25.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="soDonTop3Text" fill="#cd805f" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="71.763671875" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="Open Sans Semibold" size="25.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </GridPane>
+               </children>
+            </AnchorPane>
          </children>
-      </AnchorPane>
+      </GridPane>
    </children>
 </AnchorPane>

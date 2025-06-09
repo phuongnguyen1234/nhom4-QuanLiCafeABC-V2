@@ -33,6 +33,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -41,6 +42,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -92,6 +94,9 @@ public class HoaDonUI {
     @FXML
     public void initialize() {
         disableItems(true);
+        Label label = new Label("Đang tải...");
+        label.setFont(Font.font("Open Sans", 18));
+        tableDonHang.setPlaceholder(label);
 
         // Setup các cột
         colSTT.setCellValueFactory(cellDataFeatures -> {

@@ -62,6 +62,8 @@ public class ThemVaoThucDonUI {
     @FXML
     private AnchorPane mainAnchorPane;
 
+    private boolean dataChanged = false; // Biến để theo dõi thay đổi dữ liệu
+
     @FXML
     public void initialize() {
         try{
@@ -199,6 +201,7 @@ public void themVaoThucDon() {
 
     requestTask.setOnSucceeded(event -> {
         MessageUtils.showInfoMessage("Thêm món thành công!");
+        this.dataChanged = true; // Đánh dấu dữ liệu đã thay đổi
         btnThemVaoThucDon.setDisable(false);
         btnQuayLai.setDisable(false);
         tenMonTextField.getScene().getWindow().hide();
@@ -283,6 +286,8 @@ public void themVaoThucDon() {
     };
 }
 
-
+    public boolean isDataChanged() {
+        return dataChanged;
+    }
 
 }
