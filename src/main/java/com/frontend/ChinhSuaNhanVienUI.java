@@ -74,6 +74,9 @@ public class ChinhSuaNhanVienUI {
     @FXML
     private AnchorPane mainAnchorPaneChinhSua;
 
+    @FXML
+    private AnchorPane mainAnchorPane;
+
     private ToggleGroup gioiTinhToggleGroup;
 
     private File newSelectedImageFile; // Dùng để lưu ảnh chân dung mới nếu người dùng chọn
@@ -104,6 +107,8 @@ public class ChinhSuaNhanVienUI {
         trangThaiComboBox.getItems().addAll("Đi làm", "Nghỉ việc");
 
        addComboBoxEvents();
+
+       mainAnchorPane.setDisable(true);
 
     // Sự kiện nút quay lại
     btnQuayLai.setOnAction(event -> quayLai());
@@ -254,6 +259,7 @@ private void updateComboBoxesSafely(Runnable updateAction) {
              } else {
             anhChanDungImageView.setImage(new Image(getClass().getResourceAsStream("/icons/profile.png")));
         }
+        mainAnchorPane.setDisable(false); // Kích hoạt giao diện sau khi hiển thị thông tin
     }
 }
 

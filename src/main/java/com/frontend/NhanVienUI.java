@@ -124,6 +124,11 @@ public class NhanVienUI {
         colHanhDong.setCellFactory(col -> new TableCell<>() {
             private final Button xemButton = new Button("Xem");
             private final Button suaButton = new Button("Sửa");
+        
+        // Căn giữa colHanhDong
+            {
+                setAlignment(javafx.geometry.Pos.CENTER);
+            }
 
             {
                 // Thiết lập nút "Xem"
@@ -154,9 +159,11 @@ public class NhanVienUI {
                 if (empty || getTableRow() == null || getTableRow().getItem() == null) {
                     setGraphic(null); // Không hiển thị gì nếu dòng trống
                 } else {
+                    HBox hBox = new HBox(10, xemButton, suaButton); // Tạo HBox chứa các nút
+                    hBox.setAlignment(javafx.geometry.Pos.CENTER); // Căn giữa các nút trong HBox
                     NhanVienDTO nhanVien = getTableRow().getItem();
                     suaButton.setDisable("Online".equals(nhanVien.getTrangThaiHoatDong())); // Disable nếu trạng thái là "Online"
-                    setGraphic(new HBox(10, xemButton, suaButton)); // Hiển thị cả hai nút
+                    setGraphic(hBox); // Hiển thị HBox
                 }
             }
         });

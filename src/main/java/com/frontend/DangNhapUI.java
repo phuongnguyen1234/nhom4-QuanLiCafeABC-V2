@@ -250,6 +250,7 @@ public class DangNhapUI {
             Parent root = loader.load();
             Stage stage = (Stage) emailTextField.getScene().getWindow();
             stage.setScene(new Scene(root));
+            stage.centerOnScreen();
             stage.setTitle(tieuDe);
             stage.show();
             return loader; // Trả về loader

@@ -22,7 +22,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="780.0" prefWidth="680.0" stylesheets="@../css/nhanVienCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ChinhSuaNhanVienUI">
+<AnchorPane fx:id="mainAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="780.0" prefWidth="680.0" stylesheets="@../css/nhanVienCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ChinhSuaNhanVienUI">
    <children>
    <AnchorPane fx:id="mainAnchorPaneChinhSua" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <VBox prefHeight="720.0" prefWidth="462.0" spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
