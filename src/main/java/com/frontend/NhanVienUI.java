@@ -258,8 +258,8 @@ public class NhanVienUI {
                     if (showInactive) {
                         return "Nghỉ việc".equals(nv.getTrangThai());
                     } else {
-                        // Nếu checkbox KHÔNG được chọn, hiển thị TẤT CẢ nhân viên (không lọc theo trạng thái)
-                        return true;
+                        // Nếu checkbox KHÔNG được chọn, chỉ hiển thị nhân viên "Đi làm" (không lọc theo trạng thái)
+                        return "Đi làm".equals(nv.getTrangThai());
                     }
                 })
                 .collect(Collectors.toList());
@@ -287,8 +287,8 @@ public class NhanVienUI {
                     if (showInactive) {
                         return "Nghỉ việc".equals(nv.getTrangThai());
                     } else {
-                        // Nếu checkbox KHÔNG được chọn, hiển thị TẤT CẢ nhân viên (không lọc theo trạng thái)
-                        return true;
+                         // Nếu checkbox KHÔNG được chọn, chỉ hiển thị nhân viên "Đi làm" (không lọc theo trạng thái)
+                        return "Đi làm".equals(nv.getTrangThai());
                     }
                 })
                 .collect(Collectors.toList());
