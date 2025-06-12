@@ -80,14 +80,14 @@
          <!--bảng dữ liệu-->
             <TableView fx:id="tableViewQuanLiHoSo" prefHeight="635.0" prefWidth="1300.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
               <columns>
-                <TableColumn fx:id="colSTT" editable="false" prefWidth="58.0" resizable="false" text="STT" />
-                <TableColumn fx:id="colMaNhanVien" editable="false" prefWidth="135.0" resizable="false" text="Mã nhân viên" />
-                  <TableColumn fx:id="colHoTen" editable="false" prefWidth="226.0" resizable="false" text="Họ tên" />
-                  <TableColumn fx:id="colLoaiNhanVien" editable="false" prefWidth="150.0" resizable="false" text="Loại nhân viên" />
-                  <TableColumn fx:id="colViTri" editable="false" prefWidth="150.0" resizable="false" text="Vị trí" />
-                  <TableColumn fx:id="colTrangThaiDiLam" editable="false" prefWidth="159.0" resizable="false" text="Trạng thái đi làm" />
-                  <TableColumn fx:id="colTrangThaiHoatDong" editable="false" prefWidth="214.0" resizable="false" text="Trạng thái hoạt động" />
-                  <TableColumn fx:id="colHanhDong" editable="false" prefWidth="206.0" resizable="false" />
+                <TableColumn fx:id="colSTT" editable="false" prefWidth="58.0" resizable="false" text="STT" sortable="false" />
+                <TableColumn fx:id="colMaNhanVien" editable="false" prefWidth="135.0" resizable="false" text="Mã nhân viên" sortable="false" />
+                  <TableColumn fx:id="colHoTen" editable="false" prefWidth="226.0" resizable="false" text="Họ tên" sortable="false" />
+                  <TableColumn fx:id="colLoaiNhanVien" editable="false" prefWidth="150.0" resizable="false" text="Loại nhân viên" sortable="false" />
+                  <TableColumn fx:id="colViTri" editable="false" prefWidth="150.0" resizable="false" text="Vị trí" sortable="false" />
+                  <TableColumn fx:id="colTrangThaiDiLam" editable="false" prefWidth="159.0" resizable="false" text="Trạng thái đi làm" sortable="false" />
+                  <TableColumn fx:id="colTrangThaiHoatDong" editable="false" prefWidth="214.0" resizable="false" text="Trạng thái hoạt động" sortable="false" />
+                  <TableColumn fx:id="colHanhDong" editable="false" prefWidth="206.0" resizable="false" sortable="false" />
               </columns>
             </TableView>
             <Pagination fx:id="phanTrang" layoutX="515.0" layoutY="640.0" maxPageIndicatorCount="5" pageCount="30" prefHeight="60.0" prefWidth="271.0" styleClass="font-size-20" />

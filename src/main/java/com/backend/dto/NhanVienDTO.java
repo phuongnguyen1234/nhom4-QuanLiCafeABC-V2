@@ -183,24 +183,4 @@ public class NhanVienDTO {
                 + matKhau + ", trangThaiHoatDong=" + trangThaiHoatDong + "]";
     }
     
-     public static NhanVienDTO convertToDTO(NhanVien nhanVien) {
-        NhanVienDTO dto = new NhanVienDTO();
-        dto.setMaNhanVien(nhanVien.getMaNhanVien());
-        dto.setTenNhanVien(nhanVien.getHoTen());
-        dto.setAnhChanDung(nhanVien.getAnhChanDung());
-        dto.setGioiTinh(nhanVien.getGioiTinh());
-        dto.setNgaySinh(nhanVien.getNgaySinh());
-        dto.setQueQuan(nhanVien.getQueQuan());
-        dto.setDiaChi(nhanVien.getDiaChi());
-        dto.setSoDienThoai(nhanVien.getSoDienThoai());
-        dto.setLoaiNhanVien(nhanVien.getLoaiNhanVien());
-        dto.setViTri(nhanVien.getViTri());
-        dto.setThoiGianVaoLam(nhanVien.getThoiGianVaoLam());
-        dto.setMucLuong(nhanVien.getMucLuong());
-        dto.setTrangThai(nhanVien.getTrangThai()); // Trạng thái làm việc (Đi làm, Nghỉ việc)
-        dto.setEmail(nhanVien.getEmail());
-        dto.setMatKhau(null); // Không trả về mật khẩu
-        dto.setTrangThaiHoatDong(nhanVien.getTrangThaiHoatDong());
-        return dto;
-    }
 }

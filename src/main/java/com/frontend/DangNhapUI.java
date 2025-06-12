@@ -29,6 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 
@@ -77,7 +78,22 @@ public class DangNhapUI {
     
     @FXML
     private void quenMatKhau() {
-        MessageUtils.showInfoMessage("Chức năng quên mật khẩu hiện chưa được hỗ trợ.");
+        // MessageUtils.showInfoMessage("Chức năng quên mật khẩu hiện chưa được hỗ trợ.");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/nhapEmail.fxml")); // Đường dẫn tới FXML của bạn
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Quên Mật Khẩu");
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
+            // stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/forgot_password_icon.png"))); // Thêm icon nếu có
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+            MessageUtils.showErrorMessage("Không thể mở form quên mật khẩu.");
+        }
+
     }
 
     @FXML

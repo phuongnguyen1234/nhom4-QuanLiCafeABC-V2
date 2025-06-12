@@ -6,6 +6,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.cache.annotation.EnableCaching;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -18,6 +19,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 @SpringBootApplication
+@EnableCaching // Bật tính năng cache của Spring
 @EnableJpaRepositories(basePackages = "com.backend.repository")
 @EntityScan(basePackages = "com.backend.model")
 @ComponentScan(basePackages = {"com.backend.control", "com.backend.service", "com.backend.config"})

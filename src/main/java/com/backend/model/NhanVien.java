@@ -232,25 +232,4 @@ public class NhanVien {
         this.donHangList = donHangList;
     }
 
-    public static NhanVien convertToEntity(NhanVienDTO dto) {
-        NhanVien nhanVien = new NhanVien();
-        nhanVien.setMaNhanVien(dto.getMaNhanVien());
-        nhanVien.setHoTen(dto.getTenNhanVien());
-        nhanVien.setAnhChanDung(dto.getAnhChanDung());
-        nhanVien.setGioiTinh(dto.getGioiTinh());
-        nhanVien.setNgaySinh(dto.getNgaySinh());
-        nhanVien.setQueQuan(dto.getQueQuan());
-        nhanVien.setDiaChi(dto.getDiaChi());
-        nhanVien.setSoDienThoai(dto.getSoDienThoai());
-        nhanVien.setLoaiNhanVien(dto.getLoaiNhanVien());
-        nhanVien.setViTri(dto.getViTri());
-        nhanVien.setThoiGianVaoLam(dto.getThoiGianVaoLam());
-        nhanVien.setMucLuong(dto.getMucLuong());
-        nhanVien.setTrangThai(dto.getTrangThai()); // Trạng thái làm việc (Đi làm, Nghỉ việc)
-        nhanVien.setEmail(dto.getEmail());
-        // Mật khẩu sẽ được xử lý riêng (mã hóa)
-        // nhanVien.setMatKhau(dto.getMatKhau()); 
-        nhanVien.setTrangThaiHoatDong(dto.getTrangThaiHoatDong());
-        return nhanVien;
-    }
 }

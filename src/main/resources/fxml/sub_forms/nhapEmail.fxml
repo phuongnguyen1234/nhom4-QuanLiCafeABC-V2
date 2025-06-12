@@ -7,14 +7,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="750.0" stylesheets="@dangNhapCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.NhapEmailUI">
+<AnchorPane fx:id="rootPaneNhapEmail" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="750.0" stylesheets="@../css/dangNhapCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.NhapEmailUI">
    <children>
       <Label layoutX="270.0" layoutY="20.0" text="Quên mật khẩu" />
       <VBox layoutX="61.0" layoutY="168.0" spacing="20.0" AnchorPane.leftAnchor="61.0" AnchorPane.rightAnchor="59.0">
          <children>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="normal-text" text="Vui lòng nhập email tương ứng với tài khoản của bạn. Chúng tôi sẽ gửi cho bạn mã OTP về email của bạn." wrappingWidth="630.6689453125" />
-            <TextField fx:id="emailTextField" prefHeight="40.0" styleClass="textfield" />
-            <Button fx:id="btnDatLaiMatKhau" mnemonicParsing="false" onAction="#datLaiMatKhau" prefHeight="45.0" prefWidth="696.0" styleClass="btn" text="Đặt lại mật khẩu" />
+            <TextField fx:id="emailField" prefHeight="40.0" promptText="Email" styleClass="textfield" />
+            <Button fx:id="btnGuiOtp" mnemonicParsing="false" onAction="#handleGuiOtp" prefHeight="45.0" prefWidth="696.0" styleClass="btn" text="Gửi OTP" />
          </children>
       </VBox>
    </children>

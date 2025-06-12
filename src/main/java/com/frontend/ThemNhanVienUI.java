@@ -24,6 +24,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
@@ -93,6 +94,8 @@ public class ThemNhanVienUI {
     @FXML
     private Button btnQuayLai;
 
+    @FXML
+    private Label mucLuongLabel; // Thêm FXML cho mucLuongLabel
 
     private NhanVienUI nhanVienUI;
     private File selectedImageFile; // Lưu trữ file ảnh đã chọn
@@ -101,6 +104,11 @@ public class ThemNhanVienUI {
             .build();
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private ToggleGroup gioiTinhToggleGroup;
+
+    private boolean dataChanged = false; // Biến để theo dõi thay đổi dữ liệu
+    public boolean isDataChanged() {
+        return dataChanged;
+    }
 
     // Phương thức để nhận tham chiếu từ màn hình chính
     public void setNhanVienUI(NhanVienUI nhanVienUI) {
@@ -136,13 +144,22 @@ private void updateValuesFromLoaiNhanVien() {
         switch (loaiNhanVien) {
             case "Chủ quán":
                 viTriComboBox.setValue("Chủ quán");
+                mucLuongLabel.setText("Mức lương (VND):");
+                matKhauPasswordField.setDisable(false);
                 break;
             case "Full-time":
+            // Chuyển giá trị viTriComboBox về các giá trị khác nếu đang là "Chủ quán"
+                if ("Chủ quán".equals(viTriComboBox.getValue())) {
+                    viTriComboBox.setValue("Thu ngân"); // Hoặc một giá trị mặc định khác
+                }
+                mucLuongLabel.setText("Mức lương (VND/ngày):");
+                break;
             case "Part-time":
                 // Chuyển giá trị viTriComboBox và quyenTruyCapComboBox về các giá trị khác
                 if ("Chủ quán".equals(viTriComboBox.getValue())) {
                     viTriComboBox.setValue("Thu ngân");
                 }
+                 mucLuongLabel.setText("Mức lương (VND/giờ):");
                 break;
         }
     });
@@ -157,22 +174,26 @@ private void updateValuesFromViTri() {
             case "Chủ quán":
                 loaiNhanVienComboBox.setValue("Chủ quán");
                 matKhauPasswordField.setDisable(false);
+                mucLuongLabel.setText("Mức lương (VND):");
                 break;
             case "Thu ngân":
-                loaiNhanVienComboBox.setValue("Full-time");
-                matKhauPasswordField.setDisable(false);
+                    loaiNhanVienComboBox.setValue("Full-time"); 
+                    mucLuongLabel.setText("Mức lương (VND/ngày):");
+                    matKhauPasswordField.setDisable(false); // Cho phép nhập mật khẩu
                 break;
             case "Pha chế":
             case "Phục vụ":
-                loaiNhanVienComboBox.setValue("Full-time");
-                // Vô hiệu hóa và xóa trường mật khẩu
-                matKhauPasswordField.setDisable(true);
-                matKhauPasswordField.clear();
-                break;
+                    loaiNhanVienComboBox.setValue("Full-time"); 
+                    mucLuongLabel.setText("Mức lương (VND/ngày):");
+                    matKhauPasswordField.setDisable(true); // Không cho phép nhập mật khẩu
+                    matKhauPasswordField.clear(); // Xóa mật khẩu nếu đã nhập
+                    // Label lương sẽ được cập nhật bởi updateValuesFromLoaiNhanVien
+                    break;
             default:
                 matKhauPasswordField.setDisable(false); // Mặc định cho phép nhập nếu không phải các trường hợp trên
                 break;
         }
+        updateValuesFromLoaiNhanVien();
     });
 }
 
@@ -326,6 +347,7 @@ String tenNhanVien = tenNhanVienTextField.getText().trim();
 
         task.setOnSucceeded(e -> {
             MessageUtils.showInfoMessage("Thành công! Thêm nhân viên thành công!");
+            this.dataChanged = true; // Đánh dấu dữ liệu đã thay đổi
             if (nhanVienUI != null) {
                 nhanVienUI.loadNhanVienData(); // Tải lại danh sách nhân viên đang làm việc
             }

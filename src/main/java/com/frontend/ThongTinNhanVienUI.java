@@ -5,6 +5,7 @@ import com.backend.utils.ImageUtils;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -19,12 +20,18 @@ public class ThongTinNhanVienUI {
                         textSoDienThoai, textLoaiNhanVien, textViTri, textThoiGianVaoLam, textMucLuong, 
                         textEmail, textTrangThaiHoatDong, textTrangThai;
 
-    @FXML private Circle circleTrangThai;
-    @FXML private ImageView imgChanDung;
-    @FXML private Button btnQuayLai;
+    @FXML 
+    private Circle circleTrangThai;
 
-    // private NhanVienUI nhanVienUI; // Nếu cần callback
-    // public void setNhanVienUI(NhanVienUI nhanVienUI) { this.nhanVienUI = nhanVienUI; }
+    @FXML 
+    private ImageView imgChanDung;
+
+    @FXML
+    private Label mucLuongLabel;
+
+    @FXML 
+    private Button btnQuayLai;
+
 
     // Hiển thị thông tin nhân viên
 public void hienThiThongTin(NhanVienDTO nhanVien) {
@@ -38,7 +45,15 @@ public void hienThiThongTin(NhanVienDTO nhanVien) {
     textLoaiNhanVien.setText(nhanVien.getLoaiNhanVien());
     textViTri.setText(nhanVien.getViTri());
     textThoiGianVaoLam.setText(nhanVien.getThoiGianVaoLam() != null ? nhanVien.getThoiGianVaoLam().toString() : "N/A");
-    textMucLuong.setText(String.valueOf(nhanVien.getMucLuong()));
+    // Cập nhật labelMucLuong và textMucLuong
+            if ("Part-time".equals(nhanVien.getLoaiNhanVien())) {
+                mucLuongLabel.setText("Mức lương (VND/giờ):");
+            } else if ("Full-time".equals(nhanVien.getLoaiNhanVien())) { 
+                mucLuongLabel.setText("Mức lương (VND/ngày):");
+            } else {
+                mucLuongLabel.setText("Mức lương (VND):");
+            }
+    textMucLuong.setText(String.format("%,d", nhanVien.getMucLuong())); 
     textEmail.setText(nhanVien.getEmail());
     textTrangThaiHoatDong.setText(nhanVien.getTrangThaiHoatDong());
     textTrangThai.setText(nhanVien.getTrangThai() != null ? nhanVien.getTrangThai() : "N/A");

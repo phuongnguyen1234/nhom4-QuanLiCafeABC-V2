@@ -23,6 +23,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.PasswordField;
@@ -33,21 +34,46 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class ChinhSuaNhanVienUI { 
     private NhanVienDTO nhanVien;
 
-    @FXML private TextField tenNhanVienTextField, queQuanTextField, soDienThoaiTextField, mucLuongTextField, emailTextField;
-    @FXML private TextArea diaChiTextArea;
-    @FXML private PasswordField matKhauPasswordField;
-    @FXML private ComboBox<String> loaiNhanVienComboBox, viTriComboBox, trangThaiComboBox;
-    @FXML private DatePicker ngaySinhDatePicker, thoiGianVaoLamDatePicker;
-    @FXML private RadioButton namRadioButton, nuRadioButton;
-    @FXML private ImageView anhChanDungImageView;
-    @FXML private Button btnChonAnh, btnQuayLai, btnCapNhat;
-    @FXML private HBox gioiTinhHBox;
+    @FXML 
+    private TextField tenNhanVienTextField, queQuanTextField, soDienThoaiTextField, mucLuongTextField, emailTextField;
+
+    @FXML 
+    private TextArea diaChiTextArea;
+
+    @FXML 
+    private PasswordField matKhauPasswordField;
+
+    @FXML 
+    private ComboBox<String> loaiNhanVienComboBox, viTriComboBox, trangThaiComboBox;
+
+    @FXML 
+    private DatePicker ngaySinhDatePicker, thoiGianVaoLamDatePicker;
+
+    @FXML 
+    private RadioButton namRadioButton, nuRadioButton;
+
+    @FXML 
+    private ImageView anhChanDungImageView;
+
+    @FXML 
+    private Button btnChonAnh, btnQuayLai, btnCapNhat;
+
+    @FXML 
+    private HBox gioiTinhHBox;
+
+    @FXML
+    private Label mucLuongLabel; // Thêm FXML cho mucLuongLabel
+
+    @FXML
+    private AnchorPane mainAnchorPaneChinhSua;
+
     private ToggleGroup gioiTinhToggleGroup;
 
     private File newSelectedImageFile; // Dùng để lưu ảnh chân dung mới nếu người dùng chọn
@@ -57,6 +83,10 @@ public class ChinhSuaNhanVienUI {
             .build();
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
+    private boolean dataChanged = false; // Biến để theo dõi thay đổi dữ liệu
+    public boolean isDataChanged() {
+        return dataChanged;
+    }
 
    // Phương thức để nhận tham chiếu từ màn hình chính
     public void setNhanVienUI(NhanVienUI nhanVienUI) {
@@ -93,13 +123,22 @@ private void updateValuesFromLoaiNhanVien() {
         switch (loaiNhanVien) {
             case "Chủ quán":
                 viTriComboBox.setValue("Chủ quán");
+                mucLuongLabel.setText("Mức lương (VND):");
+                matKhauPasswordField.setDisable(false);
                 break;
             case "Full-time":
+            // Chuyển giá trị viTriComboBox về các giá trị khác nếu đang là "Chủ quán"
+                if ("Chủ quán".equals(viTriComboBox.getValue())) {
+                    viTriComboBox.setValue("Thu ngân"); // Hoặc một giá trị mặc định khác
+                }
+                mucLuongLabel.setText("Mức lương (VND/ngày):");
+                break;
             case "Part-time":
-                // Chuyển giá trị viTriComboBox và trangThaiComboBox về các giá trị khác
+                // Chuyển giá trị viTriComboBox và quyenTruyCapComboBox về các giá trị khác
                 if ("Chủ quán".equals(viTriComboBox.getValue())) {
                     viTriComboBox.setValue("Thu ngân");
                 }
+                 mucLuongLabel.setText("Mức lương (VND/giờ):");
                 break;
         }
     });
@@ -113,15 +152,22 @@ private void updateValuesFromViTri() {
         switch (viTri) {
             case "Chủ quán":
                 loaiNhanVienComboBox.setValue("Chủ quán");
+                mucLuongLabel.setText("Mức lương (VND):");
                 matKhauPasswordField.setDisable(false); // Cho phép nhập mật khẩu
                 break;
             case "Thu ngân":
-                loaiNhanVienComboBox.setValue("Full-time");
+                if ("Chủ quán".equals(loaiNhanVienComboBox.getValue())) { // Chỉ thay đổi nếu không phải Chủ quán
+                        loaiNhanVienComboBox.setValue("Full-time"); 
+                        mucLuongLabel.setText("Mức lương (VND/ngày):");
+                    }
                 matKhauPasswordField.setDisable(false); // Cho phép nhập mật khẩu
                 break;
             case "Pha chế":
             case "Phục vụ":
-                loaiNhanVienComboBox.setValue("Full-time");
+                if ("Chủ quán".equals(loaiNhanVienComboBox.getValue())) { // Chỉ thay đổi nếu không phải Chủ quán
+                        loaiNhanVienComboBox.setValue("Full-time"); 
+                        mucLuongLabel.setText("Mức lương (VND/ngày):");
+                    }
                 matKhauPasswordField.setDisable(true); // Không cho phép nhập mật khẩu
                 matKhauPasswordField.clear(); // Xóa mật khẩu nếu đã nhập
                 break;
@@ -188,6 +234,14 @@ private void updateComboBoxesSafely(Runnable updateAction) {
         loaiNhanVienComboBox.setValue(nhanVien.getLoaiNhanVien());
         viTriComboBox.setValue(nhanVien.getViTri());
         thoiGianVaoLamDatePicker.setValue(nhanVien.getThoiGianVaoLam());
+        // Cập nhật labelMucLuong và textMucLuong
+            if ("Part-time".equals(nhanVien.getLoaiNhanVien())) {
+                mucLuongLabel.setText("Mức lương (VND/giờ):");
+            } else if ("Full-time".equals(nhanVien.getLoaiNhanVien())) { 
+                mucLuongLabel.setText("Mức lương (VND/ngày):");
+            } else {
+                mucLuongLabel.setText("Mức lương (VND):");
+            }
         mucLuongTextField.setText(String.valueOf(nhanVien.getMucLuong()));
         trangThaiComboBox.setValue(nhanVien.getTrangThai());
         emailTextField.setText(nhanVien.getEmail());
@@ -225,7 +279,6 @@ private void capNhat() {
         String mucLuongStr = mucLuongTextField.getText().trim();
         String trangThai = trangThaiComboBox.getValue();
         String email = emailTextField.getText().trim();
-        String matKhau = matKhauPasswordField.getText(); // Mật khẩu có thể không thay đổi
 
         // Kiểm tra các trường thông tin không được để trống
          if (tenNhanVien.isEmpty()
@@ -295,9 +348,23 @@ private void capNhat() {
         updatedNhanVien.setMucLuong(mucLuong);
         updatedNhanVien.setTrangThai(trangThai);
         updatedNhanVien.setEmail(email);
-        if (matKhau != null && !matKhau.isEmpty() && !matKhau.equals(this.nhanVien.getMatKhau())) {
-            updatedNhanVien.setMatKhau(matKhau); // Chỉ gửi mật khẩu nếu nó thay đổi và không rỗng
+
+        // Xử lý mật khẩu dựa trên vị trí 
+        if ("Pha chế".equals(viTri) || "Phục vụ".equals(viTri)) {
+            updatedNhanVien.setMatKhau(null); // Set mật khẩu về null nếu vị trí là Pha chế hoặc Phục vụ
+        } else {
+             // Nếu vị trí là Chủ quán hoặc Thu ngân
+            String newPassword = matKhauPasswordField.getText();
+            
+            // Kiểm tra nếu chuyển từ vị trí không cần mật khẩu sang vị trí cần mật khẩu và mật khẩu trống
+            if ((newPassword == null || newPassword.trim().isEmpty()) && 
+                ("Pha chế".equals(this.nhanVien.getViTri()) || "Phục vụ".equals(this.nhanVien.getViTri()))) {
+                MessageUtils.showErrorMessage("Vui lòng nhập mật khẩu cho vị trí " + viTri + ".");
+                return; // Dừng việc cập nhật
+            }
+            updatedNhanVien.setMatKhau(newPassword == null || newPassword.trim().isEmpty() ? this.nhanVien.getMatKhau() : newPassword);
         }
+
         updatedNhanVien.setTrangThaiHoatDong(this.nhanVien.getTrangThaiHoatDong()); // Giữ nguyên trạng thái hoạt động
 
         if (newSelectedImageFile != null) {
@@ -325,6 +392,9 @@ private void capNhat() {
             updatedNhanVien.setAnhChanDung(this.nhanVien.getAnhChanDung()); // Giữ ảnh cũ nếu không chọn ảnh mới
         }
 
+        // Disable form trước khi gửi request
+        if (mainAnchorPaneChinhSua != null) mainAnchorPaneChinhSua.setDisable(true);
+
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
@@ -344,8 +414,11 @@ private void capNhat() {
 
         task.setOnSucceeded(e -> {
             MessageUtils.showInfoMessage("Thành công! Cập nhật thông tin nhân viên thành công!");
+            this.dataChanged = true; // Đánh dấu dữ liệu đã thay đổi
             if (nhanVienUI != null) {
                 nhanVienUI.loadNhanVienData(); // Tải lại danh sách nhân viên đang làm việc
+                // Enable lại form và đóng dialog
+            if (mainAnchorPaneChinhSua != null) mainAnchorPaneChinhSua.setDisable(false);
             }
             closeDialog();
         });
@@ -353,6 +426,8 @@ private void capNhat() {
         task.setOnFailed(e -> {
             MessageUtils.showErrorMessage("Lỗi! Không thể cập nhật nhân viên: " + task.getException().getMessage());
             task.getException().printStackTrace();
+             // Enable lại form nếu có lỗi
+            if (mainAnchorPaneChinhSua != null) mainAnchorPaneChinhSua.setDisable(false);
         });
 
         new Thread(task).start();
@@ -360,6 +435,7 @@ private void capNhat() {
     } catch (Exception e) {
         MessageUtils.showErrorMessage("Lỗi hệ thống! Có lỗi không mong muốn xảy ra: " + e.getMessage());
         e.printStackTrace();
+        if (mainAnchorPaneChinhSua != null) mainAnchorPaneChinhSua.setDisable(false); // Đảm bảo form được enable nếu có lỗi ngoài Task
     }
 }
 

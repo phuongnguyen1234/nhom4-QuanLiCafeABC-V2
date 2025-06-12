@@ -16,9 +16,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="787.0" prefWidth="600.0" stylesheets="@../css/nhanVienCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ThongTinNhanVienUI">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" stylesheets="@../css/nhanVienCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ThongTinNhanVienUI">
    <children>
-      <VBox spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+      <VBox AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
 
          <!--thông tin cá nhân-->
@@ -37,7 +37,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="TOP" vgrow="ALWAYS" />
                 <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="TOP" vgrow="ALWAYS" />
                   <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="TOP" vgrow="ALWAYS" />
-                  <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="TOP" vgrow="ALWAYS" />
+                  <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="TOP" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" valignment="CENTER" vgrow="ALWAYS" />
                   <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="TOP" vgrow="ALWAYS" />
               </rowConstraints>
@@ -50,7 +50,7 @@
                </Label>
       
                <!-- Dữ liệu thông tin cá nhân -->
-               <Text fx:id="textMaNhanVien" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;mã nhân viên&gt;" wrappingWidth="242.0" GridPane.columnIndex="1">
+               <Text fx:id="textMaNhanVien" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;mã nhân viên&gt;" wrappingWidth="198.0" GridPane.columnIndex="1">
                      <font>
                         <Font name="Open Sans" size="20.0" />
                      </font>
@@ -62,7 +62,7 @@
                      </font>
                </Label>
       
-               <Text fx:id="textHoTen" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;tên nhân viên&gt;" wrappingWidth="242.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <Text fx:id="textHoTen" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;tên nhân viên&gt;" wrappingWidth="199.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <font>
                         <Font name="Open Sans" size="20.0" />
                      </font>
@@ -74,7 +74,7 @@
                      </font>
                </Label>
       
-               <Text fx:id="textGioiTinh" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;giới tính&gt;" wrappingWidth="242.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <Text fx:id="textGioiTinh" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;giới tính&gt;" wrappingWidth="192.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <font>
                         <Font name="Open Sans" size="20.0" />
                      </font>
@@ -86,7 +86,7 @@
                      </font>
                </Label>
       
-               <Text fx:id="textNgaySinh" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;ngày sinh&gt;" wrappingWidth="242.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <Text fx:id="textNgaySinh" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;ngày sinh&gt;" wrappingWidth="190.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <font>
                         <Font name="Open Sans" size="20.0" />
                      </font>
@@ -110,19 +110,19 @@
                      </font>
                </Label>
       
-               <Text fx:id="textQueQuan" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;quê quán&gt;" wrappingWidth="242.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+               <Text fx:id="textQueQuan" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;quê quán&gt;" wrappingWidth="189.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                      <font>
                         <Font name="Open Sans" size="20.0" />
                      </font>
                </Text>
       
-               <Text fx:id="textDiaChi" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;địa chỉ&gt;" wrappingWidth="242.0" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.vgrow="ALWAYS">
+               <Text fx:id="textDiaChi" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;địa chỉ&gt;" wrappingWidth="198.0" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.vgrow="ALWAYS">
                      <font>
                         <Font name="Open Sans" size="20.0" />
                      </font>
                </Text>
       
-               <Text fx:id="textSoDienThoai" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;sđt&gt;" wrappingWidth="242.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+               <Text fx:id="textSoDienThoai" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;sđt&gt;" wrappingWidth="195.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
                      <font>
                         <Font name="Open Sans" size="20.0" />
                      </font>
@@ -176,7 +176,7 @@
                      </font>
                   </Label>
 
-                  <Label text="Mức lương:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                  <Label fx:id="mucLuongLabel" text="Mức lương:" GridPane.columnIndex="0" GridPane.rowIndex="3">
                      <font>
                         <Font name="Open Sans Semibold" size="20.0" />
                      </font>
@@ -259,7 +259,7 @@
       </VBox>
 
       <!--ảnh chân dung-->
-      <ImageView fx:id="imgChanDung" fitHeight="240.0" fitWidth="180.0" layoutX="406.0" layoutY="14.0" pickOnBounds="true">
+      <ImageView fx:id="imgChanDung" fitHeight="177.0" fitWidth="144.0" layoutX="433.0" layoutY="77.0" pickOnBounds="true">
          <image>
             <Image url="@../../icons/profile.png" />
          </image></ImageView>
@@ -277,7 +277,7 @@
       </HBox>
 
       <!--nút quay lại-->
-      <Button fx:id="btnQuayLai" layoutX="251.0" layoutY="718.0" mnemonicParsing="false" onAction="#quayLai" styleClass="btn" text="Quay lại" textFill="WHITE">
+      <Button fx:id="btnQuayLai" mnemonicParsing="false" onAction="#quayLai" styleClass="btn" text="Quay lại" textFill="WHITE" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="240.0" AnchorPane.rightAnchor="240.0">
          <font>
             <Font name="Open Sans Semibold" size="20.0" />
          </font>

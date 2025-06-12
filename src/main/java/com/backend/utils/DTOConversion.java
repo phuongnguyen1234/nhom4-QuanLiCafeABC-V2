@@ -7,10 +7,12 @@ import com.backend.dto.DanhMucKhongMonDTO;
 import com.backend.dto.DonHangDTO;
 import com.backend.dto.MonDTO;
 import com.backend.dto.MonTrongDonDTO;
+import com.backend.dto.NhanVienDTO;
 import com.backend.model.BangLuong;
 import com.backend.model.DanhMuc;
 import com.backend.model.DonHang;
 import com.backend.model.Mon;
+import com.backend.model.NhanVien;
 
 public class DTOConversion {
     public static DanhMucKhongMonDTO toDanhMucKhongMonDTO(DanhMuc danhMuc) {
@@ -115,5 +117,35 @@ public class DTOConversion {
         return dto;
     }
 
-    
+    // Phương thức chuyển đổi từ NhanVien Entity sang NhanVienDTO
+    public static NhanVienDTO toNhanVienDTO(NhanVien nhanVien) {
+        if (nhanVien == null) {
+            return null;
+        }
+        NhanVienDTO dto = new NhanVienDTO();
+        dto.setMaNhanVien(nhanVien.getMaNhanVien());
+        dto.setTenNhanVien(nhanVien.getHoTen());
+        dto.setAnhChanDung(nhanVien.getAnhChanDung());
+        dto.setGioiTinh(nhanVien.getGioiTinh());
+        dto.setNgaySinh(nhanVien.getNgaySinh());
+        dto.setQueQuan(nhanVien.getQueQuan());
+        dto.setDiaChi(nhanVien.getDiaChi());
+        dto.setSoDienThoai(nhanVien.getSoDienThoai());
+        dto.setLoaiNhanVien(nhanVien.getLoaiNhanVien());
+        dto.setViTri(nhanVien.getViTri());
+        dto.setThoiGianVaoLam(nhanVien.getThoiGianVaoLam());
+        dto.setMucLuong(nhanVien.getMucLuong());
+        dto.setTrangThai(nhanVien.getTrangThai()); // Trạng thái làm việc (Đi làm, Nghỉ việc)
+        dto.setEmail(nhanVien.getEmail());
+        dto.setMatKhau(null); // Không trả về mật khẩu ra frontend
+        dto.setTrangThaiHoatDong(nhanVien.getTrangThaiHoatDong());
+        return dto;
+    }
+
+    // Phương thức chuyển đổi từ NhanVienDTO sang NhanVien Entity
+    public static NhanVien toNhanVien(NhanVienDTO dto) {
+        // Lưu ý: Phương thức này không set MatKhau vì mật khẩu được xử lý riêng (mã hóa)
+        // và không set TrangThaiHoatDong vì trạng thái hoạt động được quản lý bởi hệ thống
+        return new NhanVien(dto.getMaNhanVien(), dto.getTenNhanVien(), dto.getAnhChanDung(), dto.getGioiTinh(), dto.getNgaySinh(), dto.getQueQuan(), dto.getDiaChi(), dto.getSoDienThoai(), dto.getLoaiNhanVien(), dto.getViTri(), dto.getThoiGianVaoLam(), dto.getMucLuong(), dto.getTrangThai(), dto.getEmail(), null, null);
+    }
 }

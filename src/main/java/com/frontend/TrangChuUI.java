@@ -187,6 +187,7 @@ public class TrangChuUI {
 
                         closeLogoutTask.setOnSucceeded(e -> {
                             System.out.println(closeLogoutTask.getValue() ? "Đăng xuất tự động khi đóng cửa sổ thành công." : "Đăng xuất tự động khi đóng cửa sổ không thành công từ server (nếu có user).");
+                            MessageUtils.showInfoMessage("Đăng xuất thành công!");
                             // Đóng executor của controller hiện tại nếu là ThucDonUI
                             if (currentCenterController instanceof ThucDonUI) {
                                 ((ThucDonUI) currentCenterController).shutdownExecutor();
@@ -262,9 +263,9 @@ public class TrangChuUI {
             if (logoutTask.getValue()) {
                 // Đăng xuất thành công, chuyển về màn hình đăng nhập
                 try {
+                    MessageUtils.showInfoMessage("Đăng xuất thành công!");
                     //  Xóa thông tin người dùng ở client
                     this.currentUser = null; 
-
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_screen/dangNhap.fxml"));
                     Parent root = loader.load();
                     Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
