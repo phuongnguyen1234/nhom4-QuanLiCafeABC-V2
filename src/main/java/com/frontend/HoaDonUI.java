@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,8 @@ import com.backend.dto.DonHangSummaryDTO;
 import com.backend.dto.NhanVienDTO;
 import com.backend.model.DonHang;
 import com.backend.quanlicapheabc.QuanlicapheabcApplication;
+import com.backend.utils.DTOConversion;
+import com.backend.utils.JavaFXUtils;
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,12 +32,14 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -74,6 +79,9 @@ public class HoaDonUI {
     @FXML
     private Pagination phanTrang;
 
+    @FXML
+    private Button btnXuatBaoCao;
+
     private final HttpClient client = HttpClient.newBuilder()
             .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
             .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
@@ -94,9 +102,8 @@ public class HoaDonUI {
     @FXML
     public void initialize() {
         disableItems(true);
-        Label label = new Label("Đang tải...");
-        label.setFont(Font.font("Open Sans", 18));
-        tableDonHang.setPlaceholder(label);
+        // Đặt placeholder ban đầu
+        tableDonHang.setPlaceholder(JavaFXUtils.createPlaceholder("Đang tải...", "/icons/loading.png"));
 
         // Setup các cột
         colSTT.setCellValueFactory(cellDataFeatures -> {
@@ -111,7 +118,34 @@ public class HoaDonUI {
         colMaDonHang.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getMaDonHang())); // DonHangSummaryDTO có getMaDonHang
         colNhanVienTaoDon.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getHoTen())); // DonHangSummaryDTO có getHoTen
         colTongTien.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getTongTien())); // DonHangSummaryDTO có getTongTien
-        colThoiGianDat.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getThoiGianDatHang()));
+        colThoiGianDat.setCellValueFactory(data -> 
+            new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getThoiGianDatHang()));
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+            colThoiGianDat.setCellFactory(column -> new TableCell<DonHangSummaryDTO, LocalDateTime>() {
+                @Override
+                protected void updateItem(LocalDateTime item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.format(formatter));
+                    }
+                }
+        });
+
+        colTongTien.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("%,d", item)); // thêm dấu phẩy phân tách 3 chữ số
+                }
+            }
+        });
 
         // Thêm cột Hành Động với nút "Xem Chi Tiết"
         colHanhDong.setCellFactory(param -> new TableCell<>() {
@@ -157,33 +191,12 @@ public class HoaDonUI {
             capNhatTrang(newIndex.intValue());
         });
 
-        loadDonHangData();
-    }
+        JavaFXUtils.disableHorizontalScrollBar(tableDonHang);
 
-    private void loadDonHangData() {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                List<DonHangDTO> fetchedDonHangsDTO = layTatCaDonHangDTO(); 
-                Platform.runLater(() -> setDuLieuDonHangTable(fetchedDonHangsDTO));
-                return null;
-            }
-
-            @Override
-            protected void succeeded() {
-                super.succeeded();
-                disableItems(false);
-            }
-
-            @Override
-            protected void failed() {
-                super.failed();
-                disableItems(false);
-                MessageUtils.showErrorMessage("Lỗi tải dữ liệu! Không thể tải danh sách đơn hàng: " + getException().getMessage());
-                getException().printStackTrace();
-            }
-        };
-        new Thread(task).start();
+        // Set DatePicker to today's date and load orders for today
+        LocalDate today = LocalDate.now();
+        thoiGian.setValue(today);
+        loc(); // Call loc() to load orders for the selected date (today)
     }
 
     private void capNhatTrang(int soTrang) {
@@ -191,7 +204,16 @@ public class HoaDonUI {
         int denViTri = Math.min(tuViTri + SO_DONG_MOI_TRANG, this.donHangList.size()); // Vị trí kết thúc
 
         List<DonHangDTO> subListOfDTOs = this.donHangList.subList(tuViTri, denViTri);
-        List<DonHangSummaryDTO> summariesForPage = convertToSummaryDTOList(subListOfDTOs);
+        List<DonHangSummaryDTO> summariesForPage = DTOConversion.toDonHangSummaryDTOList(subListOfDTOs);
+
+        // Cập nhật placeholder và trạng thái nút Xuất báo cáo
+        if (summariesForPage.isEmpty() && this.donHangList.isEmpty()) { // Kiểm tra cả danh sách gốc
+            tableDonHang.setPlaceholder(JavaFXUtils.createPlaceholder("Không có dữ liệu.", "/icons/sad.png"));
+            btnXuatBaoCao.setDisable(true);
+        } else {
+            tableDonHang.setPlaceholder(null); // Xóa placeholder khi có dữ liệu
+            btnXuatBaoCao.setDisable(false);
+        }
         tableDonHang.setItems(FXCollections.observableArrayList(summariesForPage));
     }
 
@@ -236,8 +258,13 @@ public class HoaDonUI {
                         e.printStackTrace();
                     }
                 } else if (response.statusCode() == 404) {
-                    Platform.runLater(() -> MessageUtils.showInfoMessage("Không tìm thấy đơn hàng với mã \"" + maDonHang + "\"."));
-            }}
+                    tableDonHang.setPlaceholder(JavaFXUtils.createPlaceholder("Không có dữ liệu", "/icons/no-data.png"));
+                    // Nếu không tìm thấy, coi như danh sách rỗng
+                    setDuLieuDonHangTable(FXCollections.emptyObservableList());
+                } else {
+                    setDuLieuDonHangTable(FXCollections.emptyObservableList()); // Xử lý các lỗi khác bằng cách hiển thị bảng rỗng
+                }
+            }
             // Nếu foundDonHang là null, UI đã được cập nhật trong call() (khi search trống) hoặc thông báo 404 đã hiển thị
             disableItems(false);
         });
@@ -270,10 +297,12 @@ public class HoaDonUI {
                         .build();
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
                 if (response.statusCode() == 200) {
-                    return objectMapper.readValue(response.body(), new TypeReference<List<DonHangDTO>>() {}); // Sửa TypeReference
+                    return objectMapper.readValue(response.body(), new TypeReference<List<DonHangDTO>>() {});
                 } else if (response.statusCode() == 404) {
-                     Platform.runLater(() -> MessageUtils.showInfoMessage("Không tìm thấy đơn hàng trong ngày \"" + ngayLocFormatted + "\"."));
-                    return FXCollections.emptyObservableList(); // Trả về danh sách DTO rỗng
+Platform.runLater(() -> { // Bọc cập nhật UI trong Platform.runLater
+                        tableDonHang.setPlaceholder(JavaFXUtils.createPlaceholder("Không có dữ liệu", "/icons/no-data.png"));
+                    });                    // Trả về danh sách rỗng để setDuLieuDonHangTable xử lý placeholder
+                    return new ArrayList<>();
                 } 
                 else {
                     throw new IOException("Lỗi khi lọc đơn hàng: " + response.statusCode() + " - " + response.body());
@@ -341,72 +370,50 @@ public class HoaDonUI {
     
         // Hiển thị dữ liệu của trang đầu tiên
         capNhatTrang(0);
+
+        if (danhSachDonHangDTO.isEmpty()) {
+            tableDonHang.setPlaceholder(JavaFXUtils.createPlaceholder("Không có dữ liệu.", "/icons/sad.png"));
+            btnXuatBaoCao.setDisable(true);
+        } else {
+            tableDonHang.setPlaceholder(null);
+            btnXuatBaoCao.setDisable(false);
+        }
     }
 
     public void hienThiChiTietDonHang(DonHangSummaryDTO donHangSummary){ 
         try {
-            // Task để tải chi tiết đơn hàng đầy đủ từ backend
-            Task<DonHangDTO> loadDetailTask = new Task<>() {
-                @Override
-                protected DonHangDTO call() throws Exception {
-                    HttpRequest request = HttpRequest.newBuilder()
-                            .uri(new URI("http://localhost:8080/don-hang/" + donHangSummary.getMaDonHang()))
-                            .GET()
-                            .build();
-                    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                    if (response.statusCode() == 200) {
-                        return objectMapper.readValue(response.body(), DonHangDTO.class);
-                    } else {
-                        throw new IOException("Lỗi khi tải chi tiết đơn hàng: " + response.statusCode() + " - " + response.body());
-                    }
-                }
-            };
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/chiTietDonHang.fxml"));
+            Parent root = loader.load();
+            ChiTietDonHangUI controller = loader.getController();
+            
+            // Truyền mã đơn hàng cho ChiTietDonHangUI controller
+            controller.setMaDonHangAndLoad(donHangSummary.getMaDonHang());
 
-            loadDetailTask.setOnSucceeded(event -> {
-                DonHangDTO donHangChiTiet = loadDetailTask.getValue();
-                if (donHangChiTiet != null) {
-                    try {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/chiTietDonHang.fxml"));
-                        Parent root = loader.load();
-                        ChiTietDonHangUI controller = loader.getController();
-                        controller.initData(donHangChiTiet); // Pass the converted DTO
+            // Sử dụng JavaFXUtils.createDialog để tạo dialog
+            Stage stage = JavaFXUtils.createDialog("Chi tiết đơn hàng " + donHangSummary.getMaDonHang(), root, "/icons/invoice.png");
+            stage.showAndWait(); // Sử dụng showAndWait để dialog này chặn tương tác với cửa sổ chính
 
-                        // Tạo và hiển thị Stage dialog
-                        Stage stage = new Stage();
-                        stage.initModality(Modality.APPLICATION_MODAL); // Modal dialog
-                        // Tạo một instance của controller với donHang
-                        stage.setScene(new Scene(root));
-                        stage.setTitle("Chi tiết đơn hàng " + donHangChiTiet.getMaDonHang());
-                        stage.setResizable(false);
-                        stage.showAndWait();
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        MessageUtils.showErrorMessage("Lỗi hiển thị chi tiết đơn hàng.");
-                    }
-                } else {
-                    MessageUtils.showErrorMessage("Không tìm thấy chi tiết đơn hàng.");
-                }
-            });
-
-            loadDetailTask.setOnFailed(event -> {
-                MessageUtils.showErrorMessage("Lỗi tải chi tiết đơn hàng: " + loadDetailTask.getException().getMessage());
-                loadDetailTask.getException().printStackTrace();
-            });
-
-            new Thread(loadDetailTask).start();
-
-        } catch (Exception e) { // Bắt các exception khác có thể xảy ra trước khi task chạy
+        } catch (IOException e) {
             e.printStackTrace();
-            MessageUtils.showErrorMessage("Lỗi chuẩn bị tải chi tiết đơn hàng.");
+            MessageUtils.showErrorMessage("Lỗi khi mở giao diện chi tiết đơn hàng.");
+        } catch (Exception e) { // Bắt các exception khác
+            e.printStackTrace();
+            MessageUtils.showErrorMessage("Lỗi không xác định: " + e.getMessage());
         }
     }
 
     private void disableItems(boolean value){
-        mainAnchorPane.setDisable(value);
-        timKiemTheoMaTextField.setDisable(value);
-        thoiGian.setDisable(value);
-        phanTrang.setDisable(value);
+        Platform.runLater(() -> { // Đảm bảo chạy trên JavaFX Application Thread
+            if (mainAnchorPane != null) {
+                mainAnchorPane.setDisable(value);
+            } else { // Fallback nếu mainAnchorPane chưa được inject hoặc null
+                timKiemTheoMaTextField.setDisable(value);
+                thoiGian.setDisable(value);
+                tableDonHang.setDisable(value); // Disable table view
+                phanTrang.setDisable(value);
+                btnXuatBaoCao.setDisable(value || this.donHangList.isEmpty()); // Nút xuất báo cáo cũng bị disable nếu đang load hoặc list rỗng
+            }
+        });
     }
 
     // Đổi tên và kiểu trả về để lấy List<DonHangDTO>
@@ -421,23 +428,5 @@ public class HoaDonUI {
         } else {
             throw new IOException("Lỗi khi tải danh sách đơn hàng: " + response.statusCode() + " - " + response.body());
         }
-    }
-    
-    // Helper method to convert DonHangDTO (detailed) to DonHangSummaryDTO
-    private DonHangSummaryDTO convertDonHangDTOToSummaryDTO(DonHangDTO detailedDTO) {
-        if (detailedDTO == null) return null;
-        DonHangSummaryDTO summary = new DonHangSummaryDTO();
-        summary.setMaDonHang(detailedDTO.getMaDonHang());
-        summary.setHoTen(detailedDTO.getHoTen()); 
-        summary.setThoiGianDatHang(detailedDTO.getThoiGianDatHang());
-        summary.setTongTien(detailedDTO.getTongTien());
-        return summary;
-    }
-
-    private List<DonHangSummaryDTO> convertToSummaryDTOList(List<DonHangDTO> dtoList) {
-        if (dtoList == null) {
-            return FXCollections.emptyObservableList();
-        }
-        return dtoList.stream().map(this::convertDonHangDTOToSummaryDTO).collect(Collectors.toList());
     }
 }

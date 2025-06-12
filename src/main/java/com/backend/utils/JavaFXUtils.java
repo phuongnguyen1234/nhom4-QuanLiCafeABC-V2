@@ -1,10 +1,13 @@
 package com.backend.utils;
 
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -69,6 +72,19 @@ public class JavaFXUtils {
             vbox.getChildren().add(label);
             return vbox;
         }
+    }
+
+    public static void disableHorizontalScrollBar(TableView<?> tableView) {
+        Platform.runLater(() -> {
+            for (Node node : tableView.lookupAll(".scroll-bar:horizontal")) {
+                if (node instanceof ScrollBar scrollBar) {
+                    scrollBar.setDisable(true);      // Vô hiệu hóa cuộn
+                    scrollBar.setOpacity(0);         // Ẩn khỏi mắt người dùng
+                    scrollBar.setPrefHeight(0);      // Không chiếm chỗ
+                    scrollBar.setMaxHeight(0);
+                }
+            }
+        });
     }
     
 }

@@ -26,6 +26,7 @@
 
 .btn{
     -fx-background-color: linear-gradient(to bottom right, #098c53, #246861);
+    -fx-cursor: hand;
 }
 
 .btn:hover{
@@ -128,4 +129,8 @@
     -fx-font-family: "Open Sans";
     -fx-font-size: 16px;
     -fx-alignment: center;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #286155; /* Màu thanh trượt */
 }

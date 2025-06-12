@@ -22,6 +22,8 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -59,6 +61,12 @@ public class ThongKeUI {
     @FXML
     private Hyperlink hplinkXemChiTiet;
 
+    private TrangChuUI trangChuUI;
+
+    public void setTrangChuUI(TrangChuUI trangChuUI) {
+        this.trangChuUI = trangChuUI;
+    }
+
     private final HttpClient client = HttpClient.newBuilder()
             .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
             .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
@@ -85,7 +93,40 @@ public class ThongKeUI {
         };
         barXAxis.setCategories(FXCollections.observableArrayList(slots));
 
-        hienThiSoLieuThongKe();
+        // Gọi kiểm tra và tổng hợp doanh thu tháng trước
+        Task<String> checkAggregateTask = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:8080/doanh-thu/kiem-tra-tong-hop-thang-truoc"))
+                        .POST(HttpRequest.BodyPublishers.noBody()) // Sử dụng POST
+                        .timeout(Duration.ofSeconds(25)) // Tăng timeout phòng trường hợp tổng hợp lâu
+                        .build();
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() == 200) {
+                    return response.body();
+                } else {
+                    System.err.println("Lỗi khi kiểm tra/tổng hợp doanh thu tháng trước: " + response.statusCode() + " - " + response.body());
+                    throw new IOException("Lỗi từ server: " + response.statusCode() + " - " + response.body());
+                }
+            }
+        };
+
+        checkAggregateTask.setOnSucceeded(event -> {
+            String resultMessage = checkAggregateTask.getValue();
+            System.out.println("Kết quả kiểm tra/tổng hợp doanh thu tháng trước: " + resultMessage);
+            // Có thể hiển thị thông báo nhỏ cho người dùng nếu muốn
+            // MessageUtils.showInfoMessage("Thông báo", resultMessage);
+            hienThiSoLieuThongKe(); // Sau đó mới hiển thị số liệu thống kê
+        });
+
+        checkAggregateTask.setOnFailed(event -> {
+            MessageUtils.showErrorMessage("Lỗi khi kiểm tra hoặc tổng hợp doanh thu tháng trước: " + checkAggregateTask.getException().getMessage());
+            checkAggregateTask.getException().printStackTrace();
+            hienThiSoLieuThongKe(); // Vẫn cố gắng hiển thị số liệu thống kê hiện có
+        });
+
+        new Thread(checkAggregateTask).start();
     }
 
     public void hienThiSoLieuThongKe() {
@@ -165,11 +206,12 @@ public class ThongKeUI {
                            .forEach(entry -> lineSeries.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue())));
                     }
                     bienDongDoanhThuLineChart.getData().add(lineSeries);
-                    LocalDate sixMonthsAgo = LocalDate.now().minusMonths(5);
+                    // Tiêu đề nên phản ánh đúng khoảng thời gian của dữ liệu (6 tháng trước, không bao gồm tháng hiện tại)
+                    LocalDate endDateForTitle = LocalDate.now().minusMonths(1); // Tháng trước
+                    LocalDate startDateForTitle = endDateForTitle.minusMonths(5); // 5 tháng trước của tháng trước
                     bienDongDoanhThuLineChart.setTitle("Biến động doanh thu từ " +
-                        sixMonthsAgo.format(DateTimeFormatter.ofPattern("MM/yyyy")) + " - " +
-                        LocalDate.now().format(DateTimeFormatter.ofPattern("MM/yyyy")));
-
+                        startDateForTitle.format(DateTimeFormatter.ofPattern("MM/yyyy")) + " - " +
+                        endDateForTitle.format(DateTimeFormatter.ofPattern("MM/yyyy")));
 
                     // Biểu đồ cột khoảng thời gian đặt đơn nhiều nhất tháng trước
                     khoangThoiGianDatDonNhieuNhatThangTruocBarChart.getData().clear();
@@ -204,7 +246,17 @@ public class ThongKeUI {
 
     @FXML
     public void xemChiTiet(){
-        MessageUtils.showInfoMessage("Chức năng đang được cập nhật. Vui lòng thử lại sau!");
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/chiTietDoanhThu.fxml"));
+            Parent root = loader.load();
+
+            ChiTietDoanhThuUI controller = loader.getController();
+            controller.setTrangChuUI(trangChuUI);
+            trangChuUI.getMainBorderPane().setCenter(root);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private ThongKeDTO layDuLieuThongKe() throws Exception {

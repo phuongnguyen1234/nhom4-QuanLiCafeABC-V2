@@ -1,16 +1,21 @@
 package com.backend.utils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.backend.dto.BangLuongDTO;
 import com.backend.dto.DanhMucKhongMonDTO;
 import com.backend.dto.DonHangDTO;
+import com.backend.dto.DonHangSummaryDTO;
 import com.backend.dto.MonDTO;
 import com.backend.dto.MonTrongDonDTO;
 import com.backend.model.BangLuong;
 import com.backend.model.DanhMuc;
 import com.backend.model.DonHang;
 import com.backend.model.Mon;
+
+import javafx.collections.FXCollections;
 
 public class DTOConversion {
     public static DanhMucKhongMonDTO toDanhMucKhongMonDTO(DanhMuc danhMuc) {
@@ -100,20 +105,39 @@ public class DTOConversion {
         dto.setThoiGianDatHang(donHang.getThoiGianDatHang());
         dto.setTongTien(donHang.getTongTien());
 
-        List<MonTrongDonDTO> monTrongDonList = donHang.getChiTietDonHang().stream().map(ctdh -> {
-            MonTrongDonDTO monDTO = new MonTrongDonDTO();
-            monDTO.setMaMon(ctdh.getMon().getMaMon());
-            monDTO.setTenMon(ctdh.getTenMon());
-            monDTO.setSoLuong(ctdh.getSoLuong());
-            monDTO.setDonGia(ctdh.getDonGia());
-            monDTO.setYeuCauKhac(ctdh.getYeuCauKhac());
-            monDTO.setTamTinh(ctdh.getTamTinh());
-            // Các trường khác của MonTrongDonDTO có thể được set ở đây nếu cần
-            return monDTO;
-        }).toList();
-        dto.setDanhSachMonTrongDon(monTrongDonList);
+        if (donHang.getChiTietDonHang() != null) {
+            List<MonTrongDonDTO> monTrongDonList = donHang.getChiTietDonHang().stream().map(ctdh -> {
+                MonTrongDonDTO monDTO = new MonTrongDonDTO();
+                monDTO.setMaMon(ctdh.getMon().getMaMon());
+                monDTO.setTenMon(ctdh.getTenMon());
+                monDTO.setSoLuong(ctdh.getSoLuong());
+                monDTO.setDonGia(ctdh.getDonGia());
+                monDTO.setYeuCauKhac(ctdh.getYeuCauKhac());
+                monDTO.setTamTinh(ctdh.getTamTinh());
+                // Các trường khác của MonTrongDonDTO có thể được set ở đây nếu cần
+                return monDTO;
+            }).toList();
+            dto.setDanhSachMonTrongDon(monTrongDonList);
+        } else {
+            dto.setDanhSachMonTrongDon(new ArrayList<>()); // Hoặc trả về danh sách rỗng
+        }
         return dto;
     }
 
-    
+    public static DonHangSummaryDTO toDonHangSummaryDTO(DonHangDTO detailedDTO) {
+        if (detailedDTO == null) return null;
+        DonHangSummaryDTO summary = new DonHangSummaryDTO();
+        summary.setMaDonHang(detailedDTO.getMaDonHang());
+        summary.setHoTen(detailedDTO.getHoTen()); 
+        summary.setThoiGianDatHang(detailedDTO.getThoiGianDatHang());
+        summary.setTongTien(detailedDTO.getTongTien());
+        return summary;
+    }
+
+    public static List<DonHangSummaryDTO> toDonHangSummaryDTOList(List<DonHangDTO> dtoList) {
+        if (dtoList == null) {
+            return FXCollections.emptyObservableList();
+        }
+        return dtoList.stream().map(DTOConversion::toDonHangSummaryDTO).collect(Collectors.toList());
+    } 
 }

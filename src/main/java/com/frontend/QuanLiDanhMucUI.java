@@ -126,16 +126,7 @@ public class QuanLiDanhMucUI {
             column.setReorderable(false);
         });
 
-        Platform.runLater(() -> {
-            for (Node node : tableViewDanhMuc.lookupAll(".scroll-bar:horizontal")) {
-                if (node instanceof ScrollBar scrollBar) {
-                    scrollBar.setDisable(true);      // Vô hiệu hóa cuộn
-                    scrollBar.setOpacity(0);         // Ẩn khỏi mắt người dùng
-                    scrollBar.setPrefHeight(0);      // Không chiếm chỗ
-                    scrollBar.setMaxHeight(0);
-                }
-            }
-        });
+        JavaFXUtils.disableHorizontalScrollBar(tableViewDanhMuc);
 
         loadDanhSachDanhMuc();
     }

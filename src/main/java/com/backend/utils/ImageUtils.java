@@ -40,11 +40,11 @@ public class ImageUtils {
         if (image == null) {
             // Ghi log nếu ảnh chính được cung cấp nhưng không tải được và phải dùng ảnh mặc định
             if (resourcePath != null && !resourcePath.isEmpty()) {
-                 System.err.println("ImageUtils: Không tải được resource '" + resourcePath + "'. Đang thử ảnh mặc định '" + defaultResourcePath + "'.");
+                 System.out.println("ImageUtils.loadFromResourcesOrDefault: Không tải được resource chính '" + resourcePath + "'. Đang thử ảnh mặc định '" + defaultResourcePath + "'.");
             }
             image = loadImageFromResource(defaultResourcePath);
             if (image == null && defaultResourcePath != null && !defaultResourcePath.isEmpty()) {
-                System.err.println("ImageUtils: Không tải được cả ảnh mặc định: " + defaultResourcePath);
+                System.err.println("ImageUtils.loadFromResourcesOrDefault: LỖI - Không tải được cả ảnh mặc định: '" + defaultResourcePath + "'");
             }
         }
         return image;
@@ -64,7 +64,7 @@ public class ImageUtils {
             if (imageUrl != null) {
                 return new Image(imageUrl.toExternalForm());
             } else {
-                // Không cần log ở đây vì loadFromResourcesOrDefault sẽ log nếu cần
+                System.out.println("ImageUtils.loadImageFromResource: Resource '" + resourcePath + "' không tìm thấy (URL is null).");
                 return null;
             }
         } catch (Exception e) {

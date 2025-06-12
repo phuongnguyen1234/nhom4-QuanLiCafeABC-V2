@@ -46,7 +46,7 @@ public class PdfUtils {
                 folder.mkdirs();
             }
 
-            String sanitizedThoiGianDat = thoiGianDat.replace(":", "-").replace("/", "-");
+            String sanitizedThoiGianDat = thoiGianDat.replace(":", "").replace("/", "");
             String filePath = folderPath + "hoadon_" + maDonHang + "_" + sanitizedThoiGianDat + ".pdf";
 
             Document document = new Document();

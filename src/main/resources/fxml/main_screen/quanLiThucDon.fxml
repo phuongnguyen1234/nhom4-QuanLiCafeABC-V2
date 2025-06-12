@@ -22,12 +22,12 @@
       <TableView fx:id="tableViewMon" layoutX="14.0" layoutY="183.0" prefHeight="635.0" prefWidth="1280.0" styleClass="table-view-quan-li" AnchorPane.bottomAnchor="82.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="183.0">
          <columns>
             <TableColumn fx:id="colSTT" editable="false" prefWidth="49.0" resizable="false" sortable="false" text="STT" />
-            <TableColumn fx:id="colMaMon" prefWidth="174.0" resizable="false" text="Mã món" />
-            <TableColumn fx:id="colTenMon" prefWidth="448.0" resizable="false" text="Tên món" />
-            <TableColumn fx:id="colTrangThai" prefWidth="130.0" resizable="false" text="Trạng thái" />
-            <TableColumn fx:id="colDonGia" prefWidth="134.0" resizable="false" text="Đơn giá" />
-            <TableColumn fx:id="colDanhMuc" prefWidth="165.0" resizable="false" text="Danh mục" />
-            <TableColumn fx:id="colHanhDong" maxWidth="1.7976931348623157E308" prefWidth="174.0" resizable="false" />
+            <TableColumn fx:id="colMaMon" editable="false" prefWidth="174.0" resizable="false" sortable="false" text="Mã món" />
+            <TableColumn fx:id="colTenMon" editable="false" prefWidth="448.0" resizable="false" sortable="false" text="Tên món" />
+            <TableColumn fx:id="colTrangThai" editable="false" prefWidth="130.0" resizable="false" sortable="false" text="Trạng thái" />
+            <TableColumn fx:id="colDonGia" editable="false" prefWidth="134.0" resizable="false" sortable="false" text="Đơn giá" />
+            <TableColumn fx:id="colDanhMuc" editable="false" prefWidth="165.0" resizable="false" sortable="false" text="Danh mục" />
+            <TableColumn fx:id="colHanhDong" editable="false" maxWidth="1.7976931348623157E308" prefWidth="174.0" resizable="false" sortable="false" />
          </columns>
       </TableView>
       <AnchorPane prefHeight="150.0" prefWidth="1300.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
@@ -85,7 +85,7 @@
          </styleClass>
       </AnchorPane>
       <Separator layoutX="9.0" layoutY="161.0" prefHeight="15.0" prefWidth="1290.0" />
-      <Pagination fx:id="phanTrang" layoutX="515.0" layoutY="830.0" maxPageIndicatorCount="5" pageCount="30" prefHeight="60.0" prefWidth="271.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="515.0" AnchorPane.rightAnchor="514.0">
+      <Pagination fx:id="phanTrang" layoutX="515.0" layoutY="830.0" maxPageIndicatorCount="1" pageCount="1" prefHeight="60.0" prefWidth="271.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="515.0" AnchorPane.rightAnchor="514.0">
          <styleClass>
             <String fx:value="font-size-20" />
             <String fx:value="font-family" />

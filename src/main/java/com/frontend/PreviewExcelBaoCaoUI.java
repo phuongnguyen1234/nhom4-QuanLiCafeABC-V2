@@ -14,6 +14,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.backend.dto.DonHangDTO;
 import com.backend.dto.NhanVienDTO;
+import com.backend.utils.JavaFXUtils;
 import com.backend.utils.MessageUtils;
 
 import javafx.fxml.FXML;
@@ -79,6 +80,8 @@ public class PreviewExcelBaoCaoUI {
                 setText(empty || item == null ? null : formatter.format(item));
             }
         });
+
+        JavaFXUtils.disableHorizontalScrollBar(tableBaoCao);
     }
 
     @FXML
@@ -92,12 +95,9 @@ public class PreviewExcelBaoCaoUI {
         fileChooser.setTitle("Lưu Báo Cáo");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files (*.xlsx)", "*.xlsx"));
         
-        String initialFileName = "BaoCaoDoanhThuNgay";
+        String initialFileName = "BaoCaoDoanhThuNgay_";
         if (ngayLoc != null) {
-            initialFileName += ngayLoc.format(DateTimeFormatter.ofPattern("ddMMyyyy")); // Định dạng ngày XXX
-        }
-        if (nguoiXuatBaoCao != null && nguoiXuatBaoCao.getTenNhanVien() != null) {
-            initialFileName += "_" + nguoiXuatBaoCao.getTenNhanVien().replaceAll("\\s+", ""); // Bỏ khoảng trắng
+            initialFileName += ngayLoc.format(DateTimeFormatter.ofPattern("dd/MM/yyyy_")); // Định dạng ngày XXX
         }
         initialFileName += ".xlsx";
         fileChooser.setInitialFileName(initialFileName);
@@ -107,14 +107,14 @@ public class PreviewExcelBaoCaoUI {
         if (file != null) {
             try (XSSFWorkbook workbook = new XSSFWorkbook()) {
     XSSFSheet sheet = workbook.createSheet("BaoCao");
-
     int rowNum = 0;
+
+    // Header của bảng chi tiết
     Row headerRow = sheet.createRow(rowNum++);
     String[] headers = {"STT", "Mã đơn hàng", "Nhân viên tạo đơn", "Thời gian Đặt hàng", "Tổng tiền (VND)"};
     for (int i = 0; i < headers.length; i++) {
         headerRow.createCell(i).setCellValue(headers[i]);
     }
-
     int stt = 1;
     for (DonHangDTO donHang : danhSachDonHangToExport) {
         Row row = sheet.createRow(rowNum++);
@@ -126,6 +126,26 @@ public class PreviewExcelBaoCaoUI {
         );
         row.createCell(4).setCellValue(donHang.getTongTien());
     }
+
+    // Thêm một dòng trống để phân cách trước khi ghi thông tin tổng hợp
+    rowNum++;
+
+    // Thêm thông tin tổng hợp vào cuối file
+    Row rowTongDoanhThu = sheet.createRow(rowNum++);
+    rowTongDoanhThu.createCell(0).setCellValue("Tổng doanh thu:");
+    rowTongDoanhThu.createCell(1).setCellValue(lblTongDoanhThu.getText()); // Lấy text từ Label
+
+    Row rowSoDon = sheet.createRow(rowNum++);
+    rowSoDon.createCell(0).setCellValue("Số đơn đã tạo:");
+    rowSoDon.createCell(1).setCellValue(lblSoDonDaTao.getText());
+
+    Row rowSoMon = sheet.createRow(rowNum++);
+    rowSoMon.createCell(0).setCellValue("Số món bán ra:");
+    rowSoMon.createCell(1).setCellValue(lblSoMonBanRa.getText());
+    
+    Row rowNguoiXuat = sheet.createRow(rowNum++);
+    rowNguoiXuat.createCell(0).setCellValue("Người xuất báo cáo:");
+    rowNguoiXuat.createCell(1).setCellValue(lblNguoiXuatBaoCao.getText());
 
     // Ghi ra file
     try (FileOutputStream fileOut = new FileOutputStream(file)) {
@@ -183,13 +203,5 @@ public class PreviewExcelBaoCaoUI {
             lblSoDonDaTao.setText("0");
             lblSoMonBanRa.setText("0");
         }
-    }
-
-    // Helper method to escape CSV special characters
-    private String escapeCsv(String data) {
-        if (data == null) return "";
-        // Escape double quotes by doubling them
-        String escapedData = data.replace("\"", "\"\"");
-        return escapedData;
     }
 }

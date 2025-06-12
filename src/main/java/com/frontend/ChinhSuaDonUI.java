@@ -1,5 +1,8 @@
 package com.frontend;
 
+import java.util.List;
+import java.util.Objects;
+
 import com.backend.dto.MonTrongDonDTO;
 import com.backend.utils.ImageUtils;
 
@@ -62,15 +65,42 @@ public class ChinhSuaDonUI {
     @FXML
     private void capNhat() {
         if (mon != null) {
-            int soLuong = soLuongSpinner.getValue();
-            String yeuCau = yeuCauKhacTextArea.getText();
-            int tamTinh = soLuong*mon.getDonGia();
+            int soLuongMoi = soLuongSpinner.getValue();
+            String yeuCauKhacMoi = yeuCauKhacTextArea.getText();
 
-            mon.setSoLuong(soLuong);
-            mon.setYeuCauKhac(yeuCau);
-            mon.setTamTinh(tamTinh);
+            // Cập nhật thông tin cho món hiện tại (this.mon)
+            // this.mon là một tham chiếu đến đối tượng trong danhSachMonTrongDon của ThucDonUI
+            this.mon.setSoLuong(soLuongMoi);
+            this.mon.setYeuCauKhac(yeuCauKhacMoi);
+            this.mon.setTamTinh(soLuongMoi * this.mon.getDonGia());
 
-            thucDonUI.layDanhSachMonTrongDon().set(monIndex, mon);
+            // Kiểm tra xem có món nào khác trong đơn hàng giống hệt món vừa sửa không để gộp
+            List<MonTrongDonDTO> danhSachHienTai = thucDonUI.layDanhSachMonTrongDon();
+            MonTrongDonDTO monCanGopVao = null;
+            int indexMonGoc = this.monIndex; // Lưu lại index của món đang sửa
+
+            for (int i = 0; i < danhSachHienTai.size(); i++) {
+                if (i == indexMonGoc) { // Bỏ qua chính nó
+                    continue;
+                }
+                MonTrongDonDTO monKiemTra = danhSachHienTai.get(i);
+                if (monKiemTra.getMaMon().equals(this.mon.getMaMon()) &&
+                    Objects.equals(monKiemTra.getYeuCauKhac(), this.mon.getYeuCauKhac())) {
+                    monCanGopVao = monKiemTra;
+                    break;
+                }
+            }
+
+            if (monCanGopVao != null) {
+                // Gộp số lượng và xóa món gốc đã sửa
+                monCanGopVao.setSoLuong(monCanGopVao.getSoLuong() + this.mon.getSoLuong());
+                monCanGopVao.setTamTinh(monCanGopVao.getSoLuong() * monCanGopVao.getDonGia());
+                danhSachHienTai.remove(this.mon); // Xóa món gốc (this.mon) vì đã gộp vào monCanGopVao
+            } else {
+                // Không có món nào để gộp, món đã được cập nhật tại vị trí monIndex (thông qua this.mon)
+                // Không cần làm gì thêm ở đây vì this.mon đã được cập nhật ở trên.
+            }
+
             thucDonUI.hienThiDanhSachMonTrongDon();
             thucDonUI.capNhatTongTien(thucDonUI.layDanhSachMonTrongDon());
 

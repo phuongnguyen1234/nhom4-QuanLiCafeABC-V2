@@ -3,27 +3,23 @@ package com.backend.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "ChiTietDonHang")
 public class ChiTietDonHang {
-    @EmbeddedId
-    private ChiTietDonHangId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "MaChiTietDonHang")
+    private int maChiTietDonHang;
 
     @ManyToOne
-    @MapsId("maDonHang")
-    @JoinColumn(name = "MaDonHang")
-    @JsonIgnore
-    private DonHang donHang;
-
-    @ManyToOne
-    @MapsId("maMon")
     @JoinColumn(name = "MaMon")
     @JsonIgnore
     private Mon mon;
@@ -43,25 +39,26 @@ public class ChiTietDonHang {
     @Column(name = "TamTinh")
     private int tamTinh;
 
+    @ManyToOne
+    @JoinColumn(name = "MaDonHang")
+    @JsonIgnore
+    private DonHang donHang;
+
     public ChiTietDonHang(){}
 
-    public ChiTietDonHang(DonHang donHang, Mon mon, String tenMon, int donGia, int soLuong, String yeuCauKhac, int tamTinh) {
-        this.donHang = donHang;
-        this.mon = mon;
-        this.tenMon = tenMon;
+   public ChiTietDonHang(Mon mon, String tenMon, int donGia, int soLuong, String yeuCauKhac, int tamTinh) {
         this.donGia = donGia;
         this.soLuong = soLuong;
         this.yeuCauKhac = yeuCauKhac;
         this.tamTinh = tamTinh;
-        this.id = new ChiTietDonHangId(donHang.getMaDonHang(), mon.getMaMon());
     }
 
-    public ChiTietDonHangId getId() {
-        return id;
+    public int getMaChiTietDonHang() {
+        return maChiTietDonHang;
     }
 
-    public void setId(ChiTietDonHangId id) {
-        this.id = id;
+    public void setMaChiTietDonHang(int maChiTietDonHang) {
+        this.maChiTietDonHang = maChiTietDonHang;
     }
 
     public DonHang getDonHang() {

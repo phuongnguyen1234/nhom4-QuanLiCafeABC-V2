@@ -6,8 +6,20 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import com.backend.dto.NhanVienDTO;
+import com.backend.model.DanhMuc;
+import com.backend.model.Mon;
 import com.backend.quanlicapheabc.QuanlicapheabcApplication;
 import com.backend.utils.ImageUtils;
 import com.backend.utils.MessageUtils;
@@ -26,6 +38,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import com.fasterxml.jackson.core.type.TypeReference; // Thêm import
+import com.fasterxml.jackson.databind.ObjectMapper; // Thêm import
 
 public class TrangChuUI {
     @FXML
@@ -49,6 +63,11 @@ public class TrangChuUI {
     private NhanVienDTO currentUser; // Lưu thông tin người dùng hiện tại
     private Object currentCenterController; // Để lưu controller của view đang hiển thị ở center
 
+    // Cache dữ liệu thực đơn
+    private List<DanhMuc> cachedAllDanhMucWithItems = null;
+    private final Map<String, Image> cachedMonImageCache = new HashMap<>();
+    private final ObjectMapper objectMapperTrangChu = new ObjectMapper(); // ObjectMapper riêng cho TrangChuUI nếu cần
+
     public NhanVienDTO getNhanVien(){
         return this.currentUser;
     }
@@ -63,36 +82,25 @@ public class TrangChuUI {
 
     // Phương thức helper để tải FXML và quản lý lifecycle của controller
     private void loadCenterContent(String fxmlPath) {
-        // Gọi shutdownExecutor của controller cũ nếu đó là ThucDonUI
-        if (currentCenterController instanceof ThucDonUI) {
-            ((ThucDonUI) currentCenterController).shutdownExecutor();
-        }
-        // Thêm các kiểm tra tương tự nếu các controller khác cũng có executor cần đóng
-        // else if (currentCenterController instanceof AnotherControllerWithExecutor) {
-        //     ((AnotherControllerWithExecutor) currentCenterController).shutdownExecutor();
-        // }
-
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Node content = loader.load();
             currentCenterController = loader.getController(); // Lưu controller mới
 
             // Cấu hình cho controller mới dựa trên loại của nó
-            if (currentCenterController instanceof ThucDonUI) {
-                ThucDonUI thucDonControllerInstance = (ThucDonUI) currentCenterController;
-                thucDonControllerInstance.setTrangChuUI(this);
-                if (currentUser != null) {
-                    thucDonControllerInstance.setNhanVienDTO(currentUser);
-                    boolean coQuyenQuanLiThucDon = "CHỦ_QUÁN".equalsIgnoreCase(currentUser.getViTri().toUpperCase().replace(" ", "_"));
-                    thucDonControllerInstance.setQuyenQuanLiThucDon(coQuyenQuanLiThucDon);
-                }
-            } else if (currentCenterController instanceof HoaDonUI) {
+            // Việc truyền dữ liệu cho ThucDonUI sẽ được xử lý trong phương thức thucDon()
+            // Các controller khác vẫn cấu hình như cũ
+            if (currentCenterController instanceof HoaDonUI) {
                 HoaDonUI hoaDonControllerInstance = (HoaDonUI) currentCenterController;
                 if (currentUser != null) {
                     hoaDonControllerInstance.setCurrentUser(currentUser);
                 }
             }
             // Thêm các cấu hình cho các loại controller khác nếu cần
+            else if (currentCenterController instanceof ThongKeUI) {
+                ThongKeUI thongKeControllerInstance = (ThongKeUI) currentCenterController;
+                thongKeControllerInstance.setTrangChuUI(this);
+            }
 
             mainBorderPane.setCenter(content);
         } catch (Exception e) {
@@ -103,7 +111,138 @@ public class TrangChuUI {
 
     @FXML
     public void thucDon() {
-        loadCenterContent("/fxml/main_screen/thucDon.fxml");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_screen/thucDon.fxml"));
+            Node content = loader.load();
+            ThucDonUI thucDonController = loader.getController();
+            
+            setupThucDonController(thucDonController); // Cấu hình cơ bản (truyền user, set quyền)
+            mainBorderPane.setCenter(content);
+            currentCenterController = thucDonController; // Cập nhật controller hiện tại
+
+            // Task để tải/làm mới dữ liệu thực đơn và ảnh
+            Task<Void> dataLoadTask = new Task<>() {
+                List<DanhMuc> fetchedDataTask; // Sử dụng biến cục bộ cho task
+                Map<String, Image> imageCacheForThisLoadTask = new HashMap<>(); // Cache ảnh cho lần tải/refresh này
+
+                @Override
+                protected Void call() throws Exception {
+                    if (cachedAllDanhMucWithItems == null) { // Lần đầu tải
+                        fetchedDataTask = layDanhSachDanhMucFromServer();
+                        // Tải ảnh mặc định
+                        Image defaultImg = ImageUtils.loadFromResourcesOrDefault(null, ThucDonUI.DEFAULT_MON_IMAGE_PATH_STATIC);
+                        if (defaultImg != null) {
+                            imageCacheForThisLoadTask.put(ThucDonUI.DEFAULT_MON_IMAGE_PATH_STATIC, defaultImg);
+                        }
+                        // Thu thập và tải các ảnh khác
+                        Set<String> imagePathsToLoad = new HashSet<>();
+                        for (DanhMuc dm : fetchedDataTask) {
+                            if (dm.getMonList() != null) {
+                                for (Mon mon : dm.getMonList()) {
+                                    String imagePath = mon.getAnhMinhHoa();
+                                    if (imagePath != null && !imagePath.isEmpty() && !imageCacheForThisLoadTask.containsKey(imagePath)) {
+                                        imagePathsToLoad.add(imagePath);
+                                    }
+                                }
+                            }
+                        }
+                        Map<String, Image> newlyLoadedImages = loadImagesInParallel(imagePathsToLoad, ThucDonUI.DEFAULT_MON_IMAGE_PATH_STATIC);
+                        imageCacheForThisLoadTask.putAll(newlyLoadedImages);
+                    } else { // Làm mới dữ liệu
+                        fetchedDataTask = layDanhSachDanhMucFromServer(); // Lấy dữ liệu mới nhất
+                        
+                        // Đảm bảo ảnh mặc định có trong imageCacheForThisLoadTask nếu nó chưa có trong cache chính
+                        if (!cachedMonImageCache.containsKey(ThucDonUI.DEFAULT_MON_IMAGE_PATH_STATIC) &&
+                            !imageCacheForThisLoadTask.containsKey(ThucDonUI.DEFAULT_MON_IMAGE_PATH_STATIC)) {
+                            Image defaultImg = ImageUtils.loadFromResourcesOrDefault(null, ThucDonUI.DEFAULT_MON_IMAGE_PATH_STATIC);
+                            if (defaultImg != null) {
+                                imageCacheForThisLoadTask.put(ThucDonUI.DEFAULT_MON_IMAGE_PATH_STATIC, defaultImg);
+                            }
+                        }
+                        
+                        // Thu thập các ảnh mới hoặc thay đổi cần tải
+                        Set<String> imagePathsToLoad = new HashSet<>();
+                        for (DanhMuc dm : fetchedDataTask) {
+                            if (dm.getMonList() != null) {
+                                for (Mon mon : dm.getMonList()) {
+                                    String imagePath = mon.getAnhMinhHoa();
+                                    if (imagePath != null && !imagePath.isEmpty() && 
+                                        !cachedMonImageCache.containsKey(imagePath) && 
+                                        !imageCacheForThisLoadTask.containsKey(imagePath)) {
+                                        imagePathsToLoad.add(imagePath);
+                                    }
+                                }
+                            }
+                        }
+                        Map<String, Image> newlyLoadedImages = loadImagesInParallel(imagePathsToLoad, ThucDonUI.DEFAULT_MON_IMAGE_PATH_STATIC);
+                        imageCacheForThisLoadTask.putAll(newlyLoadedImages);
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void succeeded() {
+                    if (cachedAllDanhMucWithItems == null) { // Lần đầu
+                        cachedAllDanhMucWithItems = new ArrayList<>(fetchedDataTask);
+                        cachedMonImageCache.clear(); 
+                        cachedMonImageCache.putAll(imageCacheForThisLoadTask); 
+                    } else { // Làm mới
+                        cachedAllDanhMucWithItems = new ArrayList<>(fetchedDataTask); 
+                        cachedMonImageCache.putAll(imageCacheForThisLoadTask); // Thêm các ảnh mới/thay đổi vào cache chính
+                        
+                        // Tùy chọn: Dọn dẹp cachedMonImageCache - loại bỏ ảnh không còn được tham chiếu
+                        // (logic dọn dẹp có thể thêm ở đây nếu cần)
+                    }
+                    // Gọi populateThucDon trên controller của ThucDonUI đã được hiển thị
+                    thucDonController.populateThucDon(new ArrayList<>(cachedAllDanhMucWithItems), new HashMap<>(cachedMonImageCache));
+                }
+
+                @Override
+                protected void failed() {
+                    getException().printStackTrace();
+                    // Yêu cầu ThucDonUI hiển thị lỗi bên trong nó
+                    //thucDonController.showError("Lỗi tải dữ liệu thực đơn! Vui lòng thử lại.");
+                }
+            };
+            new Thread(dataLoadTask).start();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Phương thức phụ trợ để tải ảnh song song
+    private Map<String, Image> loadImagesInParallel(Set<String> imagePaths, String defaultImagePathForFallback) {
+        Map<String, Image> loadedImages = new HashMap<>();
+        if (imagePaths == null || imagePaths.isEmpty()) {
+            return loadedImages;
+        }
+
+        int coreCount = Runtime.getRuntime().availableProcessors();
+        int poolSize = Math.min(imagePaths.size(), Math.max(1, coreCount));
+        ExecutorService executor = Executors.newFixedThreadPool(poolSize);
+        List<Future<Map.Entry<String, Image>>> futures = new ArrayList<>();
+
+        for (String path : imagePaths) {
+            Future<Map.Entry<String, Image>> future = executor.submit(() -> {
+                Image loadedImage = ImageUtils.loadFromResourcesOrDefault(path, defaultImagePathForFallback);
+                return loadedImage != null ? Map.entry(path, loadedImage) : null;
+            });
+            futures.add(future);
+        }
+
+        for (Future<Map.Entry<String, Image>> future : futures) {
+            try {
+                Map.Entry<String, Image> entry = future.get(); // Chờ và lấy kết quả
+                if (entry != null) {
+                    loadedImages.put(entry.getKey(), entry.getValue());
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                System.err.println("Lỗi khi tải ảnh song song cho một đường dẫn (trong helper): " + e.getMessage());
+            }
+        }
+        executor.shutdown();
+        return loadedImages;
     }
 
 
@@ -122,10 +261,19 @@ public class TrangChuUI {
         loadCenterContent("/fxml/main_screen/bangLuong.fxml");
     }
 
-
     @FXML
-    private void thongKe() {
+    public void thongKe() {
         loadCenterContent("/fxml/main_screen/thongKe.fxml");
+    }
+
+    // Helper để cấu hình ThucDonUI
+    private void setupThucDonController(ThucDonUI controller) {
+        controller.setTrangChuUI(this);
+        if (currentUser != null) {
+            controller.setNhanVienDTO(currentUser);
+            boolean coQuyenQuanLiThucDon = "CHỦ_QUÁN".equalsIgnoreCase(currentUser.getViTri().toUpperCase().replace(" ", "_"));
+            controller.setQuyenQuanLiThucDon(coQuyenQuanLiThucDon);
+        }
     }
 
     // Phương thức này sẽ được gọi từ DangNhapUI sau khi đăng nhập thành công
@@ -187,10 +335,6 @@ public class TrangChuUI {
 
                         closeLogoutTask.setOnSucceeded(e -> {
                             System.out.println(closeLogoutTask.getValue() ? "Đăng xuất tự động khi đóng cửa sổ thành công." : "Đăng xuất tự động khi đóng cửa sổ không thành công từ server (nếu có user).");
-                            // Đóng executor của controller hiện tại nếu là ThucDonUI
-                            if (currentCenterController instanceof ThucDonUI) {
-                                ((ThucDonUI) currentCenterController).shutdownExecutor();
-                            }
                             Platform.exit(); // Đóng ứng dụng JavaFX
                             System.exit(0);  // Đảm bảo tiến trình Java thoát hoàn toàn
                         });
@@ -205,6 +349,23 @@ public class TrangChuUI {
                     });
                 }
             });
+        }
+    }
+
+    // Phương thức tải danh mục từ server (tương tự như trong ThucDonUI cũ)
+    private List<DanhMuc> layDanhSachDanhMucFromServer() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI("http://localhost:8080/danh-muc/all"))
+                .GET()
+                .timeout(Duration.ofSeconds(15)) // Có thể tăng timeout nếu cần
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() == 200) {
+            // Sử dụng objectMapperTrangChu đã khai báo ở class level
+            return objectMapperTrangChu.readValue(response.body(), new TypeReference<List<DanhMuc>>() {});
+        } else {
+            throw new IOException("HTTP Error: " + response.statusCode() + " - " + response.body());
         }
     }
 

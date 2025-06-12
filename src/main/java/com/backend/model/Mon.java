@@ -38,11 +38,9 @@ public class Mon {
     private DanhMuc danhMuc;
 
     @ManyToMany
-    @JoinTable(
-        name = "ChiTietDonHang",
-        joinColumns = @JoinColumn(name = "MaMon"),
-        inverseJoinColumns = @JoinColumn(name = "MaDonHang")
-    )
+    @JoinTable(name = "ChiTietDonHang",
+            joinColumns = @JoinColumn(name = "MaMon"), // Cột trong ChiTietDonHang tham chiếu đến Mon (bảng hiện tại)
+            inverseJoinColumns = @JoinColumn(name = "MaDonHang")) // Cột trong ChiTietDonHang tham chiếu đến DonHang (bảng đối diện)
     @JsonIgnore
     private List<DonHang> donHangList;
 

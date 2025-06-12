@@ -14,11 +14,11 @@
       <TableView fx:id="tableViewDanhMuc" layoutX="10.0" layoutY="60.0" prefHeight="465.0" prefWidth="780.0" styleClass="table-view-quan-li" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
          <columns>
             <TableColumn fx:id="colSTT" editable="false" prefWidth="49.0" resizable="false" sortable="false" text="STT" />
-            <TableColumn fx:id="colMaDanhMuc" prefWidth="124.0" resizable="false" text="Mã danh mục" />
-            <TableColumn fx:id="colTenDanhMuc" prefWidth="201.0" resizable="false" text="Tên danh mục" />
-            <TableColumn fx:id="colLoai" prefWidth="121.0" text="Loại" />
-            <TableColumn fx:id="colTrangThai" prefWidth="140.0" resizable="false" text="Trạng thái" />
-            <TableColumn fx:id="colHanhDong" prefWidth="143.0" resizable="false" />
+            <TableColumn fx:id="colMaDanhMuc" editable="false" prefWidth="124.0" resizable="false" sortable="false" text="Mã danh mục" />
+            <TableColumn fx:id="colTenDanhMuc" editable="false" prefWidth="201.0" resizable="false" sortable="false" text="Tên danh mục" />
+            <TableColumn fx:id="colLoai" editable="false" prefWidth="121.0" sortable="false" text="Loại" />
+            <TableColumn fx:id="colTrangThai" editable="false" prefWidth="140.0" resizable="false" sortable="false" text="Trạng thái" />
+            <TableColumn fx:id="colHanhDong" editable="false" prefWidth="143.0" resizable="false" sortable="false" />
          </columns>
       </TableView>
       <HBox layoutX="275.0" layoutY="541.0" spacing="10.0">

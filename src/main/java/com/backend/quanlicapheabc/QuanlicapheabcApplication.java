@@ -1,15 +1,17 @@
 package com.backend.quanlicapheabc;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +23,7 @@ import javafx.stage.Stage;
 @EnableJpaRepositories(basePackages = "com.backend.repository")
 @EntityScan(basePackages = "com.backend.model")
 @ComponentScan(basePackages = {"com.backend.control", "com.backend.service", "com.backend.config"})
+@EnableScheduling // Thêm annotation này để kích hoạt scheduling
 public class QuanlicapheabcApplication extends Application {
 
     private ConfigurableApplicationContext springContext;

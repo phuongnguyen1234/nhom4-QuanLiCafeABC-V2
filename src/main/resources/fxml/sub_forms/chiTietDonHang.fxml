@@ -42,12 +42,12 @@
             <!--chi tiết hóa đơn-->
             <TableView fx:id="tableChiTietDonHang" prefHeight="550.0" prefWidth="570.0">
                <columns>
-                  <TableColumn fx:id="colSTT" prefWidth="34.0" resizable="false" text="STT" />
-                  <TableColumn fx:id="colTenMon" prefWidth="169.0" resizable="false" text="Tên món" />
-                  <TableColumn fx:id="colYeuCauKhac" prefWidth="139.0" resizable="false" text="Yêu cầu khác" />
-                  <TableColumn fx:id="colSoLuong" prefWidth="65.0" resizable="false" text="Số lượng" />
-                  <TableColumn fx:id="colDonGia" prefWidth="82.0" resizable="false" text="Đơn giá" />
-                  <TableColumn fx:id="colTamTinh" prefWidth="79.0" resizable="false" text="Tạm tính" />
+                  <TableColumn fx:id="colSTT" editable="false" prefWidth="34.0" resizable="false" sortable="false" text="STT" />
+                  <TableColumn fx:id="colTenMon" editable="false" prefWidth="169.0" resizable="false" sortable="false" text="Tên món" />
+                  <TableColumn fx:id="colYeuCauKhac" editable="false" prefWidth="139.0" resizable="false" sortable="false" text="Yêu cầu khác" />
+                  <TableColumn fx:id="colSoLuong" editable="false" prefWidth="65.0" resizable="false" sortable="false" text="Số lượng" />
+                  <TableColumn fx:id="colDonGia" editable="false" prefWidth="82.0" resizable="false" sortable="false" text="Đơn giá" />
+                  <TableColumn fx:id="colTamTinh" editable="false" prefWidth="79.0" resizable="false" sortable="false" text="Tạm tính" />
                </columns>
             </TableView>
 

@@ -59,7 +59,7 @@
 
 .table-cell{
     -fx-font-family: "Open Sans";
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
     -fx-alignment: center;
 }
 
@@ -121,4 +121,8 @@
     -fx-border-radius: 3px;
     -fx-text-fill: #fff;
     -fx-cursor: hand;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #286155; /* Màu thanh trượt */
 }

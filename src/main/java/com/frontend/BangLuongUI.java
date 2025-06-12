@@ -12,16 +12,19 @@ import java.util.stream.IntStream;
 
 import com.backend.dto.BangLuongDTO;
 import com.backend.quanlicapheabc.QuanlicapheabcApplication;
+import com.backend.utils.JavaFXUtils;
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -29,13 +32,16 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.text.Text; // Thêm import này
+import javafx.scene.paint.Color; // Thêm import này
+import javafx.scene.layout.AnchorPane; // Thêm nếu có AnchorPane gốc
 import javafx.scene.text.Font;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class BangLuongUI {
@@ -60,6 +66,9 @@ public class BangLuongUI {
     @FXML
     private Button btnTaoBangLuong;
 
+    @FXML
+    private AnchorPane mainAnchorPane; // Thêm fx:id="mainAnchorPane" cho AnchorPane gốc trong FXML
+
     private final HttpClient client = HttpClient.newBuilder()
             .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
             .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
@@ -71,9 +80,8 @@ public class BangLuongUI {
     private final ObservableList<BangLuongDTO> bangLuongList = FXCollections.observableArrayList();
 
     public void initialize() {
-        Label label = new Label("Đang tải...");
-        label.setFont(Font.font("Open Sans", 18));
-        tableViewBangLuong.setPlaceholder(label);
+        // Đặt placeholder và vô hiệu hóa controls ngay từ đầu
+        tableViewBangLuong.setPlaceholder(JavaFXUtils.createPlaceholder("Đang tải...", "/icons/loading.png"));
 
         // Link columns with data from getters
         colMaBangLuong.setCellValueFactory(new PropertyValueFactory<>("maBangLuong"));
@@ -85,6 +93,50 @@ public class BangLuongUI {
         colThuongDoanhThu.setCellValueFactory(new PropertyValueFactory<>("thuongDoanhThu"));
         colLuongThucNhan.setCellValueFactory(new PropertyValueFactory<>("luongThucNhan"));
         colGhiChu.setCellValueFactory(new PropertyValueFactory<>("ghiChu"));
+        // Tùy chỉnh CellFactory cho cột Ghi Chú để wrap text
+        colGhiChu.setCellFactory(column -> {
+            return new TableCell<BangLuongDTO, String>() {
+                private final Text text = new Text();
+
+                {
+                    text.wrappingWidthProperty().bind(column.widthProperty().subtract(10)); // Trừ đi một chút padding
+                    setGraphic(text);
+                    setPrefHeight(USE_COMPUTED_SIZE); // Cho phép cell tự điều chỉnh chiều cao
+                    text.setFont(Font.font("Open Sans", 16)); // Bỏ dòng này để font chữ đồng bộ với các cột khác
+
+                    // Listener để cập nhật màu chữ khi trạng thái selected thay đổi
+                    selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+                        if (text.getText() != null && !text.getText().isEmpty()) { // Chỉ đổi màu nếu có text
+                            text.setFill(isNowSelected ? Color.WHITE : Color.BLACK);
+                        }
+                    });
+                }
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        text.setText(null);
+                    } else {
+                        text.setText(item);
+                        // Đặt màu chữ ban đầu khi cell được render hoặc item thay đổi
+                        text.setFill(isSelected() ? Color.WHITE : Color.BLACK); 
+                    }
+                }
+            };
+        });
+
+        colLuongThucNhan.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("%,d", item)); // Hiển thị 1000000 thành 1,000,000
+                }
+            }
+        });
 
         // Cấu hình cột hành động với nút "Sửa"
         colHanhDong.setCellFactory(col -> new TableCell<>() {
@@ -141,7 +193,10 @@ public class BangLuongUI {
             capNhatTrang(newIndex.intValue());
         });
 
+        JavaFXUtils.disableHorizontalScrollBar(tableViewBangLuong);
+
         // Tải dữ liệu ban đầu khi khởi tạo giao diện
+        setControlsDisabled(true); // Vô hiệu hóa trước khi tải
         loc();
     }
 
@@ -157,13 +212,11 @@ public class BangLuongUI {
             controller.setBangLuong(bangLuong);
     
             // Tạo và hiển thị dialog
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL); // Modal dialog
-            stage.setTitle("Sửa bảng lương " + bangLuong.getMaBangLuong());
-            // Kích thước có thể cần điều chỉnh cho phù hợp với nội dung của chinhSuaBangLuong.fxml
-            stage.setScene(new Scene(root)); 
-            stage.setResizable(false);
-            stage.show();
+            Stage stage = JavaFXUtils.createDialog("Sửa bảng lương " + bangLuong.getMaBangLuong(), root, null);
+            stage.showAndWait();
+            if (controller.isDataChanged()) { // Kiểm tra xem có thay đổi không
+                loc(); // Tải lại dữ liệu nếu có thay đổi
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -174,6 +227,12 @@ public class BangLuongUI {
         bangLuongList.clear();
         bangLuongList.addAll(danhSachBangLuong);
     
+        // Cập nhật placeholder dựa trên kết quả
+        if (bangLuongList.isEmpty()) {
+            tableViewBangLuong.setPlaceholder(JavaFXUtils.createPlaceholder("Không có dữ liệu", "/icons/no-data.png"));
+        } else {
+            tableViewBangLuong.setPlaceholder(null); // Xóa placeholder khi có dữ liệu
+        }
         int soTrang = (int) Math.ceil((double) danhSachBangLuong.size() / SO_DONG_MOI_TRANG);
         phanTrang.setPageCount(soTrang);
         phanTrang.setCurrentPageIndex(0);
@@ -196,8 +255,8 @@ public class BangLuongUI {
     @FXML
     private void taoBangLuong() {
         // Vô hiệu hóa UI tạm thời
-        tableViewBangLuong.setDisable(true);
-        phanTrang.setDisable(true);
+        setControlsDisabled(true);
+
 
         Task<String> task = new Task<>() {
             @Override
@@ -219,21 +278,18 @@ public class BangLuongUI {
             String responseMessage = task.getValue(); // lấy thông báo trả về từ server
             MessageUtils.showInfoMessage(responseMessage); // hiển thị thông báo đúng nội dung
             loc(); // Tải lại danh sách bảng lương sau khi tạo
-            tableViewBangLuong.setDisable(false);
-            phanTrang.setDisable(false);
+            // setControlsDisabled(false); // Không cần thiết nếu loc() đã xử lý
         });
 
 
         task.setOnFailed(event -> {
             MessageUtils.showErrorMessage("Lỗi tạo bảng lương");
             task.getException().printStackTrace();
-            tableViewBangLuong.setDisable(false);
-            phanTrang.setDisable(false);
+            setControlsDisabled(false);
         });
 
         new Thread(task).start();
     }
-
     @FXML
     private void loc(){
         String thang = thangCombobox.getValue();
@@ -244,8 +300,7 @@ public class BangLuongUI {
             return;
         }
 
-        tableViewBangLuong.setDisable(true);
-        phanTrang.setDisable(true);
+        setControlsDisabled(true);
 
         Task<List<BangLuongDTO>> task = new Task<>() {
             @Override
@@ -265,17 +320,31 @@ public class BangLuongUI {
 
         task.setOnSucceeded(event -> {
             hienThiDanhSachBangLuong(task.getValue());
-            tableViewBangLuong.setDisable(false);
-            phanTrang.setDisable(false);
+            setControlsDisabled(false);
         });
 
         task.setOnFailed(event -> {
             MessageUtils.showErrorMessage("Lỗi khi load bảng lương");
             task.getException().printStackTrace();
-            tableViewBangLuong.setDisable(false);
-            phanTrang.setDisable(false);
+            setControlsDisabled(false);
+            // Hiển thị placeholder lỗi nếu cần
+            tableViewBangLuong.setPlaceholder(JavaFXUtils.createPlaceholder("Lỗi tải dữ liệu.", "/icons/error.png"));
         });
 
         new Thread(task).start();
     } 
+
+    private void setControlsDisabled(boolean disabled) {
+        Platform.runLater(() -> { // Đảm bảo chạy trên JavaFX Application Thread
+            if (mainAnchorPane != null) { // Nếu bạn đã thêm AnchorPane gốc và đặt fx:id
+                mainAnchorPane.setDisable(disabled);
+            } else { // Nếu không, disable từng control
+                tableViewBangLuong.setDisable(disabled);
+                thangCombobox.setDisable(disabled);
+                namCombobox.setDisable(disabled);
+                phanTrang.setDisable(disabled);
+                btnTaoBangLuong.setDisable(disabled);
+            }
+        });
+    }
 }

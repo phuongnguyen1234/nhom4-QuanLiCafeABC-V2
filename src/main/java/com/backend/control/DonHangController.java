@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.dto.DonHangDTO;
-import com.backend.model.DonHang;
 import com.backend.service.DonHangService;
 
 @RestController
@@ -29,8 +28,8 @@ public class DonHangController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<DonHang> createDonHang(@RequestBody DonHangDTO donHangDTO) {
-        DonHang createdDonHang = donHangService.createDonHang(donHangDTO);
+    public ResponseEntity<DonHangDTO> createDonHang(@RequestBody DonHangDTO donHangDTO) {
+        DonHangDTO createdDonHang = donHangService.createDonHang(donHangDTO);
         return ResponseEntity.status(201).body(createdDonHang); // HTTP 201 Created
     }
       // 2. Lấy đơn hàng theo ID

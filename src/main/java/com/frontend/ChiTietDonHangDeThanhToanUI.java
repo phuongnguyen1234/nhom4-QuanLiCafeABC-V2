@@ -9,9 +9,11 @@ import java.time.Duration;
 import com.backend.dto.DonHangDTO;
 import com.backend.dto.MonTrongDonDTO;
 import com.backend.quanlicapheabc.QuanlicapheabcApplication;
+import com.backend.utils.JavaFXUtils;
 import com.backend.utils.MessageUtils;
 import com.backend.utils.PdfUtils; // Import lớp tiện ích mới
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -64,7 +66,7 @@ public class ChiTietDonHangDeThanhToanUI {
             .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
             .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
             .build();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @FXML
     public void initialize() {
@@ -75,16 +77,7 @@ public class ChiTietDonHangDeThanhToanUI {
         colDonGia.setCellValueFactory(new PropertyValueFactory<>("donGia"));
         colTamTinh.setCellValueFactory(new PropertyValueFactory<>("tamTinh"));
 
-        Platform.runLater(() -> {
-            for (Node node : tableViewDonHang.lookupAll(".scroll-bar:horizontal")) {
-                if (node instanceof ScrollBar scrollBar) {
-                    scrollBar.setDisable(true);      // Vô hiệu hóa cuộn
-                    scrollBar.setOpacity(0);         // Ẩn khỏi mắt người dùng
-                    scrollBar.setPrefHeight(0);      // Không chiếm chỗ
-                    scrollBar.setMaxHeight(0);
-                }
-            }
-        });
+        JavaFXUtils.disableHorizontalScrollBar(tableViewDonHang);
 
         // Gắn dữ liệu TableView với danh sách món trong đơn
         tableViewDonHang.setItems(danhSachMonTrongDon);
@@ -120,15 +113,16 @@ public class ChiTietDonHangDeThanhToanUI {
             btnXacNhanThanhToan.setDisable(true);
             btnQuayLai.setDisable(true);
 
-            Task<Void> task = createDonHangTask(donHang);
+            Task<DonHangDTO> task = createDonHangTask(donHang); // Thay đổi kiểu Task
 
             task.setOnSucceeded(e -> {
+                DonHangDTO donHangDaTao = task.getValue(); // Lấy DonHangDTO đã được tạo từ server
                 mainAnchorPane.setDisable(false);
                 btnXacNhanThanhToan.setDisable(false);
                 btnQuayLai.setDisable(false);
                 MessageUtils.showInfoMessage("Tạo đơn thành công");
                 ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
-                PdfUtils.taoHoaDonPDF(donHang); // Gọi phương thức tiện ích để tạo PDF
+                PdfUtils.taoHoaDonPDF(donHangDaTao); // Sử dụng donHangDaTao có mã đơn hàng thật
                 thucDonUI.resetDonHang();
             });
 
@@ -161,10 +155,10 @@ public class ChiTietDonHangDeThanhToanUI {
         ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
     }
 
-    private Task<Void> createDonHangTask(DonHangDTO donHang) {
-        return new Task<Void>() {
+    private Task<DonHangDTO> createDonHangTask(DonHangDTO donHang) { // Thay đổi kiểu Task
+        return new Task<DonHangDTO>() { // Thay đổi kiểu Task
             @Override
-            protected Void call() throws Exception {
+            protected DonHangDTO call() throws Exception { // Thay đổi kiểu trả về của call()
                 String json = objectMapper.writeValueAsString(donHang);
                 System.out.println("JSON: " + json);
                 HttpRequest request = HttpRequest.newBuilder()
@@ -178,8 +172,8 @@ public class ChiTietDonHangDeThanhToanUI {
                 if (response.statusCode() != 201 && response.statusCode() != 200) {
                     throw new RuntimeException("Lỗi khi tạo đơn hàng. Mã trạng thái: " + response.statusCode());
                 }
-                return null;
-            }
+                // Parse response body để lấy DonHangDTO đã được tạo (bao gồm maDonHang)
+                return objectMapper.readValue(response.body(), DonHangDTO.class);            }
         };
     }
 

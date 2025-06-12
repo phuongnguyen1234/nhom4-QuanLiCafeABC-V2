@@ -1,19 +1,12 @@
 package com.frontend;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.backend.dto.DanhMucKhongMonDTO;
@@ -22,23 +15,18 @@ import com.backend.dto.MonTrongDonDTO;
 import com.backend.dto.NhanVienDTO;
 import com.backend.model.DanhMuc;
 import com.backend.model.Mon;
-import com.backend.quanlicapheabc.QuanlicapheabcApplication;
 import com.backend.utils.DTOConversion;
-import com.backend.utils.ImageUtils;
 import com.backend.utils.JavaFXUtils;
 import com.backend.utils.MessageUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -97,12 +85,6 @@ public class ThucDonUI {
 
     private NhanVienDTO nhanVien;
 
-    private final HttpClient client = HttpClient.newBuilder()
-            .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
-            .connectTimeout(Duration.ofSeconds(10)) // Optional: Thêm timeout
-            .build();
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     List<DanhMucKhongMonDTO> tatCaDanhMucList = new ArrayList<>();
 
     // Biến mới để lưu trữ tất cả DanhMuc với danh sách Món đầy đủ từ server
@@ -117,7 +99,10 @@ public class ThucDonUI {
         put("Khác", 3);
     }};
 
-    private final ExecutorService imageLoaderExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    // Cache để lưu trữ ảnh đã tải
+    private final Map<String, Image> monImageCache = new HashMap<>();
+    // Đổi thành public static final để TrangChuUI có thể truy cập
+    public static final String DEFAULT_MON_IMAGE_PATH_STATIC = "/icons/loading.png";
 
     public void setTrangChuUI(TrangChuUI trangChuUI) {
         this.trangChuUI = trangChuUI;
@@ -143,10 +128,13 @@ public class ThucDonUI {
     }
     @FXML
     public void initialize() {
-        //hien thi loading
+        //hien thi loading ban đầu
         loadingHbox.setVisible(true);
-        capNhatTrangThaiNutQuanLy();
+        vBoxThucDon.getChildren().clear(); // Xóa nội dung cũ nếu có
         danhMucCombobox.setDisable(true);
+        btnQuanLiThucDon.setDisable(true); // Nút quản lý cũng disable ban đầu
+        btnThanhToan.setDisable(true); // Nút thanh toán disable ban đầu
+
         tableViewDatHang.setPlaceholder(JavaFXUtils.createPlaceholder("Đơn trống!", "/icons/sad.png"));
 
         // Cấu hình các cột trong TableView
@@ -186,53 +174,6 @@ public class ThucDonUI {
             column.setReorderable(false);
         });
 
-        //khoi tao comboBox
-        Task<List<DanhMuc>> loadDanhMucTask = new Task<>() {
-            @Override
-            protected List<DanhMuc> call() throws Exception {
-                return layDanhSachDanhMuc();
-            }
-        };
-    
-        loadDanhMucTask.setOnSucceeded(e -> {
-            List<DanhMuc> fetchedDanhMucWithItems = loadDanhMucTask.getValue();
-            this.allDanhMucWithItems.clear();
-            this.allDanhMucWithItems.addAll(fetchedDanhMucWithItems);
-
-            // Populate tatCaDanhMucList (List<DanhMucKhongMonDTO>) for QuanLiThucDonUI and other potential uses
-            this.tatCaDanhMucList.clear();
-            for (DanhMuc dm : this.allDanhMucWithItems) {
-                this.tatCaDanhMucList.add(new DanhMucKhongMonDTO(dm.getMaDanhMuc(), dm.getTenDanhMuc(), dm.getLoai(), dm.getTrangThai()));
-            }
-
-            // Prepare ComboBox items: active DanhMucKhongMonDTOs, sorted
-            List<DanhMucKhongMonDTO> danhMucKhongMonHoatDongList = this.allDanhMucWithItems.stream()
-                .filter(dm -> !"Ngừng hoạt động".equalsIgnoreCase(dm.getTrangThai()))
-                .map(dm -> new DanhMucKhongMonDTO(dm.getMaDanhMuc(), dm.getTenDanhMuc(), dm.getLoai(), dm.getTrangThai()))
-                .sorted(Comparator.comparing(dto -> loaiUuTienMap.getOrDefault(dto.getLoai(), Integer.MAX_VALUE)))
-                .collect(Collectors.toList());
-
-            List<DanhMucKhongMonDTO> danhMucHienThiCombobox = new ArrayList<>();
-            danhMucHienThiCombobox.add(danhMucTatCa);
-            danhMucHienThiCombobox.addAll(danhMucKhongMonHoatDongList);
-
-            danhMucCombobox.setItems(FXCollections.observableArrayList(danhMucHienThiCombobox));
-            danhMucCombobox.setValue(danhMucTatCa);
-            // Ẩn label loading
-            loadingHbox.setVisible(false);
-
-            // Initial menu display: active DanhMuc with items, sorted
-            List<DanhMuc> danhMucCoMonHoatDongList = this.allDanhMucWithItems.stream()
-                .filter(dm -> !"Ngừng hoạt động".equalsIgnoreCase(dm.getTrangThai()))
-                .sorted(Comparator.comparing(dm -> loaiUuTienMap.getOrDefault(dm.getLoai(), Integer.MAX_VALUE)))
-                .collect(Collectors.toList());
-            hienThiThucDon(danhMucCoMonHoatDongList);
-
-            loadingHbox.setVisible(false); // Đánh dấu danh mục đã tải xong
-            capNhatTrangThaiNutQuanLy(); // Cập nhật lại trạng thái nút quản lý
-            danhMucCombobox.setDisable(false);
-        });
-
         danhMucCombobox.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(DanhMucKhongMonDTO item, boolean empty) {
@@ -249,49 +190,66 @@ public class ThucDonUI {
             }
         });
 
-        loadDanhMucTask.setOnFailed(e -> {   
-            // Cập nhật label trong HBox thành "Tải thất bại"
-            if (loadingHbox.getChildren().get(1) instanceof Label) {
-                ((Label) loadingHbox.getChildren().get(1)).setText("Tải thất bại");
-                ((ImageView) loadingHbox.getChildren().get(0)).setVisible(false);
-            }
-            loadingHbox.setVisible(true);
-            capNhatTrangThaiNutQuanLy(); // Cập nhật lại trạng thái nút (vẫn sẽ disable)
-            loadDanhMucTask.getException().printStackTrace();
-        });
-
-        Thread thread = new Thread(loadDanhMucTask);
-        thread.setDaemon(true);
-        thread.start();
-
-        // Xử lý sự kiện khi chọn danh mục
         danhMucCombobox.setOnAction(event -> {
             DanhMucKhongMonDTO selectedDanhMucDTO = danhMucCombobox.getValue();
             if (selectedDanhMucDTO == null || selectedDanhMucDTO == danhMucTatCa) {
-                // "Tất cả": hiển thị thực đơn cho các danh mục hoạt động (List<DanhMuc>), sorted
                 List<DanhMuc> activeDanhMucToDisplay = this.allDanhMucWithItems.stream()
                     .filter(dm -> !"Ngừng hoạt động".equalsIgnoreCase(dm.getTrangThai()))
                     .sorted(Comparator.comparing(dm -> loaiUuTienMap.getOrDefault(dm.getLoai(), Integer.MAX_VALUE)))
                     .collect(Collectors.toList());
                 hienThiThucDon(activeDanhMucToDisplay);
             } else {
-                // Specific DanhMucKhongMonDTO selected
-                // Find the corresponding DanhMuc object (with items) from allDanhMucWithItems
                 this.allDanhMucWithItems.stream()
                     .filter(dm -> dm.getMaDanhMuc() == selectedDanhMucDTO.getMaDanhMuc())
                     .findFirst()
                     .ifPresentOrElse(
                         danhMucWithItems -> hienThiThucDon(List.of(danhMucWithItems)),
-                        () -> hienThiThucDon(new ArrayList<>()) // Fallback: display nothing if not found
+                        () -> hienThiThucDon(new ArrayList<>()) 
                     );
             }
         });
 
-        // Gắn dữ liệu TableView với danh sách món trong đơn
         tableViewDatHang.setItems(danhSachMonTrongDon);
+        hienThiDanhSachMonTrongDon(); // Cập nhật trạng thái nút thanh toán
+        capNhatTrangThaiNutQuanLy(); // Cập nhật nút quản lý dựa trên quyền và trạng thái tải
+    }
+        
+    // Phương thức mới để nhận dữ liệu đã cache từ TrangChuUI
+    public void populateThucDon(List<DanhMuc> danhMucList, Map<String, Image> imageCache) {
+        this.allDanhMucWithItems.clear();
+        this.allDanhMucWithItems.addAll(danhMucList);
 
-        // Cập nhật trạng thái nút Thanh toán ban đầu (khi danh sách rỗng)
-        hienThiDanhSachMonTrongDon();
+        this.monImageCache.clear();
+        this.monImageCache.putAll(imageCache);
+
+        this.tatCaDanhMucList.clear();
+        for (DanhMuc dm : this.allDanhMucWithItems) {
+            this.tatCaDanhMucList.add(new DanhMucKhongMonDTO(dm.getMaDanhMuc(), dm.getTenDanhMuc(), dm.getLoai(), dm.getTrangThai()));
+        }
+
+        List<DanhMucKhongMonDTO> danhMucKhongMonHoatDongList = this.allDanhMucWithItems.stream()
+            .filter(dm -> !"Ngừng hoạt động".equalsIgnoreCase(dm.getTrangThai()))
+            .map(dm -> new DanhMucKhongMonDTO(dm.getMaDanhMuc(), dm.getTenDanhMuc(), dm.getLoai(), dm.getTrangThai()))
+            .sorted(Comparator.comparing(dto -> loaiUuTienMap.getOrDefault(dto.getLoai(), Integer.MAX_VALUE)))
+            .collect(Collectors.toList());
+
+        List<DanhMucKhongMonDTO> danhMucHienThiCombobox = new ArrayList<>();
+        danhMucHienThiCombobox.add(danhMucTatCa);
+        danhMucHienThiCombobox.addAll(danhMucKhongMonHoatDongList);
+
+        danhMucCombobox.setItems(FXCollections.observableArrayList(danhMucHienThiCombobox));
+        danhMucCombobox.setValue(danhMucTatCa);
+
+        List<DanhMuc> danhMucCoMonHoatDongList = this.allDanhMucWithItems.stream()
+            .filter(dm -> !"Ngừng hoạt động".equalsIgnoreCase(dm.getTrangThai()))
+            .sorted(Comparator.comparing(dm -> loaiUuTienMap.getOrDefault(dm.getLoai(), Integer.MAX_VALUE)))
+            .collect(Collectors.toList());
+        
+        hienThiThucDon(danhMucCoMonHoatDongList);
+        loadingHbox.setVisible(false);
+        capNhatTrangThaiNutQuanLy(); // Kích hoạt nút quản lý nếu có quyền
+        danhMucCombobox.setDisable(false);
+
     }
 
     public void sua(MonTrongDonDTO mon) {
@@ -348,11 +306,14 @@ public class ThucDonUI {
 
     public void hienThiThucDon(List<DanhMuc> danhMucList) {
         vBoxThucDon.setMaxHeight(Region.USE_COMPUTED_SIZE);
-        vBoxThucDon.getChildren().clear();
         scrollPaneThucDon.setFitToHeight(false);
+
+        List<Node> newCategoryNodes = new ArrayList<>();
 
         for (DanhMuc danhMuc : danhMucList) {
             List<Mon> danhSachMonBan = danhMuc.getMonList().stream()
+                    // Đảm bảo getMonList() không null trước khi stream
+                    .filter(Objects::nonNull) 
                     .filter(mon -> "Bán".equalsIgnoreCase(mon.getTrangThai()))
                     .collect(Collectors.toList());
 
@@ -380,8 +341,9 @@ public class ThucDonUI {
             }
 
             danhMucBox.getChildren().addAll(lblDanhMuc, gridPane);
-            vBoxThucDon.getChildren().add(danhMucBox);
+            newCategoryNodes.add(danhMucBox);
         }
+        vBoxThucDon.getChildren().setAll(newCategoryNodes); // Cập nhật một lần
     }
 
     @FXML
@@ -408,7 +370,7 @@ public class ThucDonUI {
             controller.setThucDonUI(this);
 
             // Hiển thị dialog
-            Stage stage = JavaFXUtils.createDialog("Hóa đơn", root, "/icons/invoice.png");
+            Stage stage = JavaFXUtils.createDialog("Đơn hàng", root, "/icons/invoice.png");
             stage.showAndWait();
         } catch (IOException e) {
             MessageUtils.showErrorMessage("Không thể mở hóa đơn.");
@@ -452,7 +414,6 @@ public class ThucDonUI {
         }
     }
 
-
     public void capNhatTongTien(List<MonTrongDonDTO> danhSachMonTrongDon) {
         int tongTien = 0;
         // Lặp qua từng món trong danh sách và tính tổng tiền
@@ -491,49 +452,35 @@ public class ThucDonUI {
         return danhSachMonTrongDon;
     }
 
-    private List<DanhMuc> layDanhSachDanhMuc() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI("http://localhost:8080/danh-muc/all"))
-                .GET()
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() == 200) {
-            return objectMapper.readValue(response.body(), new TypeReference<>() {});
-        } else {
-            throw new IOException("HTTP Error: " + response.statusCode());
-        }
-    }
-
     private VBox taoMonBox(Mon mon) {
         VBox monBox = new VBox(6);
         monBox.setPadding(new Insets(5, 0, 0, 0));
         monBox.setAlignment(Pos.TOP_CENTER);
         monBox.setPrefSize(160, 200);
         monBox.getStyleClass().addAll("white-bg", "shadow", "radius");
-
-        ImageView imageView = new ImageView(new Image(getClass().getResource("/icons/loading.png").toExternalForm()));
+        
+        ImageView imageView = new ImageView();
         imageView.setFitHeight(120);
         imageView.setFitWidth(120);
         imageView.setPreserveRatio(false);
 
-        // Tải ảnh trong một thread riêng
-        imageLoaderExecutor.submit(() -> {
-            String imagePath = mon.getAnhMinhHoa();
-            String defaultImagePath = "/icons/loading.png"; // Đảm bảo bạn có file này trong resources/icons
+        String imagePath = mon.getAnhMinhHoa();
+        Image imageToSet;
 
-            // Sử dụng ImageUtils để tải ảnh từ resource, với fallback
-            Image imageToLoad = ImageUtils.loadFromResourcesOrDefault(imagePath, defaultImagePath);
-
-            // Cập nhật ImageView trên UI thread
-            Platform.runLater(() -> {
-                if (imageToLoad != null) { // Chỉ set ảnh nếu tải thành công (chính hoặc mặc định)
-                    imageView.setImage(imageToLoad);
-                }
-                // Nếu imageToLoad là null (cả ảnh chính và mặc định đều lỗi), ImageView sẽ giữ ảnh "loading.png"
-            });
-        });
-
+        if (imagePath != null && !imagePath.isEmpty()) {
+            imageToSet = monImageCache.get(imagePath); // Lấy từ cache
+            // Nếu không có trong cache (trường hợp hiếm sau khi pre-load), hoặc imagePath không hợp lệ, lấy ảnh mặc định từ cache
+            if (imageToSet == null) {
+                imageToSet = monImageCache.get(DEFAULT_MON_IMAGE_PATH_STATIC);
+            }
+        } else { // imagePath là null hoặc rỗng
+            imageToSet = monImageCache.get(DEFAULT_MON_IMAGE_PATH_STATIC); // Lấy ảnh mặc định từ cache
+        }
+        if (imageToSet != null) {
+            imageView.setImage(imageToSet);
+        } else {
+            imageView.setImage(new Image(getClass().getResource("/icons/loading.png").toExternalForm())); // Fallback cuối cùng
+        }
         imageView.setCursor(Cursor.HAND);
         imageView.setOnMouseClicked(event -> hienThiFormThemMon(mon));
 
@@ -552,27 +499,5 @@ public class ThucDonUI {
 
         monBox.getChildren().addAll(imageView, vBoxText, donGiaText);
         return monBox;
-    }
-
-    /**
-     * Shuts down the imageLoaderExecutor.
-     * Should be called when this ThucDonUI instance is no longer needed.
-     */
-    public void shutdownExecutor() {
-        if (imageLoaderExecutor != null && !imageLoaderExecutor.isShutdown()) {
-            System.out.println("Shutting down ImageLoaderExecutor for ThucDonUI");
-            imageLoaderExecutor.shutdown(); // Disable new tasks from being submitted
-            try {
-                // Wait a while for existing tasks to terminate
-                if (!imageLoaderExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
-                    imageLoaderExecutor.shutdownNow(); // Cancel currently executing tasks
-                    if (!imageLoaderExecutor.awaitTermination(5, TimeUnit.SECONDS))
-                        System.err.println("ImageLoaderExecutor did not terminate in ThucDonUI");
-                }
-            } catch (InterruptedException ie) {
-                imageLoaderExecutor.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
-        }
     }
 }

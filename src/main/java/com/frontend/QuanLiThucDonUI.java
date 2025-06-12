@@ -18,19 +18,16 @@ import com.backend.utils.JavaFXUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Pagination;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -144,16 +141,7 @@ public class QuanLiThucDonUI {
 
         timMonTheoTenTextField.setOnAction(event -> timKiem());
 
-        Platform.runLater(() -> {
-            for (Node node : tableViewMon.lookupAll(".scroll-bar:horizontal")) {
-                if (node instanceof ScrollBar scrollBar) {
-                    scrollBar.setDisable(true);      // Vô hiệu hóa cuộn
-                    scrollBar.setOpacity(0);         // Ẩn khỏi mắt người dùng
-                    scrollBar.setPrefHeight(0);      // Không chiếm chỗ
-                    scrollBar.setMaxHeight(0);
-                }
-            }
-        });
+        JavaFXUtils.disableHorizontalScrollBar(tableViewMon);
 
     }
 

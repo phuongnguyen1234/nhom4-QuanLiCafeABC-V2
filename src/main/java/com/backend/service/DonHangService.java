@@ -5,11 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 import com.backend.dto.DonHangDTO;
-import com.backend.model.DonHang;
 import com.backend.model.NhanVien;
 
 public interface DonHangService {
-    DonHang createDonHang(DonHangDTO donHangDTO);
+    DonHangDTO createDonHang(DonHangDTO donHangDTO);
      List<DonHangDTO> getAllDonHang();
     
     // Mới: Lấy đơn hàng theo ID

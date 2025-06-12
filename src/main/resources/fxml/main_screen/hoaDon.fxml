@@ -23,19 +23,19 @@
          <children>
 
             <!-- Bảng dữ liệu -->
-            <TableView fx:id="tableDonHang" prefHeight="635.0" prefWidth="1300.0">
+            <TableView fx:id="tableDonHang" prefHeight="635.0" prefWidth="1300.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
                <columns>
-                  <TableColumn fx:id="colSTT" prefWidth="79.0" text="STT" />
-                  <TableColumn fx:id="colMaDonHang" prefWidth="208.0" text="Mã đơn hàng" />
-                  <TableColumn fx:id="colNhanVienTaoDon" prefWidth="229.0" text="Nhân viên tạo đơn" />
-                  <TableColumn fx:id="colTongTien" prefWidth="182.0" text="Tổng tiền" />
-                  <TableColumn fx:id="colThoiGianDat" prefWidth="412.0" text="Thời gian đặt hàng" />
-                  <TableColumn fx:id="colHanhDong" prefWidth="188.0" />
+                  <TableColumn fx:id="colSTT" editable="false" prefWidth="79.0" sortable="false" text="STT" />
+                  <TableColumn fx:id="colMaDonHang" editable="false" prefWidth="208.0" sortable="false" text="Mã đơn hàng" />
+                  <TableColumn fx:id="colNhanVienTaoDon" editable="false" prefWidth="229.0" sortable="false" text="Nhân viên tạo đơn" />
+                  <TableColumn fx:id="colTongTien" editable="false" prefWidth="182.0" sortable="false" text="Tổng tiền" />
+                  <TableColumn fx:id="colThoiGianDat" editable="false" prefWidth="412.0" sortable="false" text="Thời gian đặt hàng" />
+                  <TableColumn fx:id="colHanhDong" editable="false" prefWidth="188.0" sortable="false" />
                </columns>
             </TableView>
 
             <!--phan trang-->
-            <Pagination fx:id="phanTrang" layoutX="515.0" layoutY="640.0" maxPageIndicatorCount="5" pageCount="30" prefHeight="60.0" prefWidth="271.0" styleClass="font-size-20" />
+            <Pagination fx:id="phanTrang" layoutX="515.0" layoutY="640.0" maxPageIndicatorCount="1" pageCount="1" prefHeight="60.0" prefWidth="271.0" styleClass="font-size-20" />
          </children>
       </AnchorPane>
 

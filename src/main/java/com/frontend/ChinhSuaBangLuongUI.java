@@ -7,6 +7,7 @@ import java.time.Duration;
 
 import com.backend.dto.BangLuongDTO;
 import com.backend.quanlicapheabc.QuanlicapheabcApplication;
+import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -33,7 +34,7 @@ public class ChinhSuaBangLuongUI {
 
     private BangLuongDTO bangLuong;
 
-    private BangLuongUI bangLuongScreen;
+    private boolean dataChanged = false; // Biến để theo dõi thay đổi dữ liệu
 
     private final HttpClient client = HttpClient.newBuilder()
             .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
@@ -108,6 +109,8 @@ public class ChinhSuaBangLuongUI {
             Task<Void> updateTask = updateRequest();
             updateTask.setOnSucceeded(event -> {
                 setDisableItems(false);
+                this.dataChanged = true; // Đánh dấu dữ liệu đã thay đổi
+                MessageUtils.showInfoMessage("Cập nhật thành công");
                 // Đóng cửa sổ
                 maBangLuongText.getScene().getWindow().hide();
             });
@@ -117,6 +120,7 @@ public class ChinhSuaBangLuongUI {
                 Throwable e = updateTask.getException();
                 e.printStackTrace();
                 // Có thể hiện thông báo lỗi ở đây
+                MessageUtils.showErrorMessage("Lỗi khi cập nhật bảng lương!");
             });
 
             new Thread(updateTask).start();
@@ -155,6 +159,10 @@ public class ChinhSuaBangLuongUI {
                 return null;
             }
         };
+    }
+
+    public boolean isDataChanged() {
+        return dataChanged;
     }
 
 }
