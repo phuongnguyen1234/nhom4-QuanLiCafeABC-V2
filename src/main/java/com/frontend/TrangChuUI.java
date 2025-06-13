@@ -300,7 +300,17 @@ public class TrangChuUI {
                 if (currentStage != null) {
                     currentStage.setOnCloseRequest(event -> {
                         event.consume(); // Ngăn cửa sổ đóng ngay lập tức để xử lý đăng xuất
-
+                        boolean confirmed = MessageUtils.showConfirmationDialog(
+                    "Xác nhận đăng xuất",
+                    "Bạn có chắc chắn muốn đăng xuất?",
+                    "Tất cả phiên làm việc sẽ bị kết thúc.",
+                    "/icons/caution.png", // Đường dẫn đến icon đăng xuất
+                    getClass() // Sử dụng class để load resource
+                    );
+                    if (!confirmed) {
+                        return; // Nếu người dùng không xác nhận, không làm gì cả
+                    }
+                        
                         if (mainBorderPane != null) {
                             mainBorderPane.setDisable(true); // Vô hiệu hóa UI
                         }
@@ -395,6 +405,17 @@ public class TrangChuUI {
 
     @FXML
     private void dangXuat(ActionEvent event) {
+        boolean confirmed = MessageUtils.showConfirmationDialog(
+                "Xác nhận đăng xuất",
+                "Bạn có chắc chắn muốn đăng xuất?",
+                "Tất cả phiên làm việc sẽ bị kết thúc.",
+                "/icons/caution.png", // Đường dẫn đến icon đăng xuất
+                getClass() // Sử dụng class để load resource
+        );
+        if (!confirmed) {
+            return; // Nếu người dùng không xác nhận, không làm gì cả
+        }  
+
         // Vô hiệu hóa UI tạm thời
         if (mainBorderPane != null) {
             mainBorderPane.setDisable(true);
@@ -425,11 +446,14 @@ public class TrangChuUI {
                 try {
                     //  Xóa thông tin người dùng ở client
                     this.currentUser = null; 
-
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_screen/dangNhap.fxml"));
                     Parent root = loader.load();
                     Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                    currentStage.setOnCloseRequest(null); // Xóa handler đóng cửa sổ cũ
                     currentStage.setScene(new Scene(root));
+                    currentStage.centerOnScreen();
+                    currentStage.setResizable(false);
+                    currentStage.sizeToScene();
                     currentStage.setTitle("Đăng nhập");
                     currentStage.show();
                     System.out.println("Đăng xuất thành công!");

@@ -7,17 +7,14 @@ import com.backend.dto.DanhMucKhongMonDTO;
 import com.backend.utils.HttpUtils;
 import com.backend.utils.JavaFXUtils;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -169,6 +166,7 @@ public class QuanLiDanhMucUI {
     }
 
     private void setDisableItems(boolean disable) {
+        tableViewDanhMuc.setDisable(disable);
         btnThem.setDisable(disable);
         btnQuayLai.setDisable(disable);
     }

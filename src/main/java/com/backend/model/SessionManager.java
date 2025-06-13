@@ -4,10 +4,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionManager {
     // ConcurrentHashMap để lưu trữ thông tin của người dùng với sessionId là key
-    private static ConcurrentHashMap<String, NhanVien> userSessions = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, NhanVien> userSessions = new ConcurrentHashMap<>();
     
     // ThreadLocal để lưu trữ sessionId cho từng thread riêng biệt
-    private static ThreadLocal<String> currentSession = new ThreadLocal<>();
+    private static final ThreadLocal<String> currentSession = new ThreadLocal<>();
 
     // Thêm session mới vào userSessions
     public static void addSession(String sessionId, NhanVien nhanVien) {
@@ -37,17 +37,6 @@ public class SessionManager {
     // Lấy sessionId hiện tại
     public static String getCurrentSessionId() {
         return currentSession.get();
-    }
-
-    public static void dangXuatUserHienTai() {
-    /*NhanVien nhanVien = getNhanVienByCurrentSession();
-    if (nhanVien != null) {
-        try {
-            DangNhapController.capNhatTrangThaiHoatDong(nhanVien.getEmail(), "0");
-            removeSession(getCurrentSessionId());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } */
     }
 }
 

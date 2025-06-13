@@ -1,9 +1,6 @@
 package com.backend.service.impl;
 
-import com.backend.model.NhanVien;
-import com.backend.repository.NhanVienRepository;
-import com.backend.service.QuanLyPhienService;
-
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,9 +11,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-import java.util.List;
-import java.util.stream.Collectors;
+import com.backend.model.NhanVien;
+import com.backend.repository.NhanVienRepository;
+import com.backend.service.QuanLyPhienService;
 
 @Service
 public class QuanLyPhienServiceImpl implements QuanLyPhienService, UserDetailsService {
@@ -59,16 +56,4 @@ public class QuanLyPhienServiceImpl implements QuanLyPhienService, UserDetailsSe
                         true, // accountNonLocked
                          authorities); 
     }
-
-    // Bạn có thể thêm các phương thức khác của QuanLyPhienService ở đây nếu cần
-    // Ví dụ:
-    // public NhanVien getCurrentLoggedInUser() {
-    //     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    //     if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof UserDetails) {
-    //         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-    //         String email = userDetails.getUsername();
-    //         return nhanVienRepository.findByEmail(email).orElse(null);
-    //     }
-    //     return null;
-    // }
 }

@@ -30,12 +30,12 @@
                   <TableColumn fx:id="colNhanVienTaoDon" editable="false" prefWidth="229.0" sortable="false" text="Nhân viên tạo đơn" />
                   <TableColumn fx:id="colTongTien" editable="false" prefWidth="182.0" sortable="false" text="Tổng tiền" />
                   <TableColumn fx:id="colThoiGianDat" editable="false" prefWidth="412.0" sortable="false" text="Thời gian đặt hàng" />
-                  <TableColumn fx:id="colHanhDong" editable="false" prefWidth="188.0" sortable="false" />
+                  <TableColumn fx:id="colHanhDong" editable="false" prefWidth="168.0" sortable="false" />
                </columns>
             </TableView>
 
             <!--phan trang-->
-            <Pagination fx:id="phanTrang" layoutX="515.0" layoutY="640.0" maxPageIndicatorCount="1" pageCount="1" prefHeight="60.0" prefWidth="271.0" styleClass="font-size-20" />
+            <Pagination fx:id="phanTrang" layoutX="515.0" layoutY="640.0" maxPageIndicatorCount="5" pageCount="5" prefHeight="60.0" prefWidth="271.0" styleClass="font-size-20" />
          </children>
       </AnchorPane>
 

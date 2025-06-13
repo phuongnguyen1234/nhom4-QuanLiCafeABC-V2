@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="750.0" stylesheets="@dangNhapCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.DatLaiMatKhauUI">
+<AnchorPane fx:id="rootPaneDatLai" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="750.0" stylesheets="@../css/dangNhapCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.DatLaiMatKhauUI">
    <children>
       <Label layoutX="263.0" layoutY="20.0" text="Đặt lại mật khẩu" />
       <VBox layoutY="140.0" spacing="20.0" AnchorPane.leftAnchor="60.0" AnchorPane.rightAnchor="60.0">

@@ -198,16 +198,7 @@ public class DonHangServiceImpl implements DonHangService {
             donHangDTO.setThoiGianDatHang(donHang.getThoiGianDatHang());
             donHangDTO.setTongTien(donHang.getTongTien());
 
-            List<MonTrongDonDTO> monTrongDonDTOList = donHang.getChiTietDonHang().stream().map(chiTiet -> {
-                MonTrongDonDTO monDTO = new MonTrongDonDTO();
-                monDTO.setMaMon(chiTiet.getMon().getMaMon());
-                monDTO.setTenMon(chiTiet.getTenMon());
-                monDTO.setSoLuong(chiTiet.getSoLuong());
-                monDTO.setDonGia(chiTiet.getDonGia());
-                monDTO.setYeuCauKhac(chiTiet.getYeuCauKhac());
-                monDTO.setTamTinh(chiTiet.getTamTinh());
-                return monDTO;
-            }).toList();
+            List<MonTrongDonDTO> monTrongDonDTOList = donHang.getChiTietDonHang().stream().map(DTOConversion::toMonTrongDonDTO).toList();
             donHangDTO.setDanhSachMonTrongDon(monTrongDonDTOList);
             return donHangDTO;
         }).toList();

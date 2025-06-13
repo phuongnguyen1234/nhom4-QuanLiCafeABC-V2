@@ -222,4 +222,23 @@ public class BangLuongServiceImpl implements BangLuongService {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public int tinhToanLuongThucNhanChoCapNhat(String loaiNhanVien, int mucLuongMoi,
+                                            int ngayCongHienTai, int nghiKhongCongHienTai,
+                                            int gioLamThemHienTai, int thuongDoanhThuDaNhap) {
+        // Gọi lại private method tinhLuongThucNhan với tham số tongDoanhThu (dùng để tính thưởng theo target) là 0
+        // vì thưởng theo target (nếu có) đã được tính và lưu trong thuongDoanhThuDaNhap hoặc sẽ được tính vào cuối tháng.
+        // Ở đây, chúng ta chỉ tính lại lương cơ bản + làm thêm dựa trên mức lương mới.
+        int luongCoBanVaLamThem = tinhLuongThucNhan(
+                loaiNhanVien,
+                mucLuongMoi,
+                ngayCongHienTai,
+                nghiKhongCongHienTai,
+                gioLamThemHienTai,
+                0 // tongDoanhThu (để tính thưởng theo công thức target) là 0
+        );
+        // Cộng với khoản thưởng đã được nhập thủ công (nếu có)
+        return luongCoBanVaLamThem + thuongDoanhThuDaNhap;
+    }
 }

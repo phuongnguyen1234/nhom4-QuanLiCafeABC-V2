@@ -173,14 +173,4 @@ public class BangLuong {
     public void setDuocPhepChinhSua(String duocPhepChinhSua) {
         this.duocPhepChinhSua = duocPhepChinhSua;
     }
-
-    public YearMonth dateSQLToYearMonth(String dateSQL) {
-        String[] parts = dateSQL.split("-");
-        return YearMonth.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
-    }
-
-    public String yearMonthToDateSQL(YearMonth yearMonth) {
-        String formattedDate = yearMonth.atDay(1).format(DateTimeFormatter.ISO_LOCAL_DATE);
-        return formattedDate;
-    }
 }

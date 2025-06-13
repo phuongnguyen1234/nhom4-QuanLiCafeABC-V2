@@ -140,3 +140,11 @@
     -fx-text-fill: #fff;
     -fx-cursor: hand;
 }
+
+.password-field{
+    -fx-padding: 0 35px 0 5px;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #286155; /* Màu thanh trượt */
+}

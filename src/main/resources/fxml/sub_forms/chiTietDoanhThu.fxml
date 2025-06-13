@@ -79,13 +79,13 @@
             <TableColumn fx:id="colThoiGianTongHopDoanhThu" editable="false" prefWidth="309.0" reorderable="false" resizable="false" sortable="false" text="Thời gian tổng hợp doanh thu" />
          </columns>
       </TableView>
-      <Pagination fx:id="phanTrang" layoutX="529.0" layoutY="825.0" maxPageIndicatorCount="5" pageCount="30">
+      <Pagination fx:id="phanTrang" layoutX="529.0" layoutY="825.0" maxPageIndicatorCount="5" pageCount="5">
          <styleClass>
             <String fx:value="font-family" />
             <String fx:value="font-size-20" />
          </styleClass>
       </Pagination>
-      <Button fx:id="btnQuayLai" layoutX="1185.0" layoutY="838.0" mnemonicParsing="false" onAction="#quayLai" styleClass="btn" text="Quay lại" textFill="WHITE">
+      <Button fx:id="btnQuayLai" layoutX="1140.0" layoutY="838.0" mnemonicParsing="false" onAction="#quayLai" prefWidth="150.0" styleClass="btn" text="Quay lại" textFill="WHITE">
          <font>
             <Font name="Open Sans Semibold" size="20.0" />
          </font>

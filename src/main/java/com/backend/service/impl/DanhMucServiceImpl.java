@@ -10,6 +10,7 @@ import com.backend.dto.DanhMucKhongMonDTO;
 import com.backend.model.DanhMuc;
 import com.backend.repository.DanhMucRepository;
 import com.backend.service.DanhMucService;
+import com.backend.utils.DTOConversion;
 
 @Service
 public class DanhMucServiceImpl implements DanhMucService {
@@ -54,13 +55,6 @@ public class DanhMucServiceImpl implements DanhMucService {
     @Override
     public List<DanhMucKhongMonDTO> getAllDanhMucKhongMon() {
         List<DanhMuc> danhMucs = danhMucRepository.findAll();
-        return danhMucs.stream().map(d -> {
-            DanhMucKhongMonDTO dto = new DanhMucKhongMonDTO();
-            dto.setMaDanhMuc(d.getMaDanhMuc());
-            dto.setTenDanhMuc(d.getTenDanhMuc());
-            dto.setTrangThai(d.getTrangThai());
-            dto.setLoai(d.getLoai());
-            return dto;
-        }).collect(Collectors.toList());
+        return danhMucs.stream().map(DTOConversion::toDanhMucKhongMonDTO).collect(Collectors.toList());
     }
 }

@@ -88,8 +88,8 @@ public class ChinhSuaBangLuongUI {
             gioLamThemSpinner.getValueFactory().setValue(bangLuong.getGioLamThem());
             thangText.setText("Tháng: " + bangLuong.getThang().toString());
             soDonDaTaoText.setText("Số đơn đã tạo: " + String.valueOf(bangLuong.getDonDaTao()));
-            thuongDoanhThuText.setText("Thưởng doanh thu: " + String.valueOf(bangLuong.getThuongDoanhThu()));
-            luongThucNhanText.setText("Lương thực nhận: " + String.valueOf(bangLuong.getLuongThucNhan()));
+            thuongDoanhThuText.setText("Thưởng doanh thu: " + String.valueOf(String.format("%,d", bangLuong.getThuongDoanhThu())));
+            luongThucNhanText.setText("Lương thực nhận: " + String.valueOf(String.format("%,d",bangLuong.getLuongThucNhan())));
             ghiChuTextArea.setText(bangLuong.getGhiChu());
         }
     }

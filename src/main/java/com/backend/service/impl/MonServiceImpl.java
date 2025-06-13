@@ -3,25 +3,39 @@ package com.backend.service.impl;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.backend.dto.MonDTO;
+import com.backend.dto.NhanVienDTO;
 import com.backend.model.DanhMuc;
 import com.backend.model.Mon;
+import com.backend.model.NhanVien;
 import com.backend.repository.DanhMucRepository;
 import com.backend.repository.MonRepository;
+import com.backend.repository.NhanVienRepository;
 import com.backend.service.MonService;
+import com.backend.service.NhanVienService;
+import com.backend.utils.DTOConversion;
 
 @Service
 public class MonServiceImpl implements MonService {
     private final MonRepository monRepository;
     private final DanhMucRepository danhMucRepository;
+    private final NhanVienRepository nhanVienRepository;
+    private final NhanVienService nhanVienService;
 
-    public MonServiceImpl(MonRepository monRepository, DanhMucRepository danhMucRepository) {
+    private static final String VI_TRI_THU_NGAN = "Thu ngân";
+    private static final String TRANG_THAI_ONLINE = "Online";
+    public static final String ERROR_MESSAGE_OTHER_CASHIER_ONLINE = "Không thể thực hiện thao tác. Có nhân viên thu ngân khác đang trực tuyến.";
+
+    public MonServiceImpl(MonRepository monRepository, DanhMucRepository danhMucRepository, NhanVienRepository nhanVienRepository, NhanVienService nhanVienService) {
         this.monRepository = monRepository;
         this.danhMucRepository = danhMucRepository;
+        this.nhanVienRepository = nhanVienRepository;
+        this.nhanVienService = nhanVienService;
     }
 
     @Override
@@ -38,17 +52,14 @@ public class MonServiceImpl implements MonService {
     //sua lai theo DTO moi
     @Override
     public Mon createMon(MonDTO dto) {
-        Mon mon = new Mon();
+        // Kiểm tra xem có thu ngân nào khác đang online không
+        kiemTraCoThuNganKhacDangOnline();
+
+        Mon mon = DTOConversion.toMon(dto);
 
         // Tạo mã tự động nếu cần
         String newMaMon = generateNewMaMon();
         mon.setMaMon(newMaMon);
-
-        // Gán các thuộc tính
-        mon.setTenMon(dto.getTenMon());
-        mon.setDonGia(dto.getDonGia());
-        mon.setTrangThai(dto.getTrangThai());
-        mon.setAnhMinhHoa(dto.getAnhMinhHoa());
 
         // Tìm đối tượng danh mục từ mã danh mục
         DanhMuc danhMuc = danhMucRepository.findById(dto.getMaDanhMuc())
@@ -60,12 +71,11 @@ public class MonServiceImpl implements MonService {
 
     @Override
     public Mon updateMon(MonDTO monUpdate) {
-        Mon mon = new Mon();
-        mon.setMaMon(monUpdate.getMaMon());
-        mon.setTenMon(monUpdate.getTenMon());
-        mon.setDonGia(monUpdate.getDonGia());
-        mon.setTrangThai(monUpdate.getTrangThai());
-        mon.setAnhMinhHoa(monUpdate.getAnhMinhHoa());
+        // Kiểm tra xem có thu ngân nào khác đang online không
+        kiemTraCoThuNganKhacDangOnline();
+
+        Mon mon = DTOConversion.toMon(monUpdate);
+
         // Tìm đối tượng danh mục từ mã danh mục
         DanhMuc danhMuc = danhMucRepository.findById(monUpdate.getMaDanhMuc())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục với mã: " + monUpdate.getMaDanhMuc()));
@@ -88,5 +98,26 @@ public class MonServiceImpl implements MonService {
         return String.format("M%03d", next); // M001, M002, ...
     }
 
+    private void kiemTraCoThuNganKhacDangOnline() {
+        Optional<NhanVienDTO> currentUserOpt = nhanVienService.getCurrentLoggedInNhanVienDTO();
+        String currentMaNhanVien = currentUserOpt.map(NhanVienDTO::getMaNhanVien).orElse(null);
+
+        List<NhanVien> onlineCashiers = nhanVienRepository.findByViTriAndTrangThaiHoatDong(VI_TRI_THU_NGAN, TRANG_THAI_ONLINE);
+
+        boolean otherCashierOnline;
+        if (currentMaNhanVien != null) {
+            // Người dùng hiện tại đã đăng nhập
+            otherCashierOnline = onlineCashiers.stream()
+                                    .anyMatch(nv -> !nv.getMaNhanVien().equals(currentMaNhanVien));
+        } else {
+            // Không có người dùng nào đăng nhập (trường hợp này ít xảy ra đối với các tác vụ cần xác thực)
+            // Nếu có bất kỳ thu ngân nào online, coi như có "thu ngân khác" đang online.
+            otherCashierOnline = !onlineCashiers.isEmpty();
+        }
+
+        if (otherCashierOnline) {
+            throw new RuntimeException(ERROR_MESSAGE_OTHER_CASHIER_ONLINE);
+        }
+    }
 
 }

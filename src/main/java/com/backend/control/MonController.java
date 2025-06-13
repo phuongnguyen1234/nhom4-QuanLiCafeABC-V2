@@ -3,10 +3,12 @@ package com.backend.control;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.dto.MonDTO;
 import com.backend.model.Mon;
 import com.backend.service.MonService;
+import com.backend.service.impl.MonServiceImpl;
 
 @RestController
 @RequestMapping("/mon")
@@ -39,19 +42,41 @@ public class MonController {
     }
 
     @PostMapping
-    public ResponseEntity<Mon> createMon(@RequestBody MonDTO mon) {
-        Mon createdMon = monService.createMon(mon);
-        return ResponseEntity.status(201).body(createdMon); // HTTP 201 Created
+    public ResponseEntity<?> createMon(@RequestBody MonDTO mon) {
+        try {
+            Mon createdMon = monService.createMon(mon);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdMon);
+        } catch (RuntimeException e) {
+            if (MonServiceImpl.ERROR_MESSAGE_OTHER_CASHIER_ONLINE.equals(e.getMessage())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            } else if (e.getMessage() != null && e.getMessage().startsWith("Không tìm thấy danh mục")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            }
+            // Log lỗi không mong muốn
+            System.err.println("Lỗi không mong muốn khi tạo món: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi máy chủ không mong muốn khi tạo món.");
+        }
     }
 
-
     @PatchMapping("/{maMon}")
-    public ResponseEntity<Mon> updateMon(@RequestBody MonDTO mon) {
+    public ResponseEntity<?> updateMon(@PathVariable String maMon, @RequestBody MonDTO monDetails) {
         try {
-            Mon updated = monService.updateMon(mon);
+            if (monDetails.getMaMon() == null || monDetails.getMaMon().isEmpty()) {
+                monDetails.setMaMon(maMon);
+            } else if (!monDetails.getMaMon().equals(maMon)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                     .body(Map.of("message", "Mã món trong URL và nội dung yêu cầu không khớp."));
+            }
+            Mon updated = monService.updateMon(monDetails);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            if (MonServiceImpl.ERROR_MESSAGE_OTHER_CASHIER_ONLINE.equals(e.getMessage())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            } else if (e.getMessage() != null && e.getMessage().startsWith("Không tìm thấy danh mục")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            }
+            System.err.println("Lỗi không mong muốn khi cập nhật món " + maMon + ": " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi máy chủ không mong muốn khi cập nhật món.");
         }
     }
 }

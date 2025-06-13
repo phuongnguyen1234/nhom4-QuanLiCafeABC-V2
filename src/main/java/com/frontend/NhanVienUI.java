@@ -7,10 +7,14 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
+import java.text.Normalizer; // Thêm import này
+import java.util.regex.Pattern; // Thêm import này
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import com.backend.dto.NhanVienDTO;
 import com.backend.quanlicapheabc.QuanlicapheabcApplication;
+import com.backend.utils.JavaFXUtils;
 import com.backend.utils.MessageUtils; // Import để lấy CookieManager
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,20 +27,17 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Pagination;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class NhanVienUI {
@@ -56,10 +57,21 @@ public class NhanVienUI {
     @FXML
     private CheckBox hienNVNghiViecCheckBox;
 
+    @FXML private Button btnThemNhanVien; 
+    @FXML private Button btnTimKiem;
+
     @FXML
     private TextField timNVTheoTenTextField;
 
+    @FXML
+    private Pagination phanTrang;
+
     private final ObservableList<NhanVienDTO> nhanVienList = FXCollections.observableArrayList();
+    // Danh sách gốc chứa tất cả nhân viên tải từ backend
+    private List<NhanVienDTO> allNhanVienMasterList = new ArrayList<>(); // Danh sách lưu trữ tất cả nhân viên
+    // Danh sách sau khi lọc, dùng cho phân trang
+    private List<NhanVienDTO> filteredNhanVienList = new ArrayList<>();
+    private static final int ROWS_PER_PAGE = 20; // Số dòng mỗi trang
 
     private final HttpClient client = HttpClient.newBuilder()
             .cookieHandler(QuanlicapheabcApplication.getCookieManager()) // Sử dụng CookieManager chung
@@ -71,6 +83,9 @@ public class NhanVienUI {
     // Phương thức khởi tạo dữ liệu cho bảng
     @FXML
     public void initialize() {
+
+        // Đặt placeholder ban đầu khi đang tải
+        tableViewQuanLiHoSo.setPlaceholder(JavaFXUtils.createPlaceholder("Đang tải...", "/icons/loading.png"));
 
         // Liên kết các cột với thuộc tính của NhanVienDTO
         colMaNhanVien.setCellValueFactory(new PropertyValueFactory<>("maNhanVien"));
@@ -95,12 +110,21 @@ public class NhanVienUI {
         });
        
         // Cấu hình cột STT để hiển thị số thứ tự dòng
-        colSTT.setCellValueFactory(param -> new javafx.beans.property.SimpleIntegerProperty(tableViewQuanLiHoSo.getItems().indexOf(param.getValue()) + 1).asObject());
+        colSTT.setCellValueFactory(param -> {
+            int pageIndex = phanTrang.getCurrentPageIndex();
+            int rowIndexOnPage = tableViewQuanLiHoSo.getItems().indexOf(param.getValue());
+            return new javafx.beans.property.SimpleIntegerProperty(pageIndex * ROWS_PER_PAGE + rowIndexOnPage + 1).asObject();
+        });
 
         // Cấu hình cột hành động với nút "Sửa"
         colHanhDong.setCellFactory(col -> new TableCell<>() {
             private final Button xemButton = new Button("Xem");
             private final Button suaButton = new Button("Sửa");
+        
+        // Căn giữa colHanhDong
+            {
+                setAlignment(javafx.geometry.Pos.CENTER);
+            }
 
             {
                 // Thiết lập nút "Xem"
@@ -131,9 +155,11 @@ public class NhanVienUI {
                 if (empty || getTableRow() == null || getTableRow().getItem() == null) {
                     setGraphic(null); // Không hiển thị gì nếu dòng trống
                 } else {
+                    HBox hBox = new HBox(10, xemButton, suaButton); // Tạo HBox chứa các nút
+                    hBox.setAlignment(javafx.geometry.Pos.CENTER); // Căn giữa các nút trong HBox
                     NhanVienDTO nhanVien = getTableRow().getItem();
                     suaButton.setDisable("Online".equals(nhanVien.getTrangThaiHoatDong())); // Disable nếu trạng thái là "Online"
-                    setGraphic(new HBox(10, xemButton, suaButton)); // Hiển thị cả hai nút
+                    setGraphic(hBox); // Hiển thị HBox
                 }
             }
         });
@@ -142,35 +168,34 @@ public class NhanVienUI {
             column.setReorderable(false);
         });
 
+        JavaFXUtils.disableHorizontalScrollBar(tableViewQuanLiHoSo);
+
         tableViewQuanLiHoSo.setItems(nhanVienList);
         loadNhanVienData(); 
 
         // Xử lý sự kiện cho checkbox hiển thị nhân viên nghỉ việc
         hienNVNghiViecCheckBox.setOnAction(event -> {
             // Khi checkbox thay đổi, tải lại dữ liệu với trạng thái tương ứng
-            // Bạn có thể tùy chọn xóa nội dung trường tìm kiếm ở đây nếu muốn
-            // timNVTheoTenTextField.clear(); 
-            loadNhanVienData();
+            applyFiltersAndRefreshTable();
         });
+
+        // Xử lý sự kiện nhấn Enter trong TextField tìm kiếm
+        if (timNVTheoTenTextField != null) {
+            timNVTheoTenTextField.setOnAction(event -> kichNutTimKiem(event));
+        }
     }
     
 
      // Phương thức để lấy danh sách nhân viên từ controller và hiển thị trên TableView       
         public void loadNhanVienData() {
+        // Đặt placeholder là "Đang tải..." trước khi bắt đầu task
+        setDisableControls(true); // Vô hiệu hóa controls
+        tableViewQuanLiHoSo.setPlaceholder(JavaFXUtils.createPlaceholder("Đang tải...", "/icons/loading.png"));
         Task<List<NhanVienDTO>> task = new Task<>() {
             @Override
             protected List<NhanVienDTO> call() throws Exception {
-                String searchTerm = timNVTheoTenTextField.getText().trim();
-                String endpoint;
-                // Backend API sẽ trả về tất cả nhân viên nếu không có searchTerm,
-                // hoặc tất cả nhân viên khớp searchTerm. Việc lọc "chỉ nghỉ việc" sẽ thực hiện ở frontend.
-                if (!searchTerm.isEmpty()) {
-                    // Endpoint này nên trả về tất cả nhân viên (active và inactive) khớp với tên
-                    endpoint = "http://localhost:8080/nhan-vien/search?ten=" + searchTerm; 
-                } else {
-                    // Endpoint này nên trả về tất cả nhân viên (active và inactive)
-                    endpoint = "http://localhost:8080/nhan-vien/all"; 
-                }
+                // Luôn tải tất cả nhân viên
+                String endpoint = "http://localhost:8080/nhan-vien/all";
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(endpoint))
                         .GET()
@@ -187,28 +212,97 @@ public class NhanVienUI {
         };
 
         task.setOnSucceeded(event -> {
-            List<NhanVienDTO> fetchedEmployees = task.getValue();
-            if (hienNVNghiViecCheckBox.isSelected()) {
-                // Lọc chỉ những nhân viên có trạng thái "Nghỉ việc" (trangThai == "Nghỉ việc")
-                List<NhanVienDTO> inactiveEmployees = fetchedEmployees.stream()
-                        .filter(nv -> "Nghỉ việc".equals(nv.getTrangThai()))
-                        .collect(Collectors.toList());
-                nhanVienList.setAll(inactiveEmployees);
-            } else {
-                // Hiển thị tất cả nhân viên đã tải về
-                nhanVienList.setAll(fetchedEmployees);
-            }
-            tableViewQuanLiHoSo.refresh();
+            allNhanVienMasterList = task.getValue(); // Lưu vào danh sách master
+            applyFiltersAndRefreshTable(); // Áp dụng bộ lọc và hiển thị
+            applyFiltersAndSetupPagination(); // Áp dụng bộ lọc và thiết lập phân trang
+            setDisableControls(false); // Kích hoạt controls
         });
 
         task.setOnFailed(event -> {
             MessageUtils.showErrorMessage("Lỗi tải dữ liệu! Không thể tải danh sách nhân viên: " + task.getException().getMessage());
             task.getException().printStackTrace();
+            setDisableControls(false); // Kích hoạt controls
         });
 
         new Thread(task).start();
     }
 
+    // Phương thức để bật/tắt các controls
+    private void setDisableControls(boolean disable) {
+        // Kiểm tra null trước khi setDisable để tránh NullPointerException nếu fx:id chưa được gán
+        if (tableViewQuanLiHoSo != null) tableViewQuanLiHoSo.setDisable(disable);
+        if (hienNVNghiViecCheckBox != null) hienNVNghiViecCheckBox.setDisable(disable);
+        if (timNVTheoTenTextField != null) timNVTheoTenTextField.setDisable(disable);
+        if (btnThemNhanVien != null) btnThemNhanVien.setDisable(disable); 
+        if (btnTimKiem != null) btnTimKiem.setDisable(disable);         
+    }
+
+    // Phương thức mới để áp dụng bộ lọc và làm mới TableView
+    private void applyFiltersAndRefreshTable() {
+        String rawSearchTerm = timNVTheoTenTextField.getText().trim();
+        String searchTermNormalized = removeAccents(rawSearchTerm).toLowerCase();
+        boolean showInactive = hienNVNghiViecCheckBox.isSelected();
+
+        List<NhanVienDTO> filteredList = allNhanVienMasterList.stream()
+                .filter(nv -> {
+                    // Lọc theo tên
+                    boolean nameMatches = searchTermNormalized.isEmpty() ||
+                                          (nv.getTenNhanVien() != null && removeAccents(nv.getTenNhanVien().toLowerCase()).contains(searchTermNormalized));
+                    if (!nameMatches) {
+                        return false;
+                    }
+
+                    // Nếu checkbox được chọn, hiển thị TẤT CẢ nhân viên
+                    if (showInactive) {
+                        return true;
+                    } else {
+                        // Nếu checkbox KHÔNG được chọn, chỉ hiển thị nhân viên "Đi làm" (không lọc theo trạng thái)
+                        return "Đi làm".equals(nv.getTrangThai());
+                    }
+                })
+                .collect(Collectors.toList());
+
+        this.filteredNhanVienList = filteredList; // Lưu kết quả lọc
+        setupPagination(); // Thiết lập lại phân trang với danh sách đã lọc
+    }
+
+    // Phương thức áp dụng bộ lọc và thiết lập phân trang
+    private void applyFiltersAndSetupPagination() {
+        String rawSearchTerm = timNVTheoTenTextField.getText().trim();
+        String searchTermNormalized = removeAccents(rawSearchTerm).toLowerCase();
+        boolean showInactive = hienNVNghiViecCheckBox.isSelected();
+
+        this.filteredNhanVienList = allNhanVienMasterList.stream()
+                .filter(nv -> {
+                    // Lọc theo tên
+                    boolean nameMatches = searchTermNormalized.isEmpty() ||
+                                          (nv.getTenNhanVien() != null && removeAccents(nv.getTenNhanVien()).toLowerCase().contains(searchTermNormalized));
+                    if (!nameMatches) {
+                        return false;
+                    }
+
+                   // Nếu checkbox được chọn, hiển thị TẤT CẢ nhân viên
+                    if (showInactive) {
+                        return true;
+                    } else {
+                         // Nếu checkbox KHÔNG được chọn, chỉ hiển thị nhân viên "Đi làm" (không lọc theo trạng thái)
+                        return "Đi làm".equals(nv.getTrangThai());
+                    }
+                })
+                .collect(Collectors.toList());
+
+        setupPagination(); // Thiết lập lại phân trang với danh sách đã lọc
+    }
+
+    // Phương thức tiện ích để loại bỏ dấu tiếng Việt
+    private String removeAccents(String text) {
+        if (text == null) {
+            return "";
+        }
+        String normalized = Normalizer.normalize(text, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(normalized).replaceAll("");
+    }
 
     private void xem(NhanVienDTO nhanVien) {
         try {
@@ -216,9 +310,6 @@ public class NhanVienUI {
                 MessageUtils.showErrorMessage("Chưa chọn nhân viên! Vui lòng chọn một nhân viên để xem thông tin.");
                 return;
             }
-    
-            // Lấy mã nhân viên đã chọn
-            String maNhanVien = nhanVien.getMaNhanVien();
     
             // Truy xuất thông tin chi tiết từ cơ sở dữ liệu
             //NhanVienDTO nhanVienChiTiet = quanLiHoSoController.layThongTinNhanVien(maNhanVien);
@@ -232,28 +323,17 @@ public class NhanVienUI {
             // controller.setNhanVienUI(this); // Nếu cần callback
     
             // Hiển thị thông tin chi tiết nhân viên trên form
-            controller.hienThiThongTin(nhanVien); // Truyền trực tiếp DTO đã có
+            controller.setNhanVien(nhanVien); // Truyền trực tiếp DTO đã có
     
-            // Tạo một cửa sổ mới để hiển thị form xem chi tiết
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setResizable(false);
-            stage.setTitle("Thông tin nhân viên: " + nhanVien.getTenNhanVien());
-            stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/profile.png")));
-            stage.showAndWait();
+            Stage dialogStage = JavaFXUtils.createDialog("Thông tin nhân viên: " + nhanVien.getTenNhanVien(), root, "/icons/view.png");
+            dialogStage.showAndWait();
             
         } catch (IOException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Lỗi");
-            alert.setHeaderText("Không thể mở form xem chi tiết.");
-            MessageUtils.showErrorMessage("Lỗi hiển thị! Không thể mở form xem chi tiết: " + e.getMessage());
+            MessageUtils.showErrorMessage("Lỗi hiển thị! Không thể mở form xem chi tiết!");
         }
     }
     
-
-
     private void sua(NhanVienDTO nhanVien) {
         try {
             if (nhanVien == null) {
@@ -282,19 +362,15 @@ public class NhanVienUI {
             controller.setNhanVienUI(this); 
 
             // Hiển thị thông tin chi tiết trên form chỉnh sửa
-            controller.hienThiThongTin(nhanVien);
+            controller.setNhanVien(nhanVien);
         
-            // Tạo một cửa sổ mới để hiển thị form chỉnh sửa
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setResizable(false);
-            stage.setTitle("Chỉnh sửa nhân viên: " + nhanVien.getTenNhanVien());
-            stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/nhanVien/businessman.png")));
-            stage.showAndWait();        
+            Stage dialogStage = JavaFXUtils.createDialog("Chỉnh sửa nhân viên: " + nhanVien.getTenNhanVien(), root, "/icons/edit-text.png");
+            dialogStage.showAndWait(); 
 
             // Sau khi dialog đóng, tải lại danh sách nếu có thay đổi
+            if (controller.isDataChanged()) {
             loadNhanVienData();
+        }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -310,21 +386,15 @@ public class NhanVienUI {
 
         ThemNhanVienUI controller = loader.getController();
         
-        // Truyền tham chiếu tới màn hình chính nếu cần
         controller.setNhanVienUI(this); 
 
-
-        // Tạo và hiển thị cửa sổ mới (dialog)
-        Stage stage = new Stage();
-        stage.initModality(Modality.APPLICATION_MODAL); // Cửa sổ modal
-        stage.setTitle("Thêm nhân viên");
-        stage.setScene(new Scene(root, 680, 800)); // Kích thước cửa sổ
-        stage.setResizable(false); // Không cho phép thay đổi kích thước
-        stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/nhanVien/businessman.png")));
-        stage.showAndWait();
+       Stage dialogStage = JavaFXUtils.createDialog("Thêm nhân viên", root, "/icons/add.png");
+        dialogStage.showAndWait();
 
         // Sau khi dialog đóng, tải lại danh sách
-        loadNhanVienData();
+        if (controller.isDataChanged()) {
+            loadNhanVienData();
+        }
 
     } catch (Exception e) {
         e.printStackTrace();
@@ -333,32 +403,48 @@ public class NhanVienUI {
 }
 
     @FXML
-    private void quayLai(ActionEvent event) {
-        // Logic để quay lại màn hình TrangChuUI hoặc đóng tab/pane hiện tại
-        // Ví dụ: ((Stage) hienNVNghiViecCheckBox.getScene().getWindow()).close();
-        // Hoặc nếu NhanVienUI được load vào BorderPane của TrangChuUI:
-        // trangChuUI.loadDefaultView(); // (Cần có tham chiếu đến TrangChuUI)
-        System.out.println("Nút quay lại được nhấn. Cần triển khai logic điều hướng.");
-        // Hiện tại, nếu NhanVienUI là một phần của TrangChuUI, nút này có thể không cần thiết
-        // hoặc sẽ được xử lý bởi TrangChuUI.
-    }
-
-    /* 
-    private void setupPagination() {
-        int soTrang = (int) Math.ceil((double) danhSachGoc.size() / ROWS_PER_PAGE);
-        phanTrang.setPageCount(soTrang == 0 ? 1 : soTrang);
-        phanTrang.setCurrentPageIndex(0);
-        capNhatTrang(0); // load trang đầu tiên
-
-        phanTrang.currentPageIndexProperty().addListener((obs, oldIndex, newIndex) -> {
-            capNhatTrang(newIndex.intValue());
-        });
-    }
-*/
-    @FXML
     private void kichNutTimKiem(ActionEvent event) {
-        // Khi nhấn nút tìm kiếm, tải lại dữ liệu dựa trên nội dung trường tìm kiếm
-        // và trạng thái của checkbox "Hiển thị nhân viên nghỉ việc"
-        loadNhanVienData();
+        // Khi nút tìm kiếm được nhấn, áp dụng bộ lọc và làm mới TableView
+        applyFiltersAndRefreshTable();
+        applyFiltersAndSetupPagination(); // Cập nhật phân trang sau khi lọc
+    }
+
+
+    // Phương thức thiết lập phân trang
+    private void setupPagination() {
+        if (phanTrang == null) return; // Đảm bảo Pagination đã được load từ FXML
+
+        int totalItems = filteredNhanVienList.size();
+        int pageCount = (int) Math.ceil((double) totalItems / ROWS_PER_PAGE);
+        phanTrang.setPageCount(pageCount == 0 ? 1 : pageCount); // Đảm bảo ít nhất 1 trang
+        phanTrang.setCurrentPageIndex(0); // Reset về trang đầu tiên
+
+        // Cập nhật TableView cho trang đầu tiên
+        updateTableView(0);
+
+        // Lắng nghe sự kiện thay đổi trang
+        phanTrang.currentPageIndexProperty().removeListener(this::handlePaginationChange); // Xóa listener cũ nếu có
+        phanTrang.currentPageIndexProperty().addListener(this::handlePaginationChange); // Thêm listener mới
+
+        // Cập nhật placeholder sau khi thiết lập phân trang
+        if (totalItems == 0) {
+            tableViewQuanLiHoSo.setPlaceholder(JavaFXUtils.createPlaceholder("Không tìm thấy nhân viên.", "/icons/empty-box.png"));
+        } else {
+             tableViewQuanLiHoSo.setPlaceholder(null); // Xóa placeholder nếu có dữ liệu
+        }
+    }
+
+    // Listener cho sự kiện thay đổi trang của Pagination
+    private void handlePaginationChange(javafx.beans.value.ObservableValue<? extends Number> obs, Number oldIndex, Number newIndex) {
+        updateTableView(newIndex.intValue());
+    }
+
+    // Phương thức cập nhật TableView dựa trên chỉ số trang
+    private void updateTableView(int pageIndex) {
+        int fromIndex = pageIndex * ROWS_PER_PAGE;
+        int toIndex = Math.min(fromIndex + ROWS_PER_PAGE, filteredNhanVienList.size());
+
+        List<NhanVienDTO> pageData = filteredNhanVienList.subList(fromIndex, toIndex);
+        nhanVienList.setAll(pageData); // Cập nhật ObservableList được bind với TableView
     }
 }

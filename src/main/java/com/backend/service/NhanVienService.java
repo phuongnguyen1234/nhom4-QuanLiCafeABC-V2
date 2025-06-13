@@ -25,4 +25,21 @@ public interface NhanVienService {
 
     List<NhanVienDTO> searchNhanVienByNameInCompleteList(String ten); // Tìm kiếm trong tất cả nhân viên
     
+    /**
+     * Khởi tạo quá trình quên mật khẩu: tạo OTP, lưu vào cache và gửi email.
+     * @param email Email của nhân viên.
+     * @throws org.springframework.security.core.userdetails.UsernameNotFoundException nếu email không tồn tại hoặc tài khoản không hoạt động.
+     * @throws RuntimeException nếu có lỗi khi gửi email.
+     */
+    void initiatePasswordReset(String email);
+
+    /**
+     * Hoàn tất việc đặt lại mật khẩu bằng OTP.
+     * @param email Email của nhân viên.
+     * @param otp Mã OTP người dùng nhập.
+     * @param newPassword Mật khẩu mới.
+     * @return true nếu đặt lại thành công, false nếu OTP không hợp lệ hoặc hết hạn.
+     * @throws org.springframework.security.core.userdetails.UsernameNotFoundException nếu email không tồn tại.
+     */
+    boolean completePasswordReset(String email, String otp, String newPassword);
 }

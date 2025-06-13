@@ -10,8 +10,8 @@ import java.time.Duration; // Thêm import cho Duration
 
 import com.backend.dto.NhanVienDTO; // Thêm import NhanVienDTO
 import com.backend.quanlicapheabc.QuanlicapheabcApplication;
+import com.backend.utils.JavaFXUtils;
 import com.backend.utils.MessageUtils;
-import com.backend.quanlicapheabc.QuanlicapheabcApplication; // Import để lấy CookieManager
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -22,12 +22,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -43,8 +40,6 @@ public class DangNhapUI {
     private Hyperlink quenMatKhauHyperlink, xemMKHyperlink;
 
     private boolean isPasswordVisible = false;
-    private Image viewIcon;
-    private Image hideIcon;
 
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule()) // Đăng ký JavaTimeModule
@@ -60,51 +55,28 @@ public class DangNhapUI {
        // Ẩn TextField mật khẩu ban đầu
         matKhauTextField.setVisible(false);
         matKhauTextField.setManaged(false); // Không quản lý layout khi ẩn
-
-        // Load icons
-        try {
-            viewIcon = new Image(getClass().getResourceAsStream("/icons/view.png"));
-            hideIcon = new Image(getClass().getResourceAsStream("/icons/hide.png"));
-        } catch (Exception e) {
-            System.err.println("Không thể tải icon xem/ẩn mật khẩu: " + e.getMessage());
-            // Có thể đặt icon mặc định hoặc xử lý lỗi khác ở đây
-        }
-        // Set icon ban đầu cho hyperlink
-        if (viewIcon != null) {
-            ((ImageView) xemMKHyperlink.getGraphic()).setImage(viewIcon);
-        }
+        // Đảm bảo FXML đã thiết lập icon ban đầu (view.png) cho xemMKHyperlink
+        // Ví dụ: <Image url="@/icons/view.png" /> bên trong ImageView của Hyperlink
     }
     
     @FXML
     private void quenMatKhau() {
-        MessageUtils.showInfoMessage("Chức năng quên mật khẩu hiện chưa được hỗ trợ.");
+        // MessageUtils.showInfoMessage("Chức năng quên mật khẩu hiện chưa được hỗ trợ.");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/nhapEmail.fxml")); // Đường dẫn tới FXML của bạn
+            Parent root = loader.load();
+            Stage stage = JavaFXUtils.createDialog("Quên mật khẩu", root, null);
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+            MessageUtils.showErrorMessage("Không thể mở form quên mật khẩu.");
+        }
+
     }
 
     @FXML
     private void xemMatKhau(ActionEvent event) {
-        isPasswordVisible = !isPasswordVisible;
-
-        if (isPasswordVisible) {
-            // Hiển thị mật khẩu
-            matKhauTextField.setText(matKhauPWField.getText());
-            matKhauTextField.setVisible(true);
-            matKhauTextField.setManaged(true);
-            matKhauPWField.setVisible(false);
-            matKhauPWField.setManaged(false);
-            if (hideIcon != null) {
-                ((ImageView) xemMKHyperlink.getGraphic()).setImage(hideIcon);
-            }
-        } else {
-            // Ẩn mật khẩu
-            matKhauPWField.setText(matKhauTextField.getText());
-            matKhauPWField.setVisible(true);
-            matKhauPWField.setManaged(true);
-            matKhauTextField.setVisible(false);
-            matKhauTextField.setManaged(false);
-            if (viewIcon != null) {
-                ((ImageView) xemMKHyperlink.getGraphic()).setImage(viewIcon);
-            }
-        }
+        isPasswordVisible = JavaFXUtils.togglePasswordVisibility(isPasswordVisible, matKhauTextField, matKhauPWField, xemMKHyperlink);
     }
 
     @FXML
@@ -234,6 +206,8 @@ public class DangNhapUI {
             Parent root = loader.load();
             Stage stage = (Stage) emailTextField.getScene().getWindow();
             stage.setScene(new Scene(root));
+            stage.sizeToScene(); // Thêm dòng này để Stage tự điều chỉnh kích thước
+            stage.centerOnScreen();
             stage.setTitle(tieuDe);
             stage.show();
             return loader; // Trả về loader
@@ -245,4 +219,3 @@ public class DangNhapUI {
 
    
 }
-

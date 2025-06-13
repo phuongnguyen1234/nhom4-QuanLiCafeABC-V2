@@ -16,9 +16,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="787.0" prefWidth="600.0" stylesheets="@../css/nhanVienCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ThongTinNhanVienUI">
+<AnchorPane fx:id="mainAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" stylesheets="@../css/nhanVienCSS.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frontend.ThongTinNhanVienUI">
    <children>
-      <VBox spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+      <VBox spacing="10.0" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
 
          <!--thông tin cá nhân-->
@@ -29,102 +29,102 @@
          </Label>
             <GridPane alignment="CENTER" hgap="10.0" vgap="10.0" VBox.vgrow="NEVER">
               <columnConstraints>
-                <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="277.0" minWidth="10.0" prefWidth="143.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="357.0" minWidth="10.0" prefWidth="357.0" />
+                <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="277.0" minWidth="10.0" prefWidth="124.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="446.0" minWidth="10.0" prefWidth="446.0" />
               </columnConstraints>
               <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="TOP" vgrow="ALWAYS" />
-                <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="TOP" vgrow="ALWAYS" />
-                <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="TOP" vgrow="ALWAYS" />
-                  <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="TOP" vgrow="ALWAYS" />
-                  <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="TOP" vgrow="ALWAYS" />
+                <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="CENTER" vgrow="ALWAYS" />
+                <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="CENTER" vgrow="ALWAYS" />
+                <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="CENTER" vgrow="ALWAYS" />
+                  <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="CENTER" vgrow="ALWAYS" />
+                  <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="CENTER" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" valignment="CENTER" vgrow="ALWAYS" />
-                  <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="TOP" vgrow="ALWAYS" />
+                  <RowConstraints minHeight="10.0" prefHeight="25.0" valignment="CENTER" vgrow="ALWAYS" />
               </rowConstraints>
                <children>
                <!-- Các Label thông tin -->
                <Label text="Mã nhân viên:">
                      <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
+                        <Font name="Open Sans Semibold" size="18.0" />
                      </font>
                </Label>
       
                <!-- Dữ liệu thông tin cá nhân -->
-               <Text fx:id="textMaNhanVien" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;mã nhân viên&gt;" wrappingWidth="242.0" GridPane.columnIndex="1">
+               <Text fx:id="textMaNhanVien" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;mã nhân viên&gt;" wrappingWidth="198.0" GridPane.columnIndex="1">
                      <font>
-                        <Font name="Open Sans" size="20.0" />
+                        <Font name="Open Sans" size="18.0" />
                      </font>
                </Text>
       
                <Label text="Họ tên:" GridPane.rowIndex="1">
                      <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
+                        <Font name="Open Sans Semibold" size="18.0" />
                      </font>
                </Label>
       
-               <Text fx:id="textHoTen" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;tên nhân viên&gt;" wrappingWidth="242.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <Text fx:id="textHoTen" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;tên nhân viên&gt;" wrappingWidth="199.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <font>
-                        <Font name="Open Sans" size="20.0" />
+                        <Font name="Open Sans" size="18.0" />
                      </font>
                </Text>
       
                <Label text="Giới tính:" GridPane.rowIndex="2">
                      <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
+                        <Font name="Open Sans Semibold" size="18.0" />
                      </font>
                </Label>
       
-               <Text fx:id="textGioiTinh" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;giới tính&gt;" wrappingWidth="242.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <Text fx:id="textGioiTinh" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;giới tính&gt;" wrappingWidth="192.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <font>
-                        <Font name="Open Sans" size="20.0" />
+                        <Font name="Open Sans" size="18.0" />
                      </font>
                </Text>
       
                <Label text="Ngày sinh:" GridPane.rowIndex="3">
                      <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
+                        <Font name="Open Sans Semibold" size="18.0" />
                      </font>
                </Label>
       
-               <Text fx:id="textNgaySinh" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;ngày sinh&gt;" wrappingWidth="242.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <Text fx:id="textNgaySinh" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;ngày sinh&gt;" wrappingWidth="190.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <font>
-                        <Font name="Open Sans" size="20.0" />
+                        <Font name="Open Sans" size="18.0" />
                      </font>
                </Text>
       
                <Label text="Quê quán:" GridPane.rowIndex="4">
                      <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
+                        <Font name="Open Sans Semibold" size="18.0" />
                      </font>
                </Label>
       
                <Label text="Địa chỉ:" GridPane.rowIndex="5" GridPane.vgrow="ALWAYS">
                      <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
+                        <Font name="Open Sans Semibold" size="18.0" />
                      </font>
                </Label>
       
                <Label text="Số điện thoại:" GridPane.rowIndex="6">
                      <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
+                        <Font name="Open Sans Semibold" size="18.0" />
                      </font>
                </Label>
       
-               <Text fx:id="textQueQuan" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;quê quán&gt;" wrappingWidth="242.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+               <Text fx:id="textQueQuan" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;quê quán&gt;" wrappingWidth="189.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                      <font>
-                        <Font name="Open Sans" size="20.0" />
+                        <Font name="Open Sans" size="18.0" />
                      </font>
                </Text>
       
-               <Text fx:id="textDiaChi" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;địa chỉ&gt;" wrappingWidth="242.0" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.vgrow="ALWAYS">
+               <Text fx:id="textDiaChi" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;địa chỉ&gt;" wrappingWidth="198.0" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.vgrow="ALWAYS">
                      <font>
-                        <Font name="Open Sans" size="20.0" />
+                        <Font name="Open Sans" size="18.0" />
                      </font>
                </Text>
       
-               <Text fx:id="textSoDienThoai" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;sđt&gt;" wrappingWidth="242.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+               <Text fx:id="textSoDienThoai" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;sđt&gt;" wrappingWidth="195.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
                      <font>
-                        <Font name="Open Sans" size="20.0" />
+                        <Font name="Open Sans" size="18.0" />
                      </font>
                </Text>
                </children>
@@ -144,15 +144,15 @@
 
             <GridPane hgap="10.0" vgap="10.0" VBox.vgrow="NEVER">
                <columnConstraints>
-                  <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="255.0" minWidth="10.0" prefWidth="148.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="352.0" minWidth="10.0" prefWidth="352.0" />
+                  <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="255.0" minWidth="10.0" prefWidth="192.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="418.0" minWidth="10.0" prefWidth="378.0" />
                </columnConstraints>
                <rowConstraints>
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                   
                </rowConstraints>
 
@@ -160,60 +160,60 @@
                   <!-- Các Label thông tin -->
                   <Label text="Loại nhân viên:" GridPane.columnIndex="0" GridPane.rowIndex="0">
                      <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
+                        <Font name="Open Sans Semibold" size="18.0" />
                      </font>
                   </Label>
 
                   <Label text="Vị trí:" GridPane.columnIndex="0" GridPane.rowIndex="1">
                      <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
+                        <Font name="Open Sans Semibold" size="18.0" />
                      </font>
                   </Label>
 
                   <Label text="Ngày vào làm:" GridPane.columnIndex="0" GridPane.rowIndex="2">
                      <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
+                        <Font name="Open Sans Semibold" size="18.0" />
                      </font>
                   </Label>
 
-                  <Label text="Mức lương:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                  <Label fx:id="mucLuongLabel" text="Mức lương (VND/ngày):" GridPane.columnIndex="0" GridPane.rowIndex="3">
                      <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
+                        <Font name="Open Sans Semibold" size="17.0" />
                      </font>
                   </Label>
 
                   <!-- Dữ liệu thông tin việc làm -->
                   <Text fx:id="textLoaiNhanVien" strokeType="OUTSIDE" strokeWidth="0.0" text="Loại nhân viên" wrappingWidth="353.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                      <font>
-                        <Font name="Open Sans" size="20.0" />
+                        <Font name="Open Sans" size="18.0" />
                      </font>
                   </Text>
 
                   <Text fx:id="textViTri" strokeType="OUTSIDE" strokeWidth="0.0" text="Vị trí" wrappingWidth="352.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <font>
-                        <Font name="Open Sans" size="20.0" />
+                        <Font name="Open Sans" size="18.0" />
                      </font>
                   </Text>
 
                   <Text fx:id="textThoiGianVaoLam" strokeType="OUTSIDE" strokeWidth="0.0" text="Thời gian vào làm" wrappingWidth="351.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <font>
-                        <Font name="Open Sans" size="20.0" />
+                        <Font name="Open Sans" size="18.0" />
                      </font>
                   </Text>
 
                   <Text fx:id="textMucLuong" strokeType="OUTSIDE" strokeWidth="0.0" text="Mức lương" wrappingWidth="349.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <font>
-                        <Font name="Open Sans" size="20.0" />
+                        <Font name="Open Sans" size="18.0" />
                      </font>
                   </Text>
                   <Label text="Trạng thái:" GridPane.rowIndex="4">
                      <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
+                        <Font name="Open Sans Semibold" size="18.0" />
                      </font>
                   </Label>
                   <Text fx:id="textTrangThai" strokeType="OUTSIDE" strokeWidth="0.0" text="Trạng thái" wrappingWidth="349.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                      <font>
-                        <Font name="Open Sans" size="20.0" />
+                        <Font name="Open Sans" size="18.0" />
                      </font>
                   </Text>
                </children>
@@ -231,25 +231,25 @@
       
                   <GridPane hgap="10.0" vgap="10.0" VBox.vgrow="NEVER">
                <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="255.0" minWidth="10.0" prefWidth="155.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="345.0" minWidth="10.0" prefWidth="345.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="255.0" minWidth="10.0" prefWidth="81.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="502.0" minWidth="10.0" prefWidth="489.0" />
                </columnConstraints>
                <rowConstraints>
-                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                </rowConstraints>
       
                      <children>
                   <!-- Các Label thông tin -->
                   <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="0">
                      <font>
-                        <Font name="Open Sans Semibold" size="20.0" />
+                        <Font name="Open Sans Semibold" size="18.0" />
                      </font>
                   </Label>
             
                               <!-- Dữ liệu thông tin đăng nhập -->
                   <Text fx:id="textEmail" text="Email người dùng" wrappingWidth="343.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                      <font>
-                        <Font name="Open Sans" size="20.0" />
+                        <Font name="Open Sans" size="18.0" />
                      </font>
                   </Text>
                </children>
@@ -257,27 +257,32 @@
 
          </children>
       </VBox>
-
-      <!--ảnh chân dung-->
-      <ImageView fx:id="imgChanDung" fitHeight="240.0" fitWidth="180.0" layoutX="406.0" layoutY="14.0" pickOnBounds="true">
-         <image>
-            <Image url="@../../icons/profile.png" />
-         </image></ImageView>
-
-         <!--trạng thái hoạt động-->
-      <HBox layoutX="433.0" layoutY="266.0" prefHeight="20.0" prefWidth="115.0" spacing="10.0">
+      <VBox alignment="TOP_CENTER" layoutX="430.0" layoutY="10.0" prefWidth="160.0" spacing="10.0">
          <children>
-            <Circle fx:id="circleTrangThai" fill="#4caf50" radius="11.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
-            <Text fx:id="textTrangThaiHoatDong" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;trạng thái&gt;">
-               <font>
-                  <Font name="Open Sans Semibold" size="16.0" />
-               </font>
-            </Text>
+      
+            <!--ảnh chân dung-->
+            <ImageView fx:id="imgChanDung" fitHeight="177.0" fitWidth="144.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../../icons/profile.png" />
+               </image>
+            </ImageView>
+      
+               <!--trạng thái hoạt động-->
+            <HBox alignment="TOP_CENTER" prefHeight="20.0" prefWidth="115.0" spacing="10.0">
+               <children>
+                  <Circle fx:id="circleTrangThai" fill="#4caf50" radius="11.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+                  <Text fx:id="textTrangThaiHoatDong" strokeType="OUTSIDE" strokeWidth="0.0" text="&lt;trạng thái&gt;">
+                     <font>
+                        <Font name="Open Sans Semibold" size="16.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
          </children>
-      </HBox>
+      </VBox>
 
       <!--nút quay lại-->
-      <Button fx:id="btnQuayLai" layoutX="251.0" layoutY="718.0" mnemonicParsing="false" onAction="#quayLai" styleClass="btn" text="Quay lại" textFill="WHITE">
+      <Button fx:id="btnQuayLai" layoutX="240.0" layoutY="633.0" mnemonicParsing="false" onAction="#quayLai" styleClass="btn" text="Quay lại" textFill="WHITE" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="240.0" AnchorPane.rightAnchor="240.0">
          <font>
             <Font name="Open Sans Semibold" size="20.0" />
          </font>

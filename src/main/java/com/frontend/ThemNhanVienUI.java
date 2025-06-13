@@ -15,16 +15,18 @@ import java.util.UUID;
 
 import com.backend.dto.NhanVienDTO;
 import com.backend.quanlicapheabc.QuanlicapheabcApplication; // Import để lấy CookieManager
+import com.backend.utils.JavaFXUtils;
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
@@ -36,63 +38,39 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class ThemNhanVienUI {
-    // Thông tin cá nhân
     @FXML
-    private TextField tenNhanVienTextField;
+    private TextField tenNhanVienTextField, matKhauTextField, queQuanTextField, soDienThoaiTextField, mucLuongTextField, emailTextField;
 
     @FXML
-    private HBox gioiTinhHBox;
-    
+    private HBox gioiTinhHBox;    
     @FXML
-    private RadioButton namRadioButton;
+    private RadioButton namRadioButton, nuRadioButton;
 
     @FXML
-    private RadioButton nuRadioButton;
-
-    @FXML
-    private DatePicker ngaySinhDatePicker;
-
-    @FXML
-    private TextField queQuanTextField;
+    private DatePicker ngaySinhDatePicker, thoiGianVaoLamDatePicker;
 
     @FXML
     private TextArea diaChiTextArea;
 
     @FXML
-    private TextField soDienThoaiTextField;
-
-    // Thông tin việc làm
-    @FXML
-    private ComboBox<String> loaiNhanVienComboBox;
-
-    @FXML
-    private ComboBox<String> viTriComboBox;
-
-    @FXML
-    private DatePicker thoiGianVaoLamDatePicker;
-
-    @FXML
-    private TextField mucLuongTextField;
-
-    // Thông tin đăng nhập
-    @FXML
-    private TextField emailTextField;
+    private ComboBox<String> loaiNhanVienComboBox, viTriComboBox;
 
     @FXML
     private PasswordField matKhauPasswordField;
 
     @FXML
     private ImageView anhChanDungImageView;
+    
+    @FXML
+    private Button btnChonAnh, btnThem, btnQuayLai;
 
     @FXML
-    private Button btnChonAnh; 
+    private Label mucLuongLabel; // Thêm FXML cho mucLuongLabel
 
     @FXML
-    private Button btnThem;
+    private Hyperlink xemMKHyperlink;
 
-    @FXML
-    private Button btnQuayLai;
-
+    private boolean isPasswordVisible = false;
 
     private NhanVienUI nhanVienUI;
     private File selectedImageFile; // Lưu trữ file ảnh đã chọn
@@ -102,6 +80,11 @@ public class ThemNhanVienUI {
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private ToggleGroup gioiTinhToggleGroup;
 
+    private boolean dataChanged = false; // Biến để theo dõi thay đổi dữ liệu
+    public boolean isDataChanged() {
+        return dataChanged;
+    }
+
     // Phương thức để nhận tham chiếu từ màn hình chính
     public void setNhanVienUI(NhanVienUI nhanVienUI) {
         this.nhanVienUI = nhanVienUI;
@@ -109,85 +92,106 @@ public class ThemNhanVienUI {
 
     @FXML
     public void initialize() {
+    // Ẩn TextField mật khẩu ban đầu
+        matKhauTextField.setVisible(false);
+        matKhauTextField.setManaged(false); // Không quản lý layout khi ẩn
+            // Đảm bảo FXML đã thiết lập icon ban đầu (view.png) cho xemMKHyperlink
+            // Ví dụ: <Image url="@/icons/view.png" /> bên trong ImageView của Hyperlink
+
         gioiTinhToggleGroup = new ToggleGroup();
         namRadioButton.setToggleGroup(gioiTinhToggleGroup);
         nuRadioButton.setToggleGroup(gioiTinhToggleGroup);
-    // Khởi tạo các giá trị cho ComboBox
-    loaiNhanVienComboBox.getItems().addAll("Chủ quán", "Full-time", "Part-time");
-    viTriComboBox.getItems().addAll("Chủ quán", "Thu ngân", "Pha chế", "Phục vụ");
+        // Khởi tạo các giá trị cho ComboBox
+        loaiNhanVienComboBox.getItems().addAll("Chủ quán", "Full-time", "Part-time");
+        viTriComboBox.getItems().addAll("Chủ quán", "Thu ngân", "Pha chế", "Phục vụ");
 
-    // Đặt các giá trị mặc định nếu cần thiết
-    ngaySinhDatePicker.setValue(LocalDate.now());
-    thoiGianVaoLamDatePicker.setValue(LocalDate.now());
+        // Đặt các giá trị mặc định nếu cần thiết
+        ngaySinhDatePicker.setValue(LocalDate.now());
+        thoiGianVaoLamDatePicker.setValue(LocalDate.now());
 
-    addComboBoxEvents(); // Thêm sự kiện cho ComboBox
-}
+        addComboBoxEvents(); // Thêm sự kiện cho ComboBox
+    }
 
     
   //Thêm sự kiện cho ComboBox.
-private void addComboBoxEvents() {
-    loaiNhanVienComboBox.setOnAction(event -> updateValuesFromLoaiNhanVien());
-    viTriComboBox.setOnAction(event -> updateValuesFromViTri());
-}
+    private void addComboBoxEvents() {
+        loaiNhanVienComboBox.setOnAction(event -> updateValuesFromLoaiNhanVien());
+        viTriComboBox.setOnAction(event -> updateValuesFromViTri());
+    }
 
-private void updateValuesFromLoaiNhanVien() {
-    String loaiNhanVien = loaiNhanVienComboBox.getValue();
-    updateComboBoxesSafely(() -> {
-        switch (loaiNhanVien) {
-            case "Chủ quán":
-                viTriComboBox.setValue("Chủ quán");
-                break;
-            case "Full-time":
-            case "Part-time":
-                // Chuyển giá trị viTriComboBox và quyenTruyCapComboBox về các giá trị khác
-                if ("Chủ quán".equals(viTriComboBox.getValue())) {
-                    viTriComboBox.setValue("Thu ngân");
+    private void updateValuesFromLoaiNhanVien() {
+        String loaiNhanVien = loaiNhanVienComboBox.getValue();
+        updateComboBoxesSafely(() -> {
+            switch (loaiNhanVien) {
+                case "Chủ quán" -> {
+                    viTriComboBox.setValue("Chủ quán");
+                    mucLuongLabel.setText("Mức lương (VND):");
+                    matKhauPasswordField.setDisable(false);
                 }
-                break;
-        }
-    });
-}
+                case "Full-time" -> {
+                    // Chuyển giá trị viTriComboBox về các giá trị khác nếu đang là "Chủ quán"
+                    if ("Chủ quán".equals(viTriComboBox.getValue())) {
+                        viTriComboBox.setValue("Thu ngân"); // Hoặc một giá trị mặc định khác
+                    }
+                    mucLuongLabel.setText("Mức lương (VND/ngày):");
+                }
+                case "Part-time" -> {
+                    // Chuyển giá trị viTriComboBox và quyenTruyCapComboBox về các giá trị khác
+                    if ("Chủ quán".equals(viTriComboBox.getValue())) {
+                        viTriComboBox.setValue("Thu ngân");
+                    }
+                    mucLuongLabel.setText("Mức lương (VND/giờ):");
+                }
+            }
+        });
+    }
 
 
   //Cập nhật giá trị dựa trên Vị Trí.
-private void updateValuesFromViTri() {
-    String viTri = viTriComboBox.getValue();
-    updateComboBoxesSafely(() -> {
-        switch (viTri) {
-            case "Chủ quán":
-                loaiNhanVienComboBox.setValue("Chủ quán");
-                matKhauPasswordField.setDisable(false);
-                break;
-            case "Thu ngân":
-                loaiNhanVienComboBox.setValue("Full-time");
-                matKhauPasswordField.setDisable(false);
-                break;
-            case "Pha chế":
-            case "Phục vụ":
-                loaiNhanVienComboBox.setValue("Full-time");
-                // Vô hiệu hóa và xóa trường mật khẩu
-                matKhauPasswordField.setDisable(true);
-                matKhauPasswordField.clear();
-                break;
-            default:
-                matKhauPasswordField.setDisable(false); // Mặc định cho phép nhập nếu không phải các trường hợp trên
-                break;
-        }
-    });
-}
+    private void updateValuesFromViTri() {
+        String viTri = viTriComboBox.getValue();
+        updateComboBoxesSafely(() -> {
+            switch (viTri) {
+                case "Chủ quán" -> {
+                    loaiNhanVienComboBox.setValue("Chủ quán");
+                    matKhauPasswordField.setDisable(false);
+                    mucLuongLabel.setText("Mức lương (VND):");
+                }
+                case "Thu ngân" -> {
+                    loaiNhanVienComboBox.setValue("Full-time");
+                    mucLuongLabel.setText("Mức lương (VND/ngày):");
+                    matKhauPasswordField.setDisable(false); // Cho phép nhập mật khẩu
+                }
+                case "Pha chế", "Phục vụ" -> {
+                    loaiNhanVienComboBox.setValue("Full-time");
+                    mucLuongLabel.setText("Mức lương (VND/ngày):");
+                    matKhauPasswordField.setDisable(true); // Không cho phép nhập mật khẩu
+                    matKhauPasswordField.clear(); // Xóa mật khẩu nếu đã nhập
+                    // Label lương sẽ được cập nhật bởi updateValuesFromLoaiNhanVien
+                }
+                default -> matKhauPasswordField.setDisable(false); // Mặc định cho phép nhập nếu không phải các trường hợp trên
+            }
+            updateValuesFromLoaiNhanVien();
+        });
+    }
 
   //Phương thức an toàn để cập nhật giá trị của ComboBox.
-private void updateComboBoxesSafely(Runnable updateAction) {
-    // Vô hiệu hóa sự kiện để tránh vòng lặp
-    loaiNhanVienComboBox.setOnAction(null);
-    viTriComboBox.setOnAction(null);
+    private void updateComboBoxesSafely(Runnable updateAction) {
+        // Vô hiệu hóa sự kiện để tránh vòng lặp
+        loaiNhanVienComboBox.setOnAction(null);
+        viTriComboBox.setOnAction(null);
 
-    // Thực hiện hành động cập nhật
-    updateAction.run();
+        // Thực hiện hành động cập nhật
+        updateAction.run();
 
-    // Gán lại sự kiện
-    addComboBoxEvents();
-}
+        // Gán lại sự kiện
+        addComboBoxEvents();
+    }
+
+    @FXML
+    private void xemMatKhau(){
+        isPasswordVisible = JavaFXUtils.togglePasswordVisibility(isPasswordVisible, matKhauTextField, matKhauPasswordField, xemMKHyperlink);
+    }
 
 
     @FXML
@@ -214,7 +218,7 @@ private void updateComboBoxesSafely(Runnable updateAction) {
 
     @FXML
     public void kichNutThemNhanVien() {
-String tenNhanVien = tenNhanVienTextField.getText().trim();
+        String tenNhanVien = tenNhanVienTextField.getText().trim();
         RadioButton selectedGioiTinhRadio = (RadioButton) gioiTinhToggleGroup.getSelectedToggle();
         LocalDate ngaySinh = ngaySinhDatePicker.getValue();
         String queQuan = queQuanTextField.getText().trim();
@@ -326,6 +330,7 @@ String tenNhanVien = tenNhanVienTextField.getText().trim();
 
         task.setOnSucceeded(e -> {
             MessageUtils.showInfoMessage("Thành công! Thêm nhân viên thành công!");
+            this.dataChanged = true; // Đánh dấu dữ liệu đã thay đổi
             if (nhanVienUI != null) {
                 nhanVienUI.loadNhanVienData(); // Tải lại danh sách nhân viên đang làm việc
             }
@@ -340,26 +345,14 @@ String tenNhanVien = tenNhanVienTextField.getText().trim();
         new Thread(task).start();
     }
 
-// Phương thức hiển thị thông báo lỗi
-private void showErrorAlert(String message) {
-    Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle("Lỗi");
-    alert.setHeaderText("Thông báo lỗi");
-    alert.setContentText(message);
-    alert.showAndWait();
-}
+    @FXML
+    public void quayLai() {
+        closeDialog();
+    }
 
-
-@FXML
-public void quayLai() {
-    closeDialog();
-}
-
-private void closeDialog() {
-    Stage currentStage = (Stage) btnQuayLai.getScene().getWindow();
-    currentStage.close();  // Đóng cửa sổ thêm nhân viên
-}
+    private void closeDialog() {
+        Stage currentStage = (Stage) btnQuayLai.getScene().getWindow();
+        currentStage.close();  // Đóng cửa sổ thêm nhân viên
+    }
 
 }
-
-

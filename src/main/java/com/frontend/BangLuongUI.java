@@ -7,6 +7,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -24,15 +25,11 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -49,13 +46,16 @@ public class BangLuongUI {
     private TableView<BangLuongDTO> tableViewBangLuong;
 
     @FXML
-    private TableColumn<BangLuongDTO, String> colMaBangLuong, colHoTen, colThang, colGhiChu;
+    private TableColumn<BangLuongDTO, String> colMaBangLuong, colHoTen, colGhiChu;
 
     @FXML
     private TableColumn<BangLuongDTO, Integer> colNgayCong, colNghiCoCong, colNghiKhongCong, colThuongDoanhThu, colLuongThucNhan;
 
     @FXML
     private TableColumn<BangLuongDTO, Void> colHanhDong; // Đảm bảo kiểu dữ liệu là Void vì đây là cột hành động.
+
+    @FXML
+    private TableColumn<BangLuongDTO, LocalDate> colThang; // Thay đổi kiểu dữ liệu của cột tháng
 
     @FXML
     private ComboBox<String> thangCombobox, namCombobox;
@@ -87,12 +87,24 @@ public class BangLuongUI {
         colMaBangLuong.setCellValueFactory(new PropertyValueFactory<>("maBangLuong"));
         colHoTen.setCellValueFactory(new PropertyValueFactory<>("hoTen"));
         colThang.setCellValueFactory(new PropertyValueFactory<>("thang"));
+        colThang.setCellFactory(column -> new TableCell<BangLuongDTO, LocalDate>() { // Cập nhật kiểu cho TableCell
+            @Override
+            protected void updateItem(LocalDate item, boolean empty) { // Item bây giờ là LocalDate
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.format(DateTimeFormatter.ofPattern("MM/yyyy")));
+                }
+            }
+        });
         colNgayCong.setCellValueFactory(new PropertyValueFactory<>("ngayCong"));
         colNghiCoCong.setCellValueFactory(new PropertyValueFactory<>("nghiCoCong"));
         colNghiKhongCong.setCellValueFactory(new PropertyValueFactory<>("nghiKhongCong"));
         colThuongDoanhThu.setCellValueFactory(new PropertyValueFactory<>("thuongDoanhThu"));
         colLuongThucNhan.setCellValueFactory(new PropertyValueFactory<>("luongThucNhan"));
         colGhiChu.setCellValueFactory(new PropertyValueFactory<>("ghiChu"));
+        colGhiChu.setSortable(false); // Tắt chức năng sort cho cột Ghi Chú
         // Tùy chỉnh CellFactory cho cột Ghi Chú để wrap text
         colGhiChu.setCellFactory(column -> {
             return new TableCell<BangLuongDTO, String>() {
@@ -106,9 +118,8 @@ public class BangLuongUI {
 
                     // Listener để cập nhật màu chữ khi trạng thái selected thay đổi
                     selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
-                        if (text.getText() != null && !text.getText().isEmpty()) { // Chỉ đổi màu nếu có text
-                            text.setFill(isNowSelected ? Color.WHITE : Color.BLACK);
-                        }
+                        // Luôn cập nhật màu chữ dựa trên trạng thái selected
+                        text.setFill(isNowSelected ? Color.WHITE : Color.BLACK);
                     });
                 }
 
@@ -117,11 +128,12 @@ public class BangLuongUI {
                     super.updateItem(item, empty);
                     if (empty || item == null) {
                         text.setText(null);
+                        // Giữ dòng này để text.setFill ở dưới được áp dụng cho cả trường hợp cell rỗng
                     } else {
                         text.setText(item);
-                        // Đặt màu chữ ban đầu khi cell được render hoặc item thay đổi
-                        text.setFill(isSelected() ? Color.WHITE : Color.BLACK); 
                     }
+                    // Đặt màu chữ dựa trên trạng thái selected, sau khi text đã được set/clear
+                    text.setFill(isSelected() ? Color.WHITE : Color.BLACK);
                 }
             };
         });
@@ -141,8 +153,18 @@ public class BangLuongUI {
         // Cấu hình cột hành động với nút "Sửa"
         colHanhDong.setCellFactory(col -> new TableCell<>() {
             private final Button suaButton = new Button("Sửa");
+            private final Button xemButton = new Button("Xem");
         
             {
+                // Thiết lập nút "Xem"
+                ImageView viewIcon = new ImageView(getClass().getResource("/icons/eye.png").toExternalForm());
+                viewIcon.setFitWidth(30);
+                viewIcon.setFitHeight(30);
+                xemButton.setGraphic(viewIcon);
+                xemButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                xemButton.getStyleClass().add("button-view"); // Giả sử bạn có style class này
+                xemButton.setOnAction(event -> xem(getTableRow().getItem()));
+
                 // Tạo ImageView và thêm ảnh
                 ImageView editIcon = new ImageView(getClass().getResource("/icons/write.png").toExternalForm());
                 editIcon.setFitWidth(30); // Chiều rộng ảnh
@@ -162,12 +184,14 @@ public class BangLuongUI {
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
         
-                BangLuongDTO bangLuong = getTableRow() != null ? getTableRow().getItem() : null;
+                BangLuongDTO currentBangLuong = getTableRow() != null ? getTableRow().getItem() : null;
         
-                if (empty || bangLuong == null || !"1".equals(bangLuong.getDuocPhepChinhSua())) {
-                    setGraphic(null); // Ẩn nút nếu bảng lương không thể chỉnh sửa
-                } else {
+                if (empty || currentBangLuong == null) {
+                    setGraphic(null);
+                } else if ("1".equals(currentBangLuong.getDuocPhepChinhSua())) {
                     setGraphic(suaButton); // Hiển thị nút "Sửa" nếu bảng lương có thể chỉnh sửa
+                } else {
+                    setGraphic(xemButton); // Hiển thị nút "Xem" nếu không được phép sửa
                 }
             }
         });
@@ -222,6 +246,26 @@ public class BangLuongUI {
         }
     }
     
+    private void xem(BangLuongDTO bangLuong) {
+        if (bangLuong == null) {
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sub_forms/chiTietBangLuong.fxml"));
+            Parent root = loader.load();
+    
+            ChiTietBangLuongUI controller = loader.getController();
+            controller.setBangLuong(bangLuong);
+    
+            // Tạo và hiển thị dialog
+            Stage stage = JavaFXUtils.createDialog("Chi tiết bảng lương: " + bangLuong.getMaBangLuong(), root, "/icons/view.png");
+            stage.showAndWait();
+            // Không cần tải lại dữ liệu ở đây vì chỉ xem
+        } catch (Exception e) {
+            MessageUtils.showErrorMessage("Lỗi hiển thị chi tiết bảng lương!");
+            e.printStackTrace();
+        }
+    }
 
     public void hienThiDanhSachBangLuong(List<BangLuongDTO> danhSachBangLuong) {
         bangLuongList.clear();
@@ -251,7 +295,6 @@ public class BangLuongUI {
         tableViewBangLuong.setItems(duLieuTrang);
     }
     
-
     @FXML
     private void taoBangLuong() {
         // Vô hiệu hóa UI tạm thời
@@ -290,6 +333,7 @@ public class BangLuongUI {
 
         new Thread(task).start();
     }
+    
     @FXML
     private void loc(){
         String thang = thangCombobox.getValue();

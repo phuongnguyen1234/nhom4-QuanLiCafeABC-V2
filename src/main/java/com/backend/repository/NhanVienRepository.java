@@ -1,8 +1,7 @@
 package com.backend.repository;
 
-import java.util.Optional;
-
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +21,6 @@ public interface NhanVienRepository extends JpaRepository<NhanVien, String> {
 
     // Thêm phương thức để tìm nhân viên theo tên (không phân biệt hoa thường)
     List<NhanVien> findByHoTenContainingIgnoreCase(String hoTen);
+
+    List<NhanVien> findByViTriAndTrangThaiHoatDong(String viTri, String trangThaiHoatDong);
 }

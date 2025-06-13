@@ -27,12 +27,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -105,20 +103,6 @@ public class ChiTietDoanhThuUI {
             }
             return new javafx.beans.property.SimpleStringProperty("");
         });
-        // Bỏ setCellFactory tùy chỉnh nếu setCellValueFactory đã đủ
-        /*
-        colThoiGian.setCellFactory(column -> new TableCell<DoanhThu, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) { // Kiểu của item là String do PropertyValueFactory<DoanhThu, String>
-                super.updateItem(item, empty);
-                if (empty || item == null) { // Kiểm tra item (giá trị từ cellValueFactory)
-                    setText(null);
-                } else {
-                    setText(item);
-                }
-            }
-        });
-        */
 
         colSoDon.setCellValueFactory(new PropertyValueFactory<>("soDon"));
         colSoMon.setCellValueFactory(new PropertyValueFactory<>("soMon"));

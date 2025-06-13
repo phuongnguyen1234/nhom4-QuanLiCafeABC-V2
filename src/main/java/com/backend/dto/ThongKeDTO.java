@@ -77,27 +77,35 @@ public class ThongKeDTO {
     public void setSoMon(int soMon) {
         this.soMon = soMon;
     }
+
     public Map<String, Integer> getTop5MonBanChay() {
         return top5MonBanChay;
     }
+
     public void setTop5MonBanChay(Map<String, Integer> top5MonBanChay) {
         this.top5MonBanChay = top5MonBanChay;
     }
+
     public Map<String, Integer> getTop3NhanVien() {
         return top3NhanVien;
     }
+
     public void setTop3NhanVien(Map<String, Integer> top3NhanVien) {
         this.top3NhanVien = top3NhanVien;
     }
+
     public Map<String, Integer> getKhoangThoiGianDatDonNhieuNhat() {
         return khoangThoiGianDatDonNhieuNhat;
     }
+
     public void setKhoangThoiGianDatDonNhieuNhat(Map<String, Integer> khoangThoiGianDatDonNhieuNhat) {
         this.khoangThoiGianDatDonNhieuNhat = khoangThoiGianDatDonNhieuNhat;
     }
+
     public Map<String, Integer> getDoanhThuTrongThoiGian() {
         return doanhThuTrongThoiGian;
     }
+    
     public void setDoanhThuTrongThoiGian(Map<String, Integer> doanhThuTrongThoiGian) {
         this.doanhThuTrongThoiGian = doanhThuTrongThoiGian;
     }

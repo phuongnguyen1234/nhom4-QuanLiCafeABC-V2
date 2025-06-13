@@ -71,6 +71,18 @@ public class PreviewExcelBaoCaoUI {
             column.setReorderable(false);
         });
 
+        colTongTien.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("%,d", item)); // thêm dấu phẩy phân tách 3 chữ số
+                }
+            }
+        });
+
         // Định dạng cột thời gian đặt hàng cho dễ đọc hơn
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         colThoiGianDat.setCellFactory(column -> new TableCell<DonHangDTO, LocalDateTime>() {
@@ -106,58 +118,61 @@ public class PreviewExcelBaoCaoUI {
 
         if (file != null) {
             try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-    XSSFSheet sheet = workbook.createSheet("BaoCao");
-    int rowNum = 0;
+                XSSFSheet sheet = workbook.createSheet("BaoCao");
+                int rowNum = 0;
 
-    // Header của bảng chi tiết
-    Row headerRow = sheet.createRow(rowNum++);
-    String[] headers = {"STT", "Mã đơn hàng", "Nhân viên tạo đơn", "Thời gian Đặt hàng", "Tổng tiền (VND)"};
-    for (int i = 0; i < headers.length; i++) {
-        headerRow.createCell(i).setCellValue(headers[i]);
-    }
-    int stt = 1;
-    for (DonHangDTO donHang : danhSachDonHangToExport) {
-        Row row = sheet.createRow(rowNum++);
-        row.createCell(0).setCellValue(stt++);
-        row.createCell(1).setCellValue(donHang.getMaDonHang());
-        row.createCell(2).setCellValue(donHang.getHoTen());
-        row.createCell(3).setCellValue(
-            donHang.getThoiGianDatHang() != null ? donHang.getThoiGianDatHang().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : ""
-        );
-        row.createCell(4).setCellValue(donHang.getTongTien());
-    }
+                // Header của bảng chi tiết
+                Row headerRow = sheet.createRow(rowNum++);
+                String[] headers = {"STT", "Mã đơn hàng", "Nhân viên tạo đơn", "Thời gian Đặt hàng", "Tổng tiền (VND)"};
+                for (int i = 0; i < headers.length; i++) {
+                    headerRow.createCell(i).setCellValue(headers[i]);
+                }
+                int stt = 1;
+                for (DonHangDTO donHang : danhSachDonHangToExport) {
+                    Row row = sheet.createRow(rowNum++);
+                    row.createCell(0).setCellValue(stt++);
+                    row.createCell(1).setCellValue(donHang.getMaDonHang());
+                    row.createCell(2).setCellValue(donHang.getHoTen());
+                    row.createCell(3).setCellValue(
+                        donHang.getThoiGianDatHang() != null ? donHang.getThoiGianDatHang().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : ""
+                    );
+                    row.createCell(4).setCellValue(String.format("%,d", donHang.getTongTien()));
+                }
 
-    // Thêm một dòng trống để phân cách trước khi ghi thông tin tổng hợp
-    rowNum++;
+                // Thêm một dòng trống để phân cách trước khi ghi thông tin tổng hợp
+                rowNum++;
 
-    // Thêm thông tin tổng hợp vào cuối file
-    Row rowTongDoanhThu = sheet.createRow(rowNum++);
-    rowTongDoanhThu.createCell(0).setCellValue("Tổng doanh thu:");
-    rowTongDoanhThu.createCell(1).setCellValue(lblTongDoanhThu.getText()); // Lấy text từ Label
+                // Thêm thông tin tổng hợp vào cuối file
+                Row rowTongDoanhThu = sheet.createRow(rowNum++);
+                rowTongDoanhThu.createCell(0).setCellValue("Tổng doanh thu:");
+                rowTongDoanhThu.createCell(1).setCellValue(lblTongDoanhThu.getText()); // Lấy text từ Label
 
-    Row rowSoDon = sheet.createRow(rowNum++);
-    rowSoDon.createCell(0).setCellValue("Số đơn đã tạo:");
-    rowSoDon.createCell(1).setCellValue(lblSoDonDaTao.getText());
+                Row rowSoDon = sheet.createRow(rowNum++);
+                rowSoDon.createCell(0).setCellValue("Số đơn đã tạo:");
+                rowSoDon.createCell(1).setCellValue(lblSoDonDaTao.getText());
 
-    Row rowSoMon = sheet.createRow(rowNum++);
-    rowSoMon.createCell(0).setCellValue("Số món bán ra:");
-    rowSoMon.createCell(1).setCellValue(lblSoMonBanRa.getText());
-    
-    Row rowNguoiXuat = sheet.createRow(rowNum++);
-    rowNguoiXuat.createCell(0).setCellValue("Người xuất báo cáo:");
-    rowNguoiXuat.createCell(1).setCellValue(lblNguoiXuatBaoCao.getText());
+                Row rowSoMon = sheet.createRow(rowNum++);
+                rowSoMon.createCell(0).setCellValue("Số món bán ra:");
+                rowSoMon.createCell(1).setCellValue(lblSoMonBanRa.getText());
+                
+                Row rowNguoiXuat = sheet.createRow(rowNum++);
+                rowNguoiXuat.createCell(0).setCellValue("Người xuất báo cáo:");
+                rowNguoiXuat.createCell(1).setCellValue(lblNguoiXuatBaoCao.getText());
 
-    // Ghi ra file
-    try (FileOutputStream fileOut = new FileOutputStream(file)) {
-        workbook.write(fileOut);
-    }
+                // Ghi ra file
+                try (FileOutputStream fileOut = new FileOutputStream(file)) {
+                    workbook.write(fileOut);
+                } catch (IOException e) {
+                    MessageUtils.showErrorMessage("Lỗi khi ghi file Excel: " + e.getMessage());
+                    e.printStackTrace();
+                    return;
+                }
 
-    MessageUtils.showInfoMessage("Báo cáo đã được xuất thành công: " + file.getAbsolutePath());
-} catch (IOException e) {
-    MessageUtils.showErrorMessage("Lỗi khi xuất báo cáo: " + e.getMessage());
-    e.printStackTrace();
-}
-
+                MessageUtils.showInfoMessage("Báo cáo đã được xuất thành công: " + file.getAbsolutePath());
+            } catch (IOException e) {
+                MessageUtils.showErrorMessage("Lỗi khi xuất báo cáo: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 

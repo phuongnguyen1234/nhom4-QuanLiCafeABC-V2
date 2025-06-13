@@ -17,14 +17,11 @@ import com.backend.utils.PdfUtils; // Import lớp tiện ích mới
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections; // Import MonTrongDonDTO
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent; // Import FXCollections
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -88,7 +85,7 @@ public class ChiTietDonHangUI {
             return;
         }
 
-        tableChiTietDonHang.setPlaceholder(JavaFXUtils.createPlaceholder("Đang tải chi tiết đơn hàng...", "/icons/loading.png"));
+        tableChiTietDonHang.setPlaceholder(JavaFXUtils.createPlaceholder("Đang tải...", "/icons/loading.png"));
 
         Task<DonHangDTO> loadTask = new Task<>() {
             @Override

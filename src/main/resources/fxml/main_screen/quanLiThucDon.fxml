@@ -85,7 +85,7 @@
          </styleClass>
       </AnchorPane>
       <Separator layoutX="9.0" layoutY="161.0" prefHeight="15.0" prefWidth="1290.0" />
-      <Pagination fx:id="phanTrang" layoutX="515.0" layoutY="830.0" maxPageIndicatorCount="1" pageCount="1" prefHeight="60.0" prefWidth="271.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="515.0" AnchorPane.rightAnchor="514.0">
+      <Pagination fx:id="phanTrang" layoutX="515.0" layoutY="830.0" maxPageIndicatorCount="5" pageCount="5" prefHeight="60.0" prefWidth="271.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="515.0" AnchorPane.rightAnchor="514.0">
          <styleClass>
             <String fx:value="font-size-20" />
             <String fx:value="font-family" />

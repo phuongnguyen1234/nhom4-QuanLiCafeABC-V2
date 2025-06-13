@@ -21,4 +21,9 @@ public interface BangLuongService {
 
     // Lấy danh sách bảng lương theo tháng
     List<BangLuongDTO> layBangLuongTheoThang(YearMonth thang);
+
+    // Phương thức mới để tính lương khi có sự thay đổi từ thông tin nhân viên
+    int tinhToanLuongThucNhanChoCapNhat(String loaiNhanVien, int mucLuongMoi,
+                                        int ngayCongHienTai, int nghiKhongCongHienTai,
+                                        int gioLamThemHienTai, int thuongDoanhThuDaNhap);
 }

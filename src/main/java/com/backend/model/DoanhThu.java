@@ -128,5 +128,4 @@ public class DoanhThu {
     public void setThoiGianTongHopDoanhThu(LocalDateTime thoiGianTongHopDoanhThu) {
         this.thoiGianTongHopDoanhThu = thoiGianTongHopDoanhThu;
     }
-
 }

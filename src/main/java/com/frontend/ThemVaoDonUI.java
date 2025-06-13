@@ -4,9 +4,9 @@ import java.util.Objects;
 
 import com.backend.dto.MonTrongDonDTO;
 import com.backend.utils.ImageUtils;
+import com.backend.utils.MessageUtils;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
@@ -49,7 +49,7 @@ public class ThemVaoDonUI {
         tenMonText.setText("Tên: " + mon.getTenMon());
         // Sử dụng loadFromResourcesOrDefault với đường dẫn ảnh từ MonTrongDonDTO và một ảnh mặc định
         anhMinhHoaImageView.setImage(ImageUtils.loadFromResourcesOrDefault(mon.getAnhMinhHoa(), "/icons/loading.png"));
-        donGiaText.setText("Đơn giá: " + mon.getDonGia() + " VND");
+        donGiaText.setText("Đơn giá: " + String.format("%,d", mon.getDonGia()) + " VND");
         soLuongSpinner.getValueFactory().setValue(1);
         yeuCauKhacTextArea.setText(mon.getYeuCauKhac());
     }
@@ -62,12 +62,7 @@ public class ThemVaoDonUI {
         String yeuCauKhacMoi = yeuCauKhacTextArea.getText();
 
         if (soLuongMoiTuSpinner <= 0) {
-            // Hiển thị thông báo lỗi hoặc không làm gì cả nếu số lượng không hợp lệ
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Số lượng không hợp lệ");
-            alert.setHeaderText(null);
-            alert.setContentText("Số lượng món phải lớn hơn 0.");
-            alert.showAndWait();
+            MessageUtils.showErrorMessage("Số lượng món phải lớn hơn 0.");
             return; // Không đóng form, để người dùng sửa
         }
 
@@ -98,7 +93,6 @@ public class ThemVaoDonUI {
         Stage stage = (Stage) soLuongSpinner.getScene().getWindow();
         stage.close();
     }
-
 
     @FXML
     private void quayLai() {

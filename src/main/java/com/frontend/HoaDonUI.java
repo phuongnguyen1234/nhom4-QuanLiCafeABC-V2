@@ -196,6 +196,10 @@ public class HoaDonUI {
         // Set DatePicker to today's date and load orders for today
         LocalDate today = LocalDate.now();
         thoiGian.setValue(today);
+
+        // Thêm sự kiện cho TextField và DatePicker
+        timKiemTheoMaTextField.setOnAction(event -> timKiem());
+        thoiGian.setOnAction(event -> loc());
         loc(); // Call loc() to load orders for the selected date (today)
     }
 
@@ -296,16 +300,17 @@ public class HoaDonUI {
                         .GET()
                         .build();
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                if (response.statusCode() == 200) {
-                    return objectMapper.readValue(response.body(), new TypeReference<List<DonHangDTO>>() {});
-                } else if (response.statusCode() == 404) {
-Platform.runLater(() -> { // Bọc cập nhật UI trong Platform.runLater
-                        tableDonHang.setPlaceholder(JavaFXUtils.createPlaceholder("Không có dữ liệu", "/icons/no-data.png"));
-                    });                    // Trả về danh sách rỗng để setDuLieuDonHangTable xử lý placeholder
-                    return new ArrayList<>();
-                } 
-                else {
-                    throw new IOException("Lỗi khi lọc đơn hàng: " + response.statusCode() + " - " + response.body());
+                switch (response.statusCode()) {
+                    case 200 -> {
+                        return objectMapper.readValue(response.body(), new TypeReference<List<DonHangDTO>>() {});
+                    }
+                    case 404 -> {
+                        Platform.runLater(() -> { // Bọc cập nhật UI trong Platform.runLater
+                            tableDonHang.setPlaceholder(JavaFXUtils.createPlaceholder("Không có dữ liệu", "/icons/no-data.png"));
+                        });                    // Trả về danh sách rỗng để setDuLieuDonHangTable xử lý placeholder
+                        return new ArrayList<>();
+                    }
+                    default -> throw new IOException("Lỗi khi lọc đơn hàng: " + response.statusCode() + " - " + response.body());
                 }
             }
         };
@@ -348,12 +353,8 @@ Platform.runLater(() -> { // Bọc cập nhật UI trong Platform.runLater
             xuatBaoCaoController.setData(dataToReport, filterDate, this.currentUser);
 
             // Hiển thị màn hình mới
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Xem trước và Xuất Báo Cáo");
-            stage.setScene(new Scene(root));
-            stage.setResizable(false);
-            stage.show();
+            Stage stage = JavaFXUtils.createDialog("Xuất báo cáo", root, null);
+            stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
             MessageUtils.showErrorMessage("Có lỗi xảy ra khi mở giao diện xuất báo cáo.");

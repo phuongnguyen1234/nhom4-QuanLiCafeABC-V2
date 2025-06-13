@@ -74,7 +74,7 @@ public class QuanLiThucDonUI {
 
     // phan trang
     private static final int ROWS_PER_PAGE = 50;
-    private List<MonDTO> allMonList = new ArrayList<>(); // Danh sách chứa tất cả món, không bị thay đổi bởi tìm kiếm
+    private final List<MonDTO> allMonList = new ArrayList<>(); // Danh sách chứa tất cả món, không bị thay đổi bởi tìm kiếm
     private List<MonDTO> danhSachGoc = new ArrayList<>(); // Danh sách hiện tại để hiển thị và phân trang (sẽ trỏ tới allMonList hoặc kết quả lọc)
 
     public void setTrangChuUI(TrangChuUI trangChuUI) {

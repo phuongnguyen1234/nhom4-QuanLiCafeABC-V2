@@ -290,25 +290,27 @@ public class ChinhSuaMonTrongThucDonUI {
             @Override
             protected Void call() throws Exception {
                 try {
-                    String json = objectMapper.writeValueAsString(mon);
+                    String jsonPayload = objectMapper.writeValueAsString(mon);
+                    // System.out.println("JSON gửi đi để cập nhật món: " + jsonPayload); // Debug
 
                     HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:8080/mon/" + mon.getMaMon()))
-                        .method("PATCH", HttpRequest.BodyPublishers.ofString(json))
+                        .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonPayload))
                         .header("Content-Type", "application/json")
                         .build();
 
-                    //lay string JSON gui di
-                    System.out.println("JSON gửi đi: " + json);
                     HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-                    if (response.statusCode() != 200) {
-                        System.err.println("Lỗi cập nhật: " + response.statusCode());
-                        System.err.println("Phản hồi: " + response.body());
+                    if (response.statusCode() >= 300) { // Check for any error status code
+                        String errorMessage = response.body();
+                        // Nếu body rỗng hoặc null, cung cấp một thông báo mặc định
+                        if (errorMessage == null || errorMessage.trim().isEmpty()) {
+                            errorMessage = "Lỗi không xác định từ máy chủ. Mã trạng thái: " + response.statusCode();
+                        }
+                        throw new IOException(errorMessage);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    throw new RuntimeException("Lỗi khi gửi PATCH request: " + e.getMessage());
                 }
                 return null;
             }

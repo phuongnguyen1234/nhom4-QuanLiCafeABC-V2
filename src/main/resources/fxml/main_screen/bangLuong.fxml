@@ -107,7 +107,7 @@
                     </columns>
                   </TableView>
       
-                  <Pagination fx:id="phanTrang" maxPageIndicatorCount="1" pageCount="1" prefHeight="64.0" prefWidth="1300.0">
+                  <Pagination fx:id="phanTrang" maxPageIndicatorCount="5" pageCount="5" prefHeight="64.0" prefWidth="1300.0">
                      <styleClass>
                         <String fx:value="font-family" />
                         <String fx:value="font-size-20" />

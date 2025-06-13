@@ -56,7 +56,7 @@ public class ChinhSuaDonUI {
             tenMonText.setText("Tên: " + mon.getTenMon());
             // Sử dụng loadFromResourcesOrDefault với đường dẫn ảnh từ MonTrongDonDTO và một ảnh mặc định
             anhMinhHoaImageView.setImage(ImageUtils.loadFromResourcesOrDefault(mon.getAnhMinhHoa(), "/icons/loading.png"));
-            donGiaText.setText("Đơn giá: " + mon.getDonGia() + " VND");
+            donGiaText.setText("Đơn giá: " + String.format("%,d", mon.getDonGia()) + " VND");
             soLuongSpinner.getValueFactory().setValue(mon.getSoLuong());
             yeuCauKhacTextArea.setText(mon.getYeuCauKhac());
         }

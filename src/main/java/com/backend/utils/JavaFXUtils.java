@@ -5,9 +5,12 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -86,5 +89,56 @@ public class JavaFXUtils {
             }
         });
     }
-    
+
+    private static final Image VIEW_ICON;
+    private static final Image HIDE_ICON;
+
+    static {
+        Image view = null;
+        Image hide = null;
+        try {
+            // Đảm bảo đường dẫn chính xác khi sử dụng getResourceAsStream
+            view = new Image(JavaFXUtils.class.getResourceAsStream("/icons/view.png"));
+            hide = new Image(JavaFXUtils.class.getResourceAsStream("/icons/hide.png"));
+        } catch (Exception e) {
+            System.err.println("LỖI NGHIÊM TRỌNG: Không thể tải icon ẩn/hiện mật khẩu trong JavaFXUtils. " + e.getMessage());
+            // Cân nhắc việc ném một RuntimeException ở đây nếu các icon này là thiết yếu
+        }
+        VIEW_ICON = view;
+        HIDE_ICON = hide;
+    }
+
+    public static boolean togglePasswordVisibility(boolean currentVisibility, TextField matKhauTextField, PasswordField matKhauPWField, Hyperlink xemMKHyperlink) {
+        boolean newVisibility = !currentVisibility;
+
+        // Thiết lập thuộc tính hiển thị và quản lý dựa trên newVisibility
+        matKhauTextField.setVisible(newVisibility);
+        matKhauTextField.setManaged(newVisibility);
+        matKhauPWField.setVisible(!newVisibility);
+        matKhauPWField.setManaged(!newVisibility);
+
+        Node graphic = xemMKHyperlink.getGraphic();
+        if (graphic instanceof ImageView iconImageView) {
+        if (newVisibility) {
+                // Mật khẩu SẼ được hiển thị (trong TextField)
+            matKhauTextField.setText(matKhauPWField.getText());
+                if (HIDE_ICON != null) {
+                    iconImageView.setImage(HIDE_ICON);
+                } else {
+                    System.err.println("Lỗi: HIDE_ICON chưa được tải trong JavaFXUtils.");
+            }
+        } else {
+                // Mật khẩu SẼ được ẩn (trong PasswordField)
+            matKhauPWField.setText(matKhauTextField.getText());
+                if (VIEW_ICON != null) {
+                    iconImageView.setImage(VIEW_ICON);
+                } else {
+                    System.err.println("Lỗi: VIEW_ICON chưa được tải trong JavaFXUtils.");
+            }
+        }
+        } else {
+            System.err.println("Cảnh báo: Hyperlink để ẩn/hiện mật khẩu không có ImageView làm graphic. Icon sẽ không thay đổi. ID: " + xemMKHyperlink.getId());
+        }
+        return newVisibility; // Trả về trạng thái mới
+    }
 }

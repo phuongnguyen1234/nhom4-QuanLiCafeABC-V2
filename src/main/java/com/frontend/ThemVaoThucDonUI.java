@@ -20,7 +20,6 @@ import com.backend.utils.HttpUtils;
 import com.backend.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -30,7 +29,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.concurrent.Task;
 import java.util.UUID;
 
@@ -84,14 +82,6 @@ public class ThemVaoThucDonUI {
                 }
             });
 
-            // Khi người dùng chọn danh mục, bạn có thể lấy mã danh mục
-            danhMucCombobox.setOnAction(event -> {
-                DanhMucKhongMonDTO selectedDanhMuc = danhMucCombobox.getSelectionModel().getSelectedItem();
-                if (selectedDanhMuc != null) {
-                    int maDanhMuc = selectedDanhMuc.getMaDanhMuc();
-                }
-            });
-
             Task<List<DanhMucKhongMonDTO>> loadDanhMucTask = new Task<>() {
                 @Override
                 protected List<DanhMucKhongMonDTO> call() throws Exception {
@@ -128,104 +118,102 @@ public class ThemVaoThucDonUI {
     }
 
     @FXML
-public void themVaoThucDon() {
-    if (mon == null) {
-        mon = new MonDTO();
-    }
+    public void themVaoThucDon() {
+        if (mon == null) {
+            mon = new MonDTO();
+        }
 
-    int donGia = 0;
+        int donGia = 0;
 
-    // Kiểm tra đầu vào
-    if (tenMonTextField.getText().isEmpty()) {
-        MessageUtils.showErrorMessage("Tên món không được để trống!");
-        return;
-    }
-
-    try {
-        donGia = Integer.parseInt(donGiaTextField.getText());
-        if (donGia <= 0) {
-            MessageUtils.showErrorMessage("Đơn giá phải lớn hơn 0!");
+        // Kiểm tra đầu vào
+        if (tenMonTextField.getText().isEmpty()) {
+            MessageUtils.showErrorMessage("Tên món không được để trống!");
             return;
         }
-    } catch (NumberFormatException e) {
-        MessageUtils.showErrorMessage("Đơn giá phải là số hợp lệ!");
-        return;
-    }
 
-    if (danhMucCombobox.getValue() == null) {
-        MessageUtils.showErrorMessage("Vui lòng chọn danh mục!");
-        return;
-    }
-
-    // Xử lý ảnh minh họa: copy file và lưu đường dẫn
-    if (this.selectedImageFile == null) {
-        MessageUtils.showErrorMessage("Vui lòng chọn ảnh minh họa!");
-        return;
-    }
-
-    String originalFileName = selectedImageFile.getName();
-    String fileExtension = "";
-    int lastDotIndex = originalFileName.lastIndexOf('.');
-    if (lastDotIndex > 0 && lastDotIndex < originalFileName.length() - 1) {
-        fileExtension = originalFileName.substring(lastDotIndex); // e.g., .jpg, .png
-    }
-    // Tạo tên file duy nhất để tránh ghi đè
-    String newImageName = UUID.randomUUID().toString() + fileExtension;
-
-    Path targetDirectory = Paths.get("src/main/resources/images/mon");
-    try {
-        if (!Files.exists(targetDirectory)) {
-            Files.createDirectories(targetDirectory);
-        }
-        Path targetPath = targetDirectory.resolve(newImageName);
-        Files.copy(selectedImageFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-        mon.setAnhMinhHoa("/images/mon/" + newImageName); // Lưu đường dẫn tương đối cho resource loading
-        } catch (IOException e) {
-            e.printStackTrace();
-            MessageUtils.showErrorMessage("Lỗi khi lưu ảnh minh họa! " + e.getMessage());
+        try {
+            donGia = Integer.parseInt(donGiaTextField.getText());
+            if (donGia <= 0) {
+                MessageUtils.showErrorMessage("Đơn giá phải lớn hơn 0!");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            MessageUtils.showErrorMessage("Đơn giá phải là số hợp lệ!");
             return;
-    }
+        }
 
-    mon.setMaMon(null);
-    mon.setTenMon(tenMonTextField.getText());
-    mon.setDonGia(donGia);
-    mon.setTrangThai("Bán");
-    mon.setMaDanhMuc(danhMucCombobox.getValue().getMaDanhMuc());
+        if (danhMucCombobox.getValue() == null) {
+            MessageUtils.showErrorMessage("Vui lòng chọn danh mục!");
+            return;
+        }
 
-    // Disable form khi bắt đầu xử lý
-    mainAnchorPane.setDisable(true);
-    btnThemVaoThucDon.setDisable(true);
-    btnQuayLai.setDisable(true);
+        // Xử lý ảnh minh họa: copy file và lưu đường dẫn
+        if (this.selectedImageFile == null) {
+            MessageUtils.showErrorMessage("Vui lòng chọn ảnh minh họa!");
+            return;
+        }
 
-    Task<Void> requestTask = createRequest(mon);
+        String originalFileName = selectedImageFile.getName();
+        String fileExtension = "";
+        int lastDotIndex = originalFileName.lastIndexOf('.');
+        if (lastDotIndex > 0 && lastDotIndex < originalFileName.length() - 1) {
+            fileExtension = originalFileName.substring(lastDotIndex); // e.g., .jpg, .png
+        }
+        // Tạo tên file duy nhất để tránh ghi đè
+        String newImageName = UUID.randomUUID().toString() + fileExtension;
 
-    requestTask.setOnSucceeded(event -> {
-        MessageUtils.showInfoMessage("Thêm món thành công!");
-        this.dataChanged = true; // Đánh dấu dữ liệu đã thay đổi
-        btnThemVaoThucDon.setDisable(false);
-        btnQuayLai.setDisable(false);
-        tenMonTextField.getScene().getWindow().hide();
-    });
+        Path targetDirectory = Paths.get("src/main/resources/images/mon");
+        try {
+            if (!Files.exists(targetDirectory)) {
+                Files.createDirectories(targetDirectory);
+            }
+            Path targetPath = targetDirectory.resolve(newImageName);
+            Files.copy(selectedImageFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+            mon.setAnhMinhHoa("/images/mon/" + newImageName); // Lưu đường dẫn tương đối cho resource loading
+            } catch (IOException e) {
+                e.printStackTrace();
+                MessageUtils.showErrorMessage("Lỗi khi lưu ảnh minh họa! " + e.getMessage());
+                return;
+        }
 
-    requestTask.setOnFailed(event -> {
-        Throwable ex = requestTask.getException();
-        ex.printStackTrace();
-        MessageUtils.showErrorMessage("Lỗi khi thêm món: " + ex.getMessage());
-        mainAnchorPane.setDisable(false); // Enable lại nếu lỗi
-        btnThemVaoThucDon.setDisable(false);
-        btnQuayLai.setDisable(false);
-    });
+        mon.setMaMon(null);
+        mon.setTenMon(tenMonTextField.getText());
+        mon.setDonGia(donGia);
+        mon.setTrangThai("Bán");
+        mon.setMaDanhMuc(danhMucCombobox.getValue().getMaDanhMuc());
 
-    requestTask.setOnCancelled(e -> {
+        // Disable form khi bắt đầu xử lý
+        mainAnchorPane.setDisable(true);
+        btnThemVaoThucDon.setDisable(true);
+        btnQuayLai.setDisable(true);
+
+        Task<Void> requestTask = createRequest(mon);
+
+        requestTask.setOnSucceeded(event -> {
+            MessageUtils.showInfoMessage("Thêm món thành công!");
+            this.dataChanged = true; // Đánh dấu dữ liệu đã thay đổi
             btnThemVaoThucDon.setDisable(false);
             btnQuayLai.setDisable(false);
-            mainAnchorPane.setDisable(false); // Enable lại nếu bị hủy
+            tenMonTextField.getScene().getWindow().hide();
         });
 
-    new Thread(requestTask).start();
-}
+        requestTask.setOnFailed(event -> {
+            Throwable ex = requestTask.getException();
+            ex.printStackTrace();
+            MessageUtils.showErrorMessage("Lỗi khi thêm món: " + ex.getMessage());
+            mainAnchorPane.setDisable(false); // Enable lại nếu lỗi
+            btnThemVaoThucDon.setDisable(false);
+            btnQuayLai.setDisable(false);
+        });
 
+        requestTask.setOnCancelled(e -> {
+                btnThemVaoThucDon.setDisable(false);
+                btnQuayLai.setDisable(false);
+                mainAnchorPane.setDisable(false); // Enable lại nếu bị hủy
+            });
 
+        new Thread(requestTask).start();
+    }
 
     @FXML
     public void quayLai(){
@@ -264,27 +252,31 @@ public void themVaoThucDon() {
     }
 
     private Task<Void> createRequest(MonDTO mon) {
-    return new Task<>() {
-        @Override
-        protected Void call() throws Exception {
-            String json = objectMapper.writeValueAsString(mon);
-            System.out.println("JSON: " + json);
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:8080/mon"))
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .header("Content-Type", "application/json")
-                    .build();
+        return new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                String jsonPayload = objectMapper.writeValueAsString(mon);
+                // System.out.println("JSON gửi đi để tạo món: " + jsonPayload); // Debug
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:8080/mon"))
+                        .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                        .header("Content-Type", "application/json")
+                        .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() != 201 && response.statusCode() != 200) {
-                throw new RuntimeException("Lỗi khi tạo món. Mã trạng thái: " + response.statusCode());
+                if (response.statusCode() >= 300) { // Check for any error status code (3xx, 4xx, 5xx)
+                    String errorMessage = response.body(); 
+                    // Nếu body rỗng hoặc null, cung cấp một thông báo mặc định
+                    if (errorMessage == null || errorMessage.trim().isEmpty()) {
+                        errorMessage = "Lỗi không xác định từ máy chủ. Mã trạng thái: " + response.statusCode();
+                    }
+                    throw new IOException(errorMessage);
+                }
+                return null;
             }
-
-            return null;
-        }
-    };
-}
+        };
+    }
 
     public boolean isDataChanged() {
         return dataChanged;
