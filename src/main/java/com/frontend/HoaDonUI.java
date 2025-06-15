@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import com.backend.dto.DonHangDTO;
 import com.backend.dto.DonHangSummaryDTO;
 import com.backend.dto.NhanVienDTO;
-import com.backend.model.DonHang;
 import com.backend.quanlicapheabc.QuanlicapheabcApplication;
 import com.backend.utils.DTOConversion;
 import com.backend.utils.JavaFXUtils;
@@ -32,14 +31,10 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -47,8 +42,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Font;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class HoaDonUI {
@@ -93,6 +86,7 @@ public class HoaDonUI {
     // Danh sách gốc chứa DonHangDTO chi tiết
     private final ObservableList<DonHangDTO> donHangList = FXCollections.observableArrayList();
     private NhanVienDTO currentUser;
+    private boolean isCurrentDisplayFromIdSearch = false; // Theo dõi nguồn gốc dữ liệu hiển thị
 
     // Phương thức để TrangChuUI truyền NhanVienDTO vào
     public void setCurrentUser(NhanVienDTO user) {
@@ -213,10 +207,8 @@ public class HoaDonUI {
         // Cập nhật placeholder và trạng thái nút Xuất báo cáo
         if (summariesForPage.isEmpty() && this.donHangList.isEmpty()) { // Kiểm tra cả danh sách gốc
             tableDonHang.setPlaceholder(JavaFXUtils.createPlaceholder("Không có dữ liệu.", "/icons/sad.png"));
-            btnXuatBaoCao.setDisable(true);
         } else {
             tableDonHang.setPlaceholder(null); // Xóa placeholder khi có dữ liệu
-            btnXuatBaoCao.setDisable(false);
         }
         tableDonHang.setItems(FXCollections.observableArrayList(summariesForPage));
     }
@@ -224,24 +216,25 @@ public class HoaDonUI {
     @FXML
     void timKiem() {
         String maDonHang = timKiemTheoMaTextField.getText().trim();
+
+        if (maDonHang.isEmpty()) {
+            // Nếu ô tìm kiếm trống, không làm gì cả.
+            // Trạng thái của isCurrentDisplayFromIdSearch và nút xuất báo cáo sẽ không thay đổi.
+            // Bảng sẽ tiếp tục hiển thị dữ liệu từ lần lọc/tìm kiếm trước đó.
+            return; // Không thực hiện task tìm kiếm theo mã nữa
+        }
+
         disableItems(true);
 
         // Task will return the HttpResponse to handle different status codes in onSucceeded
         Task<HttpResponse<String>> task = new Task<>() {
             @Override
             protected HttpResponse<String> call() throws Exception {
-                if (maDonHang.isEmpty()) {
-                    // Nếu ô tìm kiếm trống, tải lại toàn bộ danh sách DTO
-                    List<DonHangDTO> allDTOs = layTatCaDonHangDTO();
-                    Platform.runLater(() -> setDuLieuDonHangTable(allDTOs));
-                    return null; // Trả về null vì đã xử lý cập nhật UI bên trong
-                }
+                // Logic tìm kiếm theo mã đã được chuyển ra ngoài điều kiện if (maDonHang.isEmpty())
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(new URI("http://localhost:8080/don-hang/" + maDonHang))
                         .GET()
                         .build();
-
-                // Send the request and return the response
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
                 return response;
             }
@@ -249,34 +242,37 @@ public class HoaDonUI {
 
         task.setOnSucceeded(event -> {
             HttpResponse<String> response = task.getValue();
-            if (response == null) {
-                // Case: search field was empty, UI already updated in call()
-            } else {
-                if (response.statusCode() == 200) {
-                    try {
-                        // Giả định endpoint trả về DonHangDTO
-                        DonHangDTO foundDonHangDTO = objectMapper.readValue(response.body(), DonHangDTO.class);
-                        setDuLieuDonHangTable(List.of(foundDonHangDTO)); 
-                    } catch (IOException e) {
-                        MessageUtils.showErrorMessage("Lỗi xử lý dữ liệu đơn hàng: " + e.getMessage());
-                        e.printStackTrace();
-                    }
-                } else if (response.statusCode() == 404) {
-                    tableDonHang.setPlaceholder(JavaFXUtils.createPlaceholder("Không có dữ liệu", "/icons/no-data.png"));
-                    // Nếu không tìm thấy, coi như danh sách rỗng
+            // response sẽ không bao giờ là null ở đây do logic mới
+            if (response.statusCode() == 200) {
+                try {
+                    DonHangDTO foundDonHangDTO = objectMapper.readValue(response.body(), DonHangDTO.class);
+                    setDuLieuDonHangTable(List.of(foundDonHangDTO));
+                    isCurrentDisplayFromIdSearch = true;
+                } catch (IOException e) {
+                    MessageUtils.showErrorMessage("Lỗi xử lý dữ liệu đơn hàng: " + e.getMessage());
+                    e.printStackTrace();
                     setDuLieuDonHangTable(FXCollections.emptyObservableList());
-                } else {
-                    setDuLieuDonHangTable(FXCollections.emptyObservableList()); // Xử lý các lỗi khác bằng cách hiển thị bảng rỗng
+                    isCurrentDisplayFromIdSearch = true; // Vẫn là ngữ cảnh tìm theo ID
                 }
+            } else if (response.statusCode() == 404) {
+                tableDonHang.setPlaceholder(JavaFXUtils.createPlaceholder("Không có dữ liệu", "/icons/no-data.png"));
+                setDuLieuDonHangTable(FXCollections.emptyObservableList());
+                isCurrentDisplayFromIdSearch = true; // Ngữ cảnh tìm theo ID, không có kết quả
+            } else {
+                MessageUtils.showErrorMessage("Lỗi máy chủ: " + response.statusCode());
+                setDuLieuDonHangTable(FXCollections.emptyObservableList());
+                isCurrentDisplayFromIdSearch = true; // Lỗi trong ngữ cảnh tìm theo ID
             }
-            // Nếu foundDonHang là null, UI đã được cập nhật trong call() (khi search trống) hoặc thông báo 404 đã hiển thị
             disableItems(false);
+            updateXuatBaoCaoButtonState();
         });
 
         task.setOnFailed(event -> {
             disableItems(false);
-            MessageUtils.showErrorMessage("Lỗi khi tìm kiếm đơn hàng: " + task.getException().getMessage()); // Error message from the exception
+            MessageUtils.showErrorMessage("Lỗi khi tìm kiếm đơn hàng: " + task.getException().getMessage());
             task.getException().printStackTrace();
+            isCurrentDisplayFromIdSearch = true; // Lỗi xảy ra trong quá trình tìm kiếm theo ID
+            updateXuatBaoCaoButtonState();
         });
 
         new Thread(task).start();
@@ -317,15 +313,19 @@ public class HoaDonUI {
 
         task.setOnSucceeded(event -> {
             setDuLieuDonHangTable(task.getValue()); 
+            isCurrentDisplayFromIdSearch = false; // Dữ liệu được tải theo ngày
             disableItems(false);
+            updateXuatBaoCaoButtonState();
         });
 
         task.setOnFailed(event -> {
             disableItems(false);
+            // Ngay cả khi lỗi, đây không phải là kết quả tìm theo ID
+            isCurrentDisplayFromIdSearch = false;
             MessageUtils.showErrorMessage("Lỗi khi lọc đơn hàng: " + task.getException().getMessage());
             task.getException().printStackTrace();
+            updateXuatBaoCaoButtonState();
         });
-
         new Thread(task).start();
     }
 
@@ -374,11 +374,10 @@ public class HoaDonUI {
 
         if (danhSachDonHangDTO.isEmpty()) {
             tableDonHang.setPlaceholder(JavaFXUtils.createPlaceholder("Không có dữ liệu.", "/icons/sad.png"));
-            btnXuatBaoCao.setDisable(true);
         } else {
             tableDonHang.setPlaceholder(null);
-            btnXuatBaoCao.setDisable(false);
         }
+        updateXuatBaoCaoButtonState();
     }
 
     public void hienThiChiTietDonHang(DonHangSummaryDTO donHangSummary){ 
@@ -412,9 +411,23 @@ public class HoaDonUI {
                 thoiGian.setDisable(value);
                 tableDonHang.setDisable(value); // Disable table view
                 phanTrang.setDisable(value);
-                btnXuatBaoCao.setDisable(value || this.donHangList.isEmpty()); // Nút xuất báo cáo cũng bị disable nếu đang load hoặc list rỗng
+                if (value) {
+                    btnXuatBaoCao.setDisable(true);
+                } else {
+                    updateXuatBaoCaoButtonState();
+                }
             }
         });
+    }
+
+    private void updateXuatBaoCaoButtonState() {
+        boolean hasData = !this.donHangList.isEmpty();
+
+        if (isCurrentDisplayFromIdSearch) {
+            btnXuatBaoCao.setDisable(true);
+        } else {
+            btnXuatBaoCao.setDisable(!hasData); // Chỉ cho phép xuất nếu có dữ liệu và không phải là kết quả tìm theo ID
+        }
     }
 
     // Đổi tên và kiểu trả về để lấy List<DonHangDTO>

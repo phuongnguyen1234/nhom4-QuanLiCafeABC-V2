@@ -27,7 +27,7 @@ public class NhapEmailUI {
 
     @FXML private TextField emailField;
     @FXML private Button btnGuiOtp;
-    @FXML private Button btnQuayLaiNhapEmail;
+    @FXML private Button btnQuayLaiNhapEmail, btnQuayLai;
     @FXML private Pane rootPaneNhapEmail; 
 
     private final HttpClient client = HttpClient.newBuilder()
@@ -86,7 +86,8 @@ public class NhapEmailUI {
             MessageUtils.showInfoMessage(responseMap.getOrDefault("message", "Yêu cầu đã được xử lý. Vui lòng kiểm tra email."));
             
             openNhapOTPDialog(email);
-            closeDialog();
+            // Đóng dialog Nhập Email sau khi dialog Nhập OTP đã được yêu cầu mở
+            closeDialog(); 
         });
 
         task.setOnFailed(e -> {
@@ -109,7 +110,8 @@ public class NhapEmailUI {
             controller.setEmailDaNhap(email); // Truyền email sang dialog nhập OTP
 
             Stage stage = JavaFXUtils.createDialog("Nhập mã OTP", root, null);
-            stage.showAndWait();
+            stage.show(); // Thay đổi từ showAndWait() sang show()
+            // Không cần closeDialog() ở đây vì nó sẽ được gọi trong handleGuiOtp
         } catch (Exception ex) {
             ex.printStackTrace();
             MessageUtils.showErrorMessage("Không thể mở form nhập OTP.");
@@ -119,5 +121,10 @@ public class NhapEmailUI {
     private void closeDialog() {
         Stage stage = (Stage) rootPaneNhapEmail.getScene().getWindow();
         stage.close();
+    }
+
+    @FXML
+    private void quayLai(){
+        closeDialog();
     }
 }

@@ -32,7 +32,7 @@ public class DatLaiMatKhauUI {
     @FXML private TextField xacNhanMKMoiTextField; // Khớp FXML
     @FXML private Hyperlink xemXacNhanMKMoiHyperlink; // Khớp FXML
 
-    @FXML private Button btnDatLaiMatKhau; // Khớp FXML
+    @FXML private Button btnDatLaiMatKhau, btnHuyBo; // Khớp FXML
     // @FXML private Button btnQuayLaiDatLai; // FXML không có nút này, có thể thêm
     @FXML private Pane rootPaneDatLai; // Giả sử AnchorPane là rootPaneDatLai
 
@@ -152,5 +152,10 @@ public class DatLaiMatKhauUI {
     private void closeDialog() {
         Stage stage = (Stage) rootPaneDatLai.getScene().getWindow();
         stage.close();
+    }
+
+    @FXML
+    private void huyBo(){
+        closeDialog();
     }
 }

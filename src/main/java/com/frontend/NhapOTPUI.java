@@ -2,6 +2,7 @@ package com.frontend;
 
 import com.backend.utils.JavaFXUtils;
 import com.backend.utils.MessageUtils;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,7 +14,7 @@ import javafx.stage.Stage;
 public class NhapOTPUI {
 
     @FXML private TextField maOTPTextField; // Khớp với FXML
-    @FXML private Button btnXacNhanMaOTP; // Khớp với FXML
+    @FXML private Button btnXacNhanMaOTP, btnHuyBo; // Khớp với FXML
     @FXML private Pane rootPaneNhapOtp; 
 
     private String emailNhanDuoc;
@@ -29,8 +30,8 @@ public class NhapOTPUI {
             MessageUtils.showErrorMessage("Mã OTP không hợp lệ. Vui lòng nhập 6 chữ số.");
             return;
         }
-        openDatLaiMatKhauDialog(emailNhanDuoc, otp);
-        closeDialog();
+        openDatLaiMatKhauDialog(emailNhanDuoc, otp); 
+        closeDialog(); // Đóng dialog Nhập OTP sau khi dialog Đặt lại mật khẩu đã được yêu cầu mở
     }
 
     private void openDatLaiMatKhauDialog(String email, String otp) {
@@ -42,7 +43,8 @@ public class NhapOTPUI {
             controller.setDataFromOtpScreen(email, otp); // Truyền email và OTP
 
             Stage stage = JavaFXUtils.createDialog("Đặt lại mật khẩu", root, null);
-            stage.showAndWait();
+            stage.show(); // Thay đổi từ showAndWait() sang show()
+            // Không cần closeDialog() ở đây vì nó sẽ được gọi trong xacNhanMaOTP
         } catch (Exception ex) {
             ex.printStackTrace();
             MessageUtils.showErrorMessage("Không thể mở form đặt lại mật khẩu.");
@@ -52,5 +54,10 @@ public class NhapOTPUI {
     private void closeDialog() {
         Stage stage = (Stage) rootPaneNhapOtp.getScene().getWindow();
         stage.close();
+    }
+
+    @FXML
+    private void huyBo(){
+        closeDialog();
     }
 }

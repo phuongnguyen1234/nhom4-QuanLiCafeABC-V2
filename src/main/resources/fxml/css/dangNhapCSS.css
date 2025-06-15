@@ -59,3 +59,14 @@
     -fx-font-size: 20px;
     -fx-padding: 0 10px 0 10px;
 }
+
+.email-field{
+    -fx-background-color: transparent;
+    -fx-border-color:linear-gradient(to bottom right, #0f6789, #286155);
+    -fx-border-width: 0 0 0.8px 0;
+    -fx-font-family: "Open Sans";
+    -fx-font-size: 14px;
+    -fx-padding: 0 10px 0 10px;
+}
+
+
