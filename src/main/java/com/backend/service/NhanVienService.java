@@ -42,4 +42,5 @@ public interface NhanVienService {
      * @throws org.springframework.security.core.userdetails.UsernameNotFoundException nếu email không tồn tại.
      */
     boolean completePasswordReset(String email, String otp, String newPassword);
+    boolean verifyOtpForPasswordReset(String email, String otp);
 }

@@ -69,4 +69,15 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Lỗi hệ thống khi đặt lại mật khẩu."));
         }
     }
+
+    @PostMapping("/verify-otp")
+public ResponseEntity<?> verifyOtp(@RequestBody Map<String, String> payload) {
+    String email = payload.get("email");
+    String otp = payload.get("otp");
+    if (email == null || otp == null) {
+        return ResponseEntity.badRequest().body(Map.of("message", "Email và OTP là bắt buộc."));
+    }
+    boolean isValid = nhanVienService.verifyOtpForPasswordReset(email, otp);
+    return ResponseEntity.ok(isValid); // Trả về true hoặc false dưới dạng text
+}
 }

@@ -233,6 +233,33 @@ public class NhanVienServiceImpl implements NhanVienService {
     }
 
     @Override
+    @Transactional(readOnly = true) // Chỉ đọc từ cache, không thay đổi DB trực tiếp ở bước này
+    public boolean verifyOtpForPasswordReset(String email, String otp) {
+        Cache.ValueWrapper valueWrapper = otpCache.get(email);
+        if (valueWrapper == null || valueWrapper.get() == null) {
+            // OTP không tồn tại trong cache cho email này
+            return false;
+        }
+
+        OtpData storedOtpData = (OtpData) valueWrapper.get();
+
+        // Kiểm tra OTP hết hạn
+        if (storedOtpData.expiryTime.isBefore(LocalDateTime.now())) {
+            otpCache.evict(email); // Xóa OTP hết hạn khỏi cache
+            return false; // OTP đã hết hạn
+        }
+
+        if (!storedOtpData.otp.equals(otp)) {
+            return false; // OTP không khớp
+        }
+
+        // OTP hợp lệ và còn hạn.
+        // Quan trọng: KHÔNG xóa OTP khỏi cache ở bước này.
+        // OTP sẽ được xóa sau khi mật khẩu được đặt lại thành công trong `completePasswordReset`.
+        return true;
+    }
+
+    @Override
     @Transactional // Cần transactional để cập nhật mật khẩu vào DB
     public boolean completePasswordReset(String email, String otp, String newPassword) {
         NhanVien nhanVien = nhanVienRepository.findByEmail(email)
@@ -285,4 +312,6 @@ public class NhanVienServiceImpl implements NhanVienService {
                 bangLuongRepository.save(bangLuong);
             });
     }
+
+    
 }

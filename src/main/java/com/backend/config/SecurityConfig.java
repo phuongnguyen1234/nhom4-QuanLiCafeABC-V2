@@ -46,7 +46,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .addFilterBefore(jsonToFormLoginParameterFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/auth/login", "/auth/forgot-password", "/auth/reset-password", "/public/**", "/error").permitAll() // Cho phép truy cập không cần xác thực
+                .requestMatchers("/auth/**", "/public/**", "/error").permitAll() // Cho phép truy cập không cần xác thực
                 .requestMatchers("/nhan-vien/**", "/bang-luong/**", "/doanh-thu/**").hasRole("CHU_QUAN")
                 .requestMatchers("/danh-muc/**", "/mon/**", "/don-hang/**").hasAnyRole("THU_NGAN", "CHU_QUAN") // Thu ngân hoặc chủ quán có thể đặt hàng
                 .anyRequest().authenticated() // Các request khác cần xác thực
