@@ -242,6 +242,12 @@ public class QuanLiThucDonUI {
 
         this.danhSachGoc = ketQua; // danhSachGoc bây giờ là kết quả đã lọc
         setupPagination();
+
+        if (ketQua.isEmpty()) {
+            tableViewMon.setPlaceholder(JavaFXUtils.createPlaceholder("Không có món nào có tên " + tenMon + ".", "/icons/no-data.png"));
+        } else {
+            tableViewMon.setPlaceholder(JavaFXUtils.createPlaceholder("Đang tải...", "/icons/loading.png")); // Xóa placeholder nếu có kết quả
+        }
     }
 
     private void capNhatTrang(int pageIndex) {

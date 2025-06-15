@@ -275,7 +275,7 @@ public class BangLuongUI {
         if (bangLuongList.isEmpty()) {
             tableViewBangLuong.setPlaceholder(JavaFXUtils.createPlaceholder("Không có dữ liệu", "/icons/no-data.png"));
         } else {
-            tableViewBangLuong.setPlaceholder(null); // Xóa placeholder khi có dữ liệu
+            tableViewBangLuong.setPlaceholder(JavaFXUtils.createPlaceholder("Đang tải...", "/icons/loading.png")); // Xóa placeholder khi có dữ liệu
         }
         int soTrang = (int) Math.ceil((double) danhSachBangLuong.size() / SO_DONG_MOI_TRANG);
         phanTrang.setPageCount(soTrang);
